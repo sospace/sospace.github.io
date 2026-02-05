@@ -3,23 +3,23 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <meta name="author" content="2607 高原兔">
-    <meta name="copyright" content="© 2026 2607 高原兔 版权所有">
-    <title>管理助手 | 2607 高原兔</title>
+    <meta name="author" content="兔弟">
+    <meta name="copyright" content="© 2026 2607全民代表大会 版权所有">
+    <title>管理助手 | 2607全民代表大会</title>
     <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><defs><linearGradient id='g' x1='0%25' y1='0%25' x2='100%25' y2='100%25'><stop offset='0%25' style='stop-color:%2300d4ff'/><stop offset='100%25' style='stop-color:%230066cc'/></linearGradient></defs><circle cx='50' cy='50' r='45' fill='url(%23g)'/><ellipse cx='50' cy='50' rx='45' ry='18' fill='none' stroke='%23fff' stroke-width='2' opacity='0.6'/><ellipse cx='50' cy='50' rx='18' ry='45' fill='none' stroke='%23fff' stroke-width='2' opacity='0.6'/><path d='M10 35 Q50 25 90 35' fill='none' stroke='%234ecca3' stroke-width='3' opacity='0.8'/><path d='M10 65 Q50 75 90 65' fill='none' stroke='%234ecca3' stroke-width='3' opacity='0.8'/></svg>">
     <style>
         /* 
          * ============================================
-         * 管理助手 - 旗堡坑矿布局工具
-         * © 2026 2607 高原兔 版权所有
-         * 未经授权禁止复制、修改或分发
+         * 管理助手 - 地图设计布局工具
+         * © 2026 2607全民代表大会 版权所有
+         * 技术支持：兔弟 | 未经授权禁止复制、修改或分发
          * ============================================
          */
         * { margin: 0; padding: 0; box-sizing: border-box; user-select: none; -webkit-user-select: none; }
         html, body { height: 100%; overflow: hidden; touch-action: none; }
         body {
             font-family: 'Microsoft YaHei', 'PingFang SC', sans-serif;
-            background: #1a1a2e;
+            background: linear-gradient(180deg, #E8F4F8 0%, #F5F9FC 100%);
             display: flex;
             color: #fff;
         }
@@ -37,7 +37,7 @@
             .tool-section, .alliance-section, .rotation-control { 
                 flex: 1 1 auto; min-width: 120px; padding: 6px !important; 
             }
-            .stats-panel, .action-btns, .shortcuts { display: none; }
+            .action-btns { display: none; }
             .rules-panel { display: none; }
             .main-area { flex: 1; }
             .header { padding: 4px 8px !important; }
@@ -49,17 +49,35 @@
         .toolbar {
             width: 200px;
             min-width: 200px;
-            background: rgba(0,0,0,0.3);
+            background: rgba(255,255,255,0.85);
             padding: 12px;
+            padding-bottom: 35px;  /* 避免被版权栏遮挡 */
             display: flex;
             flex-direction: column;
             gap: 10px;
-            border-right: 1px solid rgba(255,255,255,0.1);
+            border-right: 1px solid #C8E0EC;
             overflow-y: auto;
+            backdrop-filter: blur(10px);
+            box-shadow: 2px 0 10px rgba(168,200,216,0.3);
         }
-        .toolbar h2 { color: #00d4ff; font-size: 16px; text-align: center; padding-bottom: 8px; border-bottom: 1px solid rgba(255,255,255,0.1); }
-        .tool-section { background: rgba(255,255,255,0.05); padding: 10px; border-radius: 8px; }
-        .tool-section h3 { font-size: 11px; color: #888; margin-bottom: 6px; }
+        .toolbar h2 { color: #2980b9; font-size: 16px; text-align: center; padding-bottom: 8px; border-bottom: 1px solid #C8E0EC; }
+        
+        /* 地球闪烁动画 */
+        @keyframes sparkle {
+            0%, 100% { filter: drop-shadow(0 0 3px #00d4ff) drop-shadow(0 0 6px #fff); transform: scale(1); }
+            25% { filter: drop-shadow(0 0 8px #00d4ff) drop-shadow(0 0 15px #fff); transform: scale(1.05); }
+            50% { filter: drop-shadow(0 0 5px #4ecca3) drop-shadow(0 0 10px #fff); transform: scale(1.02); }
+            75% { filter: drop-shadow(0 0 10px #00d4ff) drop-shadow(0 0 20px #fff); transform: scale(1.08); }
+        }
+        .logo-earth {
+            display: inline-block;
+            animation: sparkle 2s ease-in-out infinite;
+            font-size: 24px;
+            vertical-align: middle;
+            margin-right: 5px;
+        }
+        .tool-section { background: rgba(200,224,236,0.3); padding: 10px; border-radius: 8px; }
+        .tool-section h3 { font-size: 11px; color: #5a7a8a; margin-bottom: 6px; }
         .tool-btn {
             width: 100%; padding: 8px; margin-bottom: 4px;
             border: 2px solid transparent; border-radius: 6px;
@@ -76,34 +94,38 @@
         .tool-btn-delete { background: linear-gradient(135deg, #636e72, #2d3436); color: #fff; }
         .tool-btn-move { background: linear-gradient(135deg, #a29bfe, #6c5ce7); color: #fff; }
         .tool-btn-pointer { background: linear-gradient(135deg, #fd79a8, #e84393); color: #fff; }
+        .tool-btn-drag { background: linear-gradient(135deg, #00b894, #00a085); color: #fff; }
         .tool-icon { width: 20px; height: 20px; display: flex; align-items: center; justify-content: center; font-size: 11px; }
         
         /* 联盟选择 */
-        .alliance-section { background: rgba(255,255,255,0.05); padding: 10px; border-radius: 8px; }
+        .alliance-section { background: rgba(200,224,236,0.3); padding: 10px; border-radius: 8px; }
+        .alliance-section h3 { font-size: 11px; color: #2c3e50; margin-bottom: 6px; font-weight: bold; }
         .alliance-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 4px; }
         .alliance-btn {
-            padding: 8px 4px; border: 2px solid transparent; border-radius: 6px;
+            padding: 8px 4px; border: 2px solid rgba(0,0,0,0.2); border-radius: 6px;
             cursor: pointer; font-weight: bold; font-size: 10px;
             display: flex; flex-direction: column; align-items: center; gap: 2px;
             transition: all 0.2s;
+            color: #1a252f;  /* 深色字体，清晰可见 */
+            text-shadow: 0 0 3px rgba(255,255,255,0.8);  /* 添加文字阴影增强可读性 */
         }
-        .alliance-btn:hover { transform: scale(1.05); }
-        .alliance-btn.active { border-color: #fff; box-shadow: 0 0 10px rgba(255,255,255,0.5); }
+        .alliance-btn:hover { transform: scale(1.05); border-color: rgba(0,0,0,0.4); }
+        .alliance-btn.active { border-color: #2980b9; box-shadow: 0 0 10px rgba(41,128,185,0.5); }
         .alliance-color { width: 20px; height: 20px; border-radius: 4px; border: 1px solid rgba(255,255,255,0.3); }
         
-        .rotation-control { background: rgba(255,255,255,0.05); padding: 10px; border-radius: 8px; }
-        .rotation-control h3 { font-size: 11px; color: #888; margin-bottom: 6px; }
+        .rotation-control { background: rgba(200,224,236,0.3); padding: 10px; border-radius: 8px; }
+        .rotation-control h3 { font-size: 11px; color: #5a7a8a; margin-bottom: 6px; }
         .rotation-slider { width: 100%; margin: 6px 0; }
-        .rotation-value { text-align: center; color: #00d4ff; font-weight: bold; font-size: 16px; }
+        .rotation-value { text-align: center; color: #2980b9; font-weight: bold; font-size: 16px; }
         .rotation-presets { display: flex; gap: 4px; flex-wrap: wrap; margin-top: 6px; }
         .rotation-preset { padding: 4px 8px; background: rgba(255,255,255,0.1); border: none; border-radius: 4px; color: #fff; cursor: pointer; font-size: 10px; }
         .rotation-preset:hover { background: rgba(255,255,255,0.2); }
         .rotation-preset.active { background: #00d4ff; color: #000; }
         
-        .stats-panel { background: rgba(255,255,255,0.05); padding: 10px; border-radius: 8px; }
+        .stats-panel { background: rgba(200,224,236,0.3); padding: 10px; border-radius: 8px; }
         .stat-row { display: flex; justify-content: space-between; padding: 3px 0; font-size: 11px; }
-        .stat-label { color: #888; }
-        .stat-value { color: #00d4ff; font-weight: bold; }
+        .stat-label { color: #5a7a8a; }
+        .stat-value { color: #2980b9; font-weight: bold; }
         .stat-value.success { color: #4ecca3; }
         .stat-value.warning { color: #ffd93d; }
         .stat-value.error { color: #ff6b6b; }
@@ -115,43 +137,44 @@
         .btn-auto { background: #ffd93d; color: #333; }
         .btn-center { background: #a29bfe; color: #fff; }
         
-        .shortcuts { font-size: 9px; color: #666; padding: 6px; background: rgba(255,255,255,0.03); border-radius: 4px; }
-        .shortcuts kbd { background: rgba(255,255,255,0.1); padding: 1px 4px; border-radius: 2px; }
+        .shortcuts { font-size: 9px; color: #5a7a8a; padding: 6px; background: rgba(200,224,236,0.3); border-radius: 4px; }
+        .shortcuts kbd { background: rgba(41,128,185,0.15); padding: 1px 4px; border-radius: 2px; color: #2980b9; }
         
         .main-area { flex: 1; display: flex; flex-direction: column; overflow: hidden; }
-        .header { padding: 8px 15px; background: rgba(0,0,0,0.2); display: flex; justify-content: space-between; align-items: center; }
-        .header h1 { color: #00d4ff; font-size: 16px; }
-        .header-info { display: flex; gap: 12px; font-size: 11px; color: #888; }
-        .header-info span { background: rgba(255,255,255,0.1); padding: 3px 8px; border-radius: 4px; }
-        .header-info .highlight { background: rgba(0, 212, 255, 0.2); color: #00d4ff; font-weight: bold; }
+        .header { padding: 8px 15px; background: rgba(255,255,255,0.8); display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #C8E0EC; }
+        .header h1 { color: #2980b9; font-size: 16px; }
+        .header-info { display: flex; gap: 12px; font-size: 11px; color: #5a7a8a; }
+        .header-info span { background: rgba(200,224,236,0.5); padding: 3px 8px; border-radius: 4px; }
+        .header-info .highlight { background: rgba(41, 128, 185, 0.2); color: #2980b9; font-weight: bold; }
         
-        .canvas-wrapper { flex: 1; overflow: hidden; background: #0a0a1f; position: relative; }
+        .canvas-wrapper { flex: 1; overflow: hidden; background: linear-gradient(135deg, #E0F4FF 0%, #F0F8FF 50%, #FAFEFE 100%); position: relative; }
         canvas { display: block; cursor: crosshair; }
         
         .rules-panel {
             width: 220px; min-width: 220px;
-            background: rgba(0,0,0,0.3);
+            background: rgba(255,255,255,0.85);
             padding: 12px;
-            border-left: 1px solid rgba(255,255,255,0.1);
+            border-left: 1px solid #C8E0EC;
             overflow-y: auto;
+            backdrop-filter: blur(10px);
         }
-        .rules-panel h2 { color: #00d4ff; font-size: 14px; margin-bottom: 10px; }
+        .rules-panel h2 { color: #2980b9; font-size: 14px; margin-bottom: 10px; }
         
         /* 版权水印 */
         .copyright-watermark {
             position: fixed; bottom: 10px; right: 10px;
-            color: rgba(255,255,255,0.15); font-size: 11px;
+            color: rgba(41, 128, 185, 0.2); font-size: 11px;
             pointer-events: none; z-index: 9999;
-            text-shadow: 1px 1px 2px rgba(0,0,0,0.5);
+            text-shadow: 1px 1px 2px rgba(255,255,255,0.8);
         }
         .copyright-footer {
             position: fixed; bottom: 0; left: 0; right: 0;
-            background: rgba(0,0,0,0.8); color: #888;
+            background: rgba(255,255,255,0.9); color: #5a7a8a;
             text-align: center; padding: 4px; font-size: 10px;
-            border-top: 1px solid rgba(255,255,255,0.1);
+            border-top: 1px solid #C8E0EC;
             z-index: 1000;
         }
-        .copyright-footer a { color: #00d4ff; text-decoration: none; }
+        .copyright-footer a { color: #2980b9; text-decoration: none; }
         @media (max-width: 768px) {
             .copyright-footer { font-size: 9px; padding: 3px; }
             .copyright-watermark { font-size: 9px; bottom: 25px; }
@@ -204,40 +227,62 @@
         .modal-btn-primary { background: #00d4ff; color: #000; }
         .modal-btn-secondary { background: rgba(255,255,255,0.1); color: #fff; }
         
-        /* 登录界面样式 */
+        /* 登录界面样式 - 冬日雪景 */
         .login-overlay {
             position: fixed; top: 0; left: 0; right: 0; bottom: 0;
-            background: linear-gradient(135deg, #1a1a2e 0%, #0a0a1f 100%);
+            background: linear-gradient(180deg, #87CEEB 0%, #B0E0E6 30%, #E0F4FF 60%, #F5F9FC 100%);
             z-index: 9999; display: flex; justify-content: center; align-items: center;
+            overflow: hidden;
+        }
+        .login-overlay::before {
+            content: ''; position: absolute; top: 0; left: 0; right: 0; bottom: 0;
+            background-image: 
+                radial-gradient(2px 2px at 20px 30px, #fff, transparent),
+                radial-gradient(2px 2px at 40px 70px, rgba(255,255,255,0.8), transparent),
+                radial-gradient(1px 1px at 90px 40px, #fff, transparent),
+                radial-gradient(2px 2px at 130px 80px, rgba(255,255,255,0.9), transparent),
+                radial-gradient(1px 1px at 160px 30px, #fff, transparent);
+            background-size: 200px 100px;
+            animation: snowfall 8s linear infinite;
+            opacity: 0.8;
+        }
+        @keyframes snowfall {
+            0% { background-position: 0 0, 0 0, 0 0, 0 0, 0 0; }
+            100% { background-position: 200px 300px, 100px 400px, 150px 350px, 50px 450px, 180px 380px; }
         }
         .login-overlay.hidden { display: none; }
         .login-box {
-            background: rgba(0,0,0,0.4); border-radius: 16px; padding: 40px;
-            border: 2px solid rgba(0,212,255,0.3); box-shadow: 0 0 60px rgba(0,212,255,0.2);
+            background: rgba(255,255,255,0.85); border-radius: 20px; padding: 40px;
+            border: 1px solid rgba(255,255,255,0.9); 
+            box-shadow: 0 8px 32px rgba(135,206,235,0.3), 0 0 60px rgba(255,255,255,0.5);
             text-align: center; min-width: 320px;
+            backdrop-filter: blur(10px);
+            position: relative; z-index: 1;
         }
-        .login-box h2 { color: #00d4ff; font-size: 24px; margin-bottom: 8px; }
-        .login-box .subtitle { color: #888; font-size: 12px; margin-bottom: 30px; }
+        .login-box h2 { color: #2980b9; font-size: 24px; margin-bottom: 8px; text-shadow: 1px 1px 2px rgba(255,255,255,0.8); }
+        .login-box .subtitle { color: #5a7a8a; font-size: 12px; margin-bottom: 30px; }
         .login-input {
             width: 100%; padding: 12px 16px; margin-bottom: 16px;
-            background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.2);
-            border-radius: 8px; color: #fff; font-size: 14px;
-            transition: border-color 0.3s;
+            background: rgba(255,255,255,0.9); border: 1px solid #B0E0E6;
+            border-radius: 10px; color: #2c3e50; font-size: 14px;
+            transition: border-color 0.3s, box-shadow 0.3s;
         }
-        .login-input:focus { outline: none; border-color: #00d4ff; }
-        .login-input::placeholder { color: #666; }
+        .login-input:focus { outline: none; border-color: #3498db; box-shadow: 0 0 10px rgba(52,152,219,0.3); }
+        .login-input::placeholder { color: #95a5a6; }
         .login-btn {
-            width: 100%; padding: 14px; background: linear-gradient(135deg, #00d4ff, #0099cc);
-            border: none; border-radius: 8px; color: #000; font-size: 14px;
+            width: 100%; padding: 14px; 
+            background: linear-gradient(135deg, #3498db, #2980b9);
+            border: none; border-radius: 10px; color: #fff; font-size: 14px;
             font-weight: bold; cursor: pointer; transition: transform 0.2s, box-shadow 0.2s;
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.2);
         }
-        .login-btn:hover { transform: translateY(-2px); box-shadow: 0 4px 20px rgba(0,212,255,0.4); }
+        .login-btn:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(52,152,219,0.4); }
         .login-btn:active { transform: translateY(0); }
         .login-error {
-            color: #ff6b6b; font-size: 12px; margin-top: 12px;
+            color: #e74c3c; font-size: 12px; margin-top: 12px;
             min-height: 18px; transition: opacity 0.3s;
         }
-        .login-footer { color: #555; font-size: 10px; margin-top: 30px; }
+        .login-footer { color: #7f8c8d; font-size: 10px; margin-top: 30px; }
         
         .rule-item { background: rgba(255,255,255,0.05); padding: 8px; border-radius: 6px; margin-bottom: 6px; border-left: 3px solid #4ecca3; }
         .rule-item.warning { border-left-color: #ffd93d; }
@@ -250,26 +295,28 @@
         .coord-info p { color: #aaa; font-size: 9px; line-height: 1.5; }
         
         .building-info {
-            position: fixed; background: rgba(0,0,0,0.95); color: #fff;
+            position: fixed; background: rgba(255,255,255,0.98); color: #2c3e50;
             padding: 10px 14px; border-radius: 8px; font-size: 11px;
             pointer-events: none; z-index: 1001; display: none;
-            border: 2px solid #00d4ff; min-width: 140px;
+            border: 2px solid #2980b9; min-width: 140px;
+            box-shadow: 0 4px 15px rgba(41,128,185,0.3);
         }
-        .building-info-title { font-size: 13px; font-weight: bold; margin-bottom: 6px; padding-bottom: 4px; border-bottom: 1px solid rgba(255,255,255,0.2); }
-        .building-info-coord { color: #00d4ff; font-size: 18px; font-weight: bold; text-align: center; margin: 6px 0; }
-        .building-info-note { color: #888; font-size: 9px; text-align: center; }
-        .building-info-status { margin-top: 4px; padding-top: 4px; border-top: 1px solid rgba(255,255,255,0.1); font-size: 10px; }
-        .building-info-status.active { color: #4ecca3; }
-        .building-info-status.inactive { color: #636e72; }
+        .building-info-title { font-size: 13px; font-weight: bold; margin-bottom: 6px; padding-bottom: 4px; border-bottom: 1px solid #C8E0EC; }
+        .building-info-coord { color: #2980b9; font-size: 18px; font-weight: bold; text-align: center; margin: 6px 0; }
+        .building-info-note { color: #5a7a8a; font-size: 9px; text-align: center; }
+        .building-info-status { margin-top: 4px; padding-top: 4px; border-top: 1px solid #C8E0EC; font-size: 10px; }
+        .building-info-status.active { color: #27ae60; }
+        .building-info-status.inactive { color: #95a5a6; }
         
         .tooltip {
-            position: fixed; background: rgba(0,0,0,0.95); color: #fff;
+            position: fixed; background: rgba(255,255,255,0.98); color: #2c3e50;
             padding: 8px 12px; border-radius: 6px; font-size: 11px;
             pointer-events: none; z-index: 1000; display: none;
-            border: 1px solid rgba(255,255,255,0.2); line-height: 1.5;
+            border: 1px solid #C8E0EC; line-height: 1.5;
+            box-shadow: 0 2px 10px rgba(41,128,185,0.2);
         }
-        .tooltip.error { background: rgba(255,107,107,0.95); border-color: #ff6b6b; }
-        .tooltip.success { background: rgba(30, 30, 60, 0.95); border-color: #4ecca3; }
+        .tooltip.error { background: rgba(231,76,60,0.95); border-color: #c0392b; color: #fff; }
+        .tooltip.success { background: rgba(255,255,255,0.98); border-color: #27ae60; color: #2c3e50; }
         
         /* 边界警告 */
         .boundary-warning {
@@ -283,19 +330,44 @@
 <body>
     <!-- 登录界面 -->
     <div class="login-overlay" id="login-overlay">
+        <!-- 雪山装饰 -->
+        <svg class="snow-mountain" viewBox="0 0 1200 200" preserveAspectRatio="none" style="position:absolute;bottom:0;left:0;width:100%;height:25%;opacity:0.6;">
+            <defs>
+                <linearGradient id="mountain1" x1="0%" y1="0%" x2="0%" y2="100%">
+                    <stop offset="0%" style="stop-color:#fff"/>
+                    <stop offset="40%" style="stop-color:#E8F4F8"/>
+                    <stop offset="100%" style="stop-color:#B8D4E3"/>
+                </linearGradient>
+                <linearGradient id="mountain2" x1="0%" y1="0%" x2="0%" y2="100%">
+                    <stop offset="0%" style="stop-color:#F0F8FF"/>
+                    <stop offset="100%" style="stop-color:#A8C8D8"/>
+                </linearGradient>
+            </defs>
+            <path d="M0 200 L0 120 L150 60 L250 100 L400 30 L500 80 L650 20 L800 70 L900 40 L1050 90 L1200 50 L1200 200 Z" fill="url(#mountain2)"/>
+            <path d="M0 200 L0 150 L100 100 L200 130 L350 70 L450 110 L600 50 L750 100 L850 60 L1000 120 L1100 80 L1200 110 L1200 200 Z" fill="url(#mountain1)"/>
+        </svg>
+        <!-- 松树装饰 -->
+        <svg class="pine-trees" viewBox="0 0 100 50" preserveAspectRatio="xMidYMax meet" style="position:absolute;bottom:8%;left:5%;width:60px;height:80px;opacity:0.4;">
+            <path d="M50 0 L35 20 L40 20 L30 35 L38 35 L25 50 L75 50 L62 35 L70 35 L60 20 L65 20 Z" fill="#2E5A4C"/>
+            <rect x="45" y="50" width="10" height="8" fill="#5D4037"/>
+        </svg>
+        <svg class="pine-trees" viewBox="0 0 100 50" preserveAspectRatio="xMidYMax meet" style="position:absolute;bottom:10%;right:8%;width:45px;height:60px;opacity:0.3;">
+            <path d="M50 0 L35 20 L40 20 L30 35 L38 35 L25 50 L75 50 L62 35 L70 35 L60 20 L65 20 Z" fill="#2E5A4C"/>
+            <rect x="45" y="50" width="10" height="8" fill="#5D4037"/>
+        </svg>
         <div class="login-box">
-            <h2>🌍 管理助手</h2>
-            <div class="subtitle">请输入账号密码登录</div>
+            <h2><span class="logo-earth">🌍</span> 管理助手</h2>
+            <div class="subtitle">❄️ 请输入账号密码登录 ❄️</div>
             <input type="text" class="login-input" id="login-username" placeholder="用户名" autocomplete="off">
             <input type="password" class="login-input" id="login-password" placeholder="密码" autocomplete="off">
             <button class="login-btn" onclick="handleLogin()">登 录</button>
             <div class="login-error" id="login-error"></div>
-            <div class="login-footer">© 2607 高原兔 版权所有</div>
+            <div class="login-footer">© 2607全民代表大会 | 技术：兔弟</div>
         </div>
     </div>
     
     <div class="toolbar">
-        <h2>🌍 管理助手</h2>
+        <h2><span class="logo-earth">🌍</span> 管理助手</h2>
         
         <div class="alliance-section">
             <h3>🏴 选择联盟</h3>
@@ -306,7 +378,7 @@
         
         <div class="tool-section">
             <h3>选择建筑</h3>
-            <button class="tool-btn tool-btn-qi active" onclick="selectTool('qi')" id="tool-qi">
+            <button class="tool-btn tool-btn-qi" onclick="selectTool('qi')" id="tool-qi">
                 <span class="tool-icon">🚩</span><span>旗 (7×7)</span>
             </button>
             <button class="tool-btn tool-btn-bao" onclick="selectTool('bao')" id="tool-bao">
@@ -325,8 +397,11 @@
             <button class="tool-btn tool-btn-pointer" onclick="selectTool('pointer')" id="tool-pointer">
                 <span class="tool-icon">👆</span><span>查看坐标</span>
             </button>
-            <button class="tool-btn tool-btn-move" onclick="selectTool('move')" id="tool-move">
+            <button class="tool-btn tool-btn-move active" onclick="selectTool('move')" id="tool-move">
                 <span class="tool-icon">✋</span><span>移动画布</span>
+            </button>
+            <button class="tool-btn tool-btn-drag" onclick="selectTool('drag')" id="tool-drag">
+                <span class="tool-icon">🔀</span><span>拖动建筑</span>
             </button>
             <button class="tool-btn tool-btn-delete" onclick="selectTool('delete')" id="tool-delete">
                 <span class="tool-icon">🗑️</span><span>删除建筑</span>
@@ -335,26 +410,13 @@
         
         <div class="rotation-control">
             <h3>🔄 画布旋转</h3>
-            <div class="rotation-value"><span id="rotation-display">0</span>°</div>
-            <input type="range" class="rotation-slider" id="rotation-slider" min="0" max="360" value="0" step="15" oninput="setRotation(this.value)">
+            <div class="rotation-value"><span id="rotation-display">45</span>°</div>
+            <input type="range" class="rotation-slider" id="rotation-slider" min="0" max="360" value="45" step="15" oninput="setRotation(this.value)">
             <div class="rotation-presets">
                 <button class="rotation-preset active" onclick="setRotation(0)">0°</button>
                 <button class="rotation-preset" onclick="setRotation(45)">45°</button>
                 <button class="rotation-preset" onclick="setRotation(90)">90°</button>
                 <button class="rotation-preset" onclick="setRotation(180)">180°</button>
-            </div>
-        </div>
-        
-        <div class="stats-panel">
-            <h3>统计</h3>
-            <div id="alliance-stats">
-                <!-- 联盟统计由JS生成 -->
-            </div>
-            <div style="border-top: 1px solid rgba(255,255,255,0.1); margin-top: 6px; padding-top: 6px;">
-                <div class="stat-row"><span class="stat-label">🏰 堡(生效)</span><span class="stat-value success" id="stat-bao-active">0</span></div>
-                <div class="stat-row"><span class="stat-label">🏰 堡(未生效)</span><span class="stat-value warning" id="stat-bao-inactive">0</span></div>
-                <div class="stat-row"><span class="stat-label">⭕ 坑</span><span class="stat-value" id="stat-keng">0</span></div>
-                <div class="stat-row"><span class="stat-label">💎 矿</span><span class="stat-value" id="stat-kuang">0</span></div>
             </div>
         </div>
         
@@ -368,20 +430,21 @@
             <button class="action-btn btn-clear" onclick="clearAll()">清空全部</button>
         </div>
         <input type="file" id="import-file" accept=".json" style="display:none" onchange="handleImport(event)">
-        
-        <div class="shortcuts">
-            <div><kbd>1</kbd>旗 <kbd>2</kbd>堡 <kbd>3</kbd>坑 <kbd>4</kbd>矿</div>
-            <div><kbd>P</kbd>查看 <kbd>D</kbd>删除 <kbd>空格</kbd>移动</div>
-            <div><kbd>Q</kbd>/<kbd>E</kbd>切换联盟 <kbd>C</kbd>回中心</div>
-        </div>
     </div>
     
     <div class="main-area">
         <div class="header">
-            <h1>🏯 旗堡坑矿</h1>
+            <h1>🏯 地图设计</h1>
             <div class="header-info">
                 <span class="highlight">坐标: <span id="mouse-game">(600, 600)</span></span>
-                <span>缩放: <span id="zoom-level">100%</span></span>
+                <span style="display:flex;align-items:center;gap:4px;">
+                    缩放: 
+                    <button id="btn-zoom-out" style="width:24px;height:24px;border:none;border-radius:4px;background:#2980b9;color:#fff;cursor:pointer;font-weight:bold;">−</button>
+                    <span id="zoom-level" style="min-width:40px;text-align:center;">100%</span>
+                    <button id="btn-zoom-in" style="width:24px;height:24px;border:none;border-radius:4px;background:#2980b9;color:#fff;cursor:pointer;font-weight:bold;">+</button>
+                    <button id="btn-zoom-reset" style="padding:2px 6px;border:none;border-radius:4px;background:#5a7a8a;color:#fff;cursor:pointer;font-size:10px;">重置</button>
+                </span>
+                <button id="btn-remove-watermark" onclick="removeWatermark()" style="padding:2px 8px;border:none;border-radius:4px;background:#e67e22;color:#fff;cursor:pointer;font-size:10px;">🔓 去水印</button>
                 <span id="boundary-status"></span>
             </div>
         </div>
@@ -392,6 +455,27 @@
     </div>
     
     <div class="rules-panel">
+        <h2>⌨️ 快捷键</h2>
+        <div class="shortcuts">
+            <div><kbd>1</kbd>旗 <kbd>2</kbd>堡 <kbd>3</kbd>坑 <kbd>4</kbd>矿 <kbd>5</kbd>拖动</div>
+            <div><kbd>P</kbd>查看 <kbd>D</kbd>删除 <kbd>空格</kbd>移动</div>
+            <div><kbd>Q</kbd>/<kbd>E</kbd>切换联盟 <kbd>C</kbd>回中心 <kbd>Esc</kbd>取消选择</div>
+        </div>
+        
+        <h2>📊 统计</h2>
+        
+        <div class="stats-panel">
+            <div id="alliance-stats">
+                <!-- 联盟统计由JS生成 -->
+            </div>
+            <div style="border-top: 1px solid #C8E0EC; margin-top: 6px; padding-top: 6px;">
+                <div class="stat-row"><span class="stat-label">🏰 堡(生效)</span><span class="stat-value success" id="stat-bao-active">0</span></div>
+                <div class="stat-row"><span class="stat-label">🏰 堡(未生效)</span><span class="stat-value warning" id="stat-bao-inactive">0</span></div>
+                <div class="stat-row"><span class="stat-label">⭕ 坑</span><span class="stat-value" id="stat-keng">0</span></div>
+                <div class="stat-row"><span class="stat-label">💎 矿</span><span class="stat-value" id="stat-kuang">0</span></div>
+            </div>
+        </div>
+        
         <h2>📋 规则</h2>
         
         <div class="coord-info">
@@ -406,6 +490,12 @@
         <div class="rule-item"><h4>🏰 堡 2×2</h4><p>旗内=绿(生效) | 旗外=灰(不生效)</p></div>
         <div class="rule-item warning"><h4>⭕ 坑 3×3</h4><p>可放多个 | 不能重叠</p></div>
         <div class="rule-item"><h4>💎 矿 2×2</h4><p>任意位置</p></div>
+        <div class="rule-item" style="border-left-color: #666;"><h4>🏛️ NPC建筑</h4><p>东南西北四方 | 固定显示不可删除</p></div>
+        
+        <h2>🗺️ 特殊区域</h2>
+        <div class="rule-item" style="border-left-color: rgba(144, 238, 144, 0.8);"><h4>🌿 沃土</h4><p>淡绿色 | (450~749)</p></div>
+        <div class="rule-item" style="border-left-color: rgba(128, 128, 128, 0.8);"><h4>🪨 黑土</h4><p>淡灰色 | (552~647)</p></div>
+        <div class="rule-item" style="border-left-color: rgba(255, 100, 100, 0.8);"><h4>🔥 红土</h4><p>淡红色 | (586~613)</p></div>
         
         <div class="rule-item warning">
             <h4>💡 提示</h4>
@@ -422,9 +512,9 @@
     </div>
     
     <!-- 版权信息 -->
-    <div class="copyright-watermark">© 2607 高原兔</div>
+    <div class="copyright-watermark">© 2607全民代表大会</div>
     <div class="copyright-footer">
-        🌍 管理助手 v1.0 | © 2026 <strong>2607 高原兔</strong> 版权所有 | 未经授权禁止复制分发
+        <span class="logo-earth">🌍</span> 管理助手 v1.0 | 版权：<strong>2607全民代表大会</strong> | 支持：2607管理委员会 | 技术：兔弟
     </div>
     
     <!-- 名称分配弹窗 -->
@@ -453,9 +543,9 @@
     <script>
         /**
          * ============================================
-         * 管理助手 - 旗堡坑矿布局工具
-         * © 2026 2607 高原兔 版权所有
-         * 未经授权禁止复制、修改或分发本程序
+         * 管理助手 - 地图设计布局工具
+         * © 2026 2607全民代表大会 版权所有
+         * 技术支持：兔弟 | 未经授权禁止复制、修改或分发本程序
          * ============================================
          */
         
@@ -473,7 +563,7 @@
             });
             // 控制台警告
             console.log('%c⚠️ 版权声明', 'color: #e74c3c; font-size: 20px; font-weight: bold;');
-            console.log('%c本程序由 2607 高原兔 开发，未经授权禁止复制、修改或分发。', 'color: #f39c12; font-size: 14px;');
+            console.log('%c本程序由 2607全民代表大会 授权，技术支持：兔弟，未经授权禁止复制、修改或分发。', 'color: #f39c12; font-size: 14px;');
         })();
         
         // ========== 登录验证 ==========
@@ -555,6 +645,53 @@
             kuang: { size: 2, color: '#ffd93d', border: '#f39c12', name: '矿', icon: '💎', coordType: 'bottomRight' }
         };
         
+        // NPC建筑配置（固定显示，不可删除）
+        // 小NPC：坐标为2×2格子的右下角坐标
+        const NPC_BUILDINGS = {
+            west:  { name: '西', x: 594, y: 604, size: 2, color: 'rgba(128, 128, 128, 0.6)', border: '#666' },
+            south: { name: '南', x: 594, y: 594, size: 2, color: 'rgba(128, 128, 128, 0.6)', border: '#666' },
+            east:  { name: '东', x: 604, y: 594, size: 2, color: 'rgba(128, 128, 128, 0.6)', border: '#666' },
+            north: { name: '北', x: 604, y: 604, size: 2, color: 'rgba(128, 128, 128, 0.6)', border: '#666' }
+        };
+        
+        // 王城NPC：对角坐标(594,605)-(605,594)，12×12区域
+        const WANG_CHENG = {
+            name: '王城',
+            x: 594,      // 右下角x
+            y: 594,      // 右下角y
+            size: 12,    // 12×12
+            color: 'rgba(255, 215, 0, 0.15)',  // 金色半透明
+            border: 'rgba(255, 215, 0, 0.5)'
+        };
+        
+        // 特殊区域背景配置（从外到内绘制：沃土→黑土→红土）
+        const SPECIAL_ZONES = [
+            {
+                name: '沃土',
+                x: 450,      // 右下角x
+                y: 450,      // 右下角y
+                size: 300,   // 300×300 (450~749)
+                color: 'rgba(144, 238, 144, 0.12)',  // 淡绿白色
+                border: 'rgba(144, 238, 144, 0.3)'
+            },
+            {
+                name: '黑土',
+                x: 552,      // 右下角x
+                y: 552,      // 右下角y
+                size: 96,    // 96×96 (552~647)
+                color: 'rgba(128, 128, 128, 0.15)',  // 淡灰色
+                border: 'rgba(128, 128, 128, 0.3)'
+            },
+            {
+                name: '红土',
+                x: 586,      // 右下角x
+                y: 586,      // 右下角y
+                size: 28,    // 28×28 (586~613)
+                color: 'rgba(255, 100, 100, 0.15)',  // 淡红色
+                border: 'rgba(255, 100, 100, 0.3)'
+            }
+        ];
+        
         // 当前选中的联盟
         let currentAlliance = 0;
         
@@ -562,16 +699,28 @@
         let activeQiSets = {};  // { allianceId: Set }
         
         // 状态
-        let currentTool = 'qi';
+        let currentTool = 'move';  // 默认为移动画布工具
         let buildings = { qi: [], bao: [], keng: [], kuang: [] };
         let panOffset = { x: 0, y: 0 };
         let zoom = 1;
-        let rotation = 0;
+        let rotation = 45;  // 默认旋转45度
         let isDragging = false;
         let dragStart = { x: 0, y: 0 };
         let panStart = { x: 0, y: 0 };
         let previewPos = null;
         let hoveredBuilding = null;
+        
+        // 水印状态
+        let watermarkRemoved = false;
+        
+        // 拖动建筑状态
+        let selectedBuildings = [];  // 选中的建筑列表 [{type, index, building}]
+        let isSelectingArea = false;  // 是否正在框选
+        let selectionStart = null;    // 框选起点
+        let selectionEnd = null;      // 框选终点
+        let isDraggingBuilding = false;  // 是否正在拖动建筑
+        let dragBuildingStart = null;    // 拖动建筑的起始游戏坐标
+        let dragBuildingOffsets = [];    // 拖动时各建筑相对于起点的偏移
         
         // 缓存（按联盟分组）
         let qiCoverageByAlliance = {};  // { allianceId: Set }
@@ -583,9 +732,14 @@
         function init() {
             initAllianceUI();
             initAllianceStats();
+            initZoomButtons();
             resizeCanvas();
             window.addEventListener('resize', resizeCanvas);
             bindEvents();
+            // 设置默认工具为移动画布
+            selectTool('move');
+            // 设置默认旋转角度
+            setRotation(45);
             render();
         }
         
@@ -632,11 +786,13 @@
             canvas.addEventListener('mousedown', onMouseDown);
             canvas.addEventListener('mouseup', onMouseUp);
             canvas.addEventListener('mouseleave', onMouseLeave);
+            canvas.addEventListener('dblclick', onDblClick);  // 双击改名堡垒
             
             // 触摸事件支持（手机端）
             canvas.addEventListener('touchstart', onTouchStart, { passive: false });
             canvas.addEventListener('touchmove', onTouchMove, { passive: false });
             canvas.addEventListener('touchend', onTouchEnd, { passive: false });
+            // 滚轮缩放
             canvas.addEventListener('wheel', onWheel, { passive: false });
             canvas.addEventListener('contextmenu', e => e.preventDefault());
             document.addEventListener('keydown', onKeyDown);
@@ -734,11 +890,57 @@
             
             // 移动画布
             if (currentTool === 'move' && isDragging) {
-                const dx = (e.clientX - dragStart.x) / zoom;
-                const dy = (e.clientY - dragStart.y) / zoom;
+                let dx = (e.clientX - dragStart.x) / zoom;
+                let dy = (e.clientY - dragStart.y) / zoom;
+                
+                // 根据旋转角度调整拖动方向
+                if (rotation !== 0) {
+                    const rad = -rotation * Math.PI / 180;
+                    const newDx = dx * Math.cos(rad) - dy * Math.sin(rad);
+                    const newDy = dx * Math.sin(rad) + dy * Math.cos(rad);
+                    dx = newDx;
+                    dy = newDy;
+                }
+                
                 panOffset.x = panStart.x + dx;
                 panOffset.y = panStart.y + dy;
                 clampPanOffset();
+                render();
+                return;
+            }
+            
+            // 拖动建筑工具
+            if (currentTool === 'drag') {
+                if (isSelectingArea && selectionStart) {
+                    // 正在框选
+                    selectionEnd = { x: gamePos.x, y: gamePos.y };
+                    render();
+                    return;
+                }
+                
+                if (isDraggingBuilding && dragBuildingStart && selectedBuildings.length > 0) {
+                    // 正在拖动建筑 - 实时预览
+                    render();
+                    return;
+                }
+                
+                // 显示提示信息
+                const hoveredB = findBuildingAtPosition(gamePos.x, gamePos.y);
+                if (hoveredB) {
+                    const isSelected = isBuildingSelected(hoveredB.type, hoveredB.index);
+                    const config = BUILDING_CONFIG[hoveredB.type];
+                    showTooltip(e.clientX, e.clientY, 
+                        `${config.icon} ${config.name}\n${isSelected ? '✅ 已选中 (拖动移动)' : '点击选中 / Ctrl+点击多选'}`, 
+                        true);
+                    hideBuildingInfo();
+                } else {
+                    if (selectedBuildings.length > 0) {
+                        showTooltip(e.clientX, e.clientY, `已选中 ${selectedBuildings.length} 个建筑\n按住拖动 / 框选添加`, true);
+                    } else {
+                        showTooltip(e.clientX, e.clientY, `点击选中建筑 / 框选多个\nCtrl+点击多选`, true);
+                    }
+                    hideBuildingInfo();
+                }
                 render();
                 return;
             }
@@ -787,16 +989,46 @@
                     }
                 }
             }
+            
+            // 检查NPC建筑
+            for (const [direction, npc] of Object.entries(NPC_BUILDINGS)) {
+                if (gameX >= npc.x && gameX <= npc.x + npc.size - 1 && gameY >= npc.y && gameY <= npc.y + npc.size - 1) {
+                    return { type: 'npc', building: { x: npc.x, y: npc.y, direction, name: npc.name, size: npc.size } };
+                }
+            }
+            
+            // 检查王城
+            if (gameX >= WANG_CHENG.x && gameX <= WANG_CHENG.x + WANG_CHENG.size - 1 && 
+                gameY >= WANG_CHENG.y && gameY <= WANG_CHENG.y + WANG_CHENG.size - 1) {
+                return { type: 'npc', building: { x: WANG_CHENG.x, y: WANG_CHENG.y, name: WANG_CHENG.name, size: WANG_CHENG.size } };
+            }
+            
             return null;
         }
         
         function showBuildingInfo(screenX, screenY, info) {
+            const statusEl = document.getElementById('building-info-status');
+            let borderColor;
+            
+            // 处理NPC建筑
+            if (info.type === 'npc') {
+                document.getElementById('building-info-title').innerHTML = `🏛️ NPC-${info.building.name}`;
+                document.getElementById('building-info-coord').textContent = `(${info.building.x}, ${info.building.y})`;
+                document.getElementById('building-info-note').textContent = '固定建筑';
+                statusEl.textContent = '不可删除';
+                statusEl.className = 'building-info-status inactive';
+                borderColor = '#666';
+                
+                buildingInfo.style.borderColor = borderColor;
+                buildingInfo.style.left = (screenX + 15) + 'px';
+                buildingInfo.style.top = (screenY - 10) + 'px';
+                buildingInfo.style.display = 'block';
+                return;
+            }
+            
             const config = BUILDING_CONFIG[info.type];
             const coord = getBuildingDisplayCoord(info.type, info.building.x, info.building.y);
             const coordNote = config.coordType === 'center' ? '中心坐标' : '右下角坐标';
-            
-            const statusEl = document.getElementById('building-info-status');
-            let borderColor;
             
             if (info.type === 'qi') {
                 const alliance = info.building.alliance;
@@ -846,6 +1078,40 @@
                 return;
             }
             
+            if (currentTool === 'drag') {
+                const gamePos = screenToGame(e.clientX, e.clientY);
+                const clickedBuilding = findBuildingAtPosition(gamePos.x, gamePos.y);
+                
+                if (clickedBuilding) {
+                    // 点击了建筑
+                    if (e.ctrlKey || e.metaKey) {
+                        // Ctrl+点击：切换选中状态
+                        toggleBuildingSelection(clickedBuilding.type, clickedBuilding.index, clickedBuilding.building);
+                    } else if (isBuildingSelected(clickedBuilding.type, clickedBuilding.index)) {
+                        // 点击已选中的建筑：开始拖动
+                        isDraggingBuilding = true;
+                        dragBuildingStart = { x: Math.floor(gamePos.x), y: Math.floor(gamePos.y) };
+                        canvas.style.cursor = 'move';
+                    } else {
+                        // 点击未选中的建筑：清除旧选择，选中新建筑并开始拖动
+                        selectedBuildings = [{ type: clickedBuilding.type, index: clickedBuilding.index, building: {...clickedBuilding.building} }];
+                        isDraggingBuilding = true;
+                        dragBuildingStart = { x: Math.floor(gamePos.x), y: Math.floor(gamePos.y) };
+                        canvas.style.cursor = 'move';
+                    }
+                } else {
+                    // 点击空白处：开始框选
+                    if (!e.ctrlKey && !e.metaKey) {
+                        selectedBuildings = [];
+                    }
+                    isSelectingArea = true;
+                    selectionStart = { x: gamePos.x, y: gamePos.y };
+                    selectionEnd = { x: gamePos.x, y: gamePos.y };
+                }
+                render();
+                return;
+            }
+            
             if (currentTool === 'delete') {
                 const gamePos = screenToGame(e.clientX, e.clientY);
                 deleteAtPosition(gamePos.x, gamePos.y);
@@ -862,9 +1128,87 @@
             }
         }
         
-        function onMouseUp() {
+        function onMouseUp(e) {
             isDragging = false;
             if (currentTool === 'move') canvas.style.cursor = 'grab';
+            
+            // 处理拖动工具
+            if (currentTool === 'drag') {
+                if (isSelectingArea && selectionStart && selectionEnd) {
+                    // 框选结束
+                    const newSelections = getBuildingsInSelectionArea(selectionStart, selectionEnd);
+                    if (e && (e.ctrlKey || e.metaKey)) {
+                        // Ctrl+框选：添加到现有选择
+                        for (const sel of newSelections) {
+                            if (!isBuildingSelected(sel.type, sel.index)) {
+                                selectedBuildings.push(sel);
+                            }
+                        }
+                    } else {
+                        selectedBuildings = newSelections;
+                    }
+                    isSelectingArea = false;
+                    selectionStart = null;
+                    selectionEnd = null;
+                    render();
+                }
+                
+                if (isDraggingBuilding && dragBuildingStart && selectedBuildings.length > 0) {
+                    // 拖动结束 - 计算位移并验证
+                    const gamePos = screenToGame(e.clientX, e.clientY);
+                    const dx = Math.floor(gamePos.x) - dragBuildingStart.x;
+                    const dy = Math.floor(gamePos.y) - dragBuildingStart.y;
+                    
+                    if (dx !== 0 || dy !== 0) {
+                        const validation = validateDragPlacement(selectedBuildings, dx, dy);
+                        if (validation.valid) {
+                            executeDrag(selectedBuildings, dx, dy);
+                            showValidationMessage(`✅ 成功移动 ${selectedBuildings.length} 个建筑`);
+                        } else {
+                            showValidationMessage(validation.message || '❌ 无法放置到该位置');
+                        }
+                    }
+                    
+                    isDraggingBuilding = false;
+                    dragBuildingStart = null;
+                    canvas.style.cursor = 'default';
+                    render();
+                }
+            }
+        }
+        
+        // 双击改名堡垒
+        function onDblClick(e) {
+            const gamePos = screenToGame(e.clientX, e.clientY);
+            const gameX = Math.floor(gamePos.x);
+            const gameY = Math.floor(gamePos.y);
+            
+            // 查找点击位置是否有堡垒
+            for (let i = 0; i < buildings.bao.length; i++) {
+                const bao = buildings.bao[i];
+                if (gameX >= bao.x && gameX < bao.x + 2 && gameY >= bao.y && gameY < bao.y + 2) {
+                    // 找到堡垒，弹出改名对话框
+                    renameBao(i, bao);
+                    return;
+                }
+            }
+        }
+        
+        // 堡垒改名函数
+        function renameBao(index, bao) {
+            const currentName = bao.name || '';
+            const newName = prompt(`🏰 堡垒改名\n坐标: (${bao.x}, ${bao.y})\n请输入新名称（留空则清除名称）:`, currentName);
+            
+            if (newName !== null) {  // 用户没有点取消
+                buildings.bao[index].name = newName.trim();
+                updateStats();
+                render();
+                if (newName.trim()) {
+                    showValidationMessage(`🏰 堡垒已命名为: ${newName.trim()}`);
+                } else {
+                    showValidationMessage(`🏰 堡垒名称已清除`);
+                }
+            }
         }
         
         function onMouseLeave() {
@@ -891,10 +1235,7 @@
             touchStartTime = Date.now();
             
             if (e.touches.length === 2) {
-                // 双指缩放
-                const dx = e.touches[0].clientX - e.touches[1].clientX;
-                const dy = e.touches[0].clientY - e.touches[1].clientY;
-                lastTouchDistance = Math.hypot(dx, dy);
+                // 禁用双指缩放（改用按钮控制）
                 return;
             }
             
@@ -914,25 +1255,25 @@
             e.preventDefault();
             
             if (e.touches.length === 2) {
-                // 双指缩放
-                const dx = e.touches[0].clientX - e.touches[1].clientX;
-                const dy = e.touches[0].clientY - e.touches[1].clientY;
-                const distance = Math.hypot(dx, dy);
-                if (lastTouchDistance > 0) {
-                    const scale = distance / lastTouchDistance;
-                    zoom = Math.max(0.2, Math.min(3, zoom * scale));
-                    document.getElementById('zoom-level').textContent = Math.round(zoom * 100) + '%';
-                    render();
-                }
-                lastTouchDistance = distance;
+                // 禁用双指缩放（改用按钮控制）
                 return;
             }
             
             const pos = getTouchPos(e);
             
             if (currentTool === 'move' && isDragging) {
-                const dx = (pos.clientX - dragStart.x) / zoom;
-                const dy = (pos.clientY - dragStart.y) / zoom;
+                let dx = (pos.clientX - dragStart.x) / zoom;
+                let dy = (pos.clientY - dragStart.y) / zoom;
+                
+                // 根据旋转角度调整拖动方向
+                if (rotation !== 0) {
+                    const rad = -rotation * Math.PI / 180;
+                    const newDx = dx * Math.cos(rad) - dy * Math.sin(rad);
+                    const newDy = dx * Math.sin(rad) + dy * Math.cos(rad);
+                    dx = newDx;
+                    dy = newDy;
+                }
+                
                 panOffset.x = panStart.x + dx;
                 panOffset.y = panStart.y + dy;
                 clampPanOffset();
@@ -971,10 +1312,55 @@
         
         function onWheel(e) {
             e.preventDefault();
-            const delta = e.deltaY > 0 ? -0.1 : 0.1;
-            zoom = Math.max(0.2, Math.min(3, zoom + delta));
+            // 使用乘法进行平滑缩放
+            const factor = e.deltaY > 0 ? 0.9 : 1.1;
+            zoom = Math.max(0.1, Math.min(3, zoom * factor));
             document.getElementById('zoom-level').textContent = Math.round(zoom * 100) + '%';
             render();
+        }
+        
+        // 缩放控制函数
+        function zoomIn(e) {
+            if (e) { e.preventDefault(); e.stopPropagation(); }
+            zoom = Math.min(3, zoom * 1.2);
+            document.getElementById('zoom-level').textContent = Math.round(zoom * 100) + '%';
+            render();
+        }
+        
+        function zoomOut(e) {
+            if (e) { e.preventDefault(); e.stopPropagation(); }
+            zoom = Math.max(0.1, zoom / 1.2);
+            document.getElementById('zoom-level').textContent = Math.round(zoom * 100) + '%';
+            render();
+        }
+        
+        function zoomReset(e) {
+            if (e) { e.preventDefault(); e.stopPropagation(); }
+            zoom = 1;
+            document.getElementById('zoom-level').textContent = '100%';
+            render();
+        }
+        
+        function initZoomButtons() {
+            const btnZoomIn = document.getElementById('btn-zoom-in');
+            const btnZoomOut = document.getElementById('btn-zoom-out');
+            const btnZoomReset = document.getElementById('btn-zoom-reset');
+            
+            if (btnZoomIn) {
+                btnZoomIn.addEventListener('click', zoomIn);
+                btnZoomIn.addEventListener('mousedown', e => e.stopPropagation());
+                btnZoomIn.addEventListener('mouseup', e => e.stopPropagation());
+            }
+            if (btnZoomOut) {
+                btnZoomOut.addEventListener('click', zoomOut);
+                btnZoomOut.addEventListener('mousedown', e => e.stopPropagation());
+                btnZoomOut.addEventListener('mouseup', e => e.stopPropagation());
+            }
+            if (btnZoomReset) {
+                btnZoomReset.addEventListener('click', zoomReset);
+                btnZoomReset.addEventListener('mousedown', e => e.stopPropagation());
+                btnZoomReset.addEventListener('mouseup', e => e.stopPropagation());
+            }
         }
         
         function onKeyDown(e) {
@@ -983,16 +1369,23 @@
                 case '2': selectTool('bao'); break;
                 case '3': selectTool('keng'); break;
                 case '4': selectTool('kuang'); break;
+                case '5': selectTool('drag'); break;
                 case 'p': selectTool('pointer'); break;
                 case 'd': selectTool('delete'); break;
                 case 'c': centerView(); break;
                 case ' ': e.preventDefault(); selectTool('move'); break;
                 case 'q': selectAlliance((currentAlliance - 1 + ALLIANCES.length) % ALLIANCES.length); break;
                 case 'e': selectAlliance((currentAlliance + 1) % ALLIANCES.length); break;
+                case 'escape': 
+                    if (currentTool === 'drag') {
+                        clearSelection();
+                        showValidationMessage('已取消选择');
+                    }
+                    break;
             }
         }
         
-        function onKeyUp(e) { if (e.key === ' ') selectTool('qi'); }
+        function onKeyUp(e) { /* 空格键不再切换工具 */ }
         
         // ========== 控制 ==========
         
@@ -1017,14 +1410,174 @@
             document.querySelectorAll('.tool-btn').forEach(btn => btn.classList.remove('active'));
             const toolBtn = document.getElementById('tool-' + tool);
             if (toolBtn) toolBtn.classList.add('active');
-            canvas.style.cursor = tool === 'move' ? 'grab' : tool === 'delete' ? 'not-allowed' : tool === 'pointer' ? 'help' : 'crosshair';
+            
+            // 切换工具时清除选中状态
+            if (tool !== 'drag') {
+                clearSelection();
+            }
+            
+            // 设置光标样式
+            if (tool === 'move') canvas.style.cursor = 'grab';
+            else if (tool === 'delete') canvas.style.cursor = 'not-allowed';
+            else if (tool === 'pointer') canvas.style.cursor = 'help';
+            else if (tool === 'drag') canvas.style.cursor = 'default';
+            else canvas.style.cursor = 'crosshair';
+        }
+        
+        // ========== 去水印功能 ==========
+        function removeWatermark() {
+            const code = prompt('请输入授权码以去除水印:');
+            if (code === '2607') {
+                watermarkRemoved = true;
+                document.querySelector('.copyright-watermark').style.display = 'none';
+                document.getElementById('btn-remove-watermark').textContent = '✅ 已授权';
+                document.getElementById('btn-remove-watermark').style.background = '#27ae60';
+                document.getElementById('btn-remove-watermark').disabled = true;
+                showValidationMessage('🎉 水印已成功移除！');
+                render();
+            } else if (code !== null) {
+                showValidationMessage('❌ 授权码错误');
+            }
+        }
+        
+        // ========== 建筑选择与拖动 ==========
+        
+        // 清除选中状态
+        function clearSelection() {
+            selectedBuildings = [];
+            isSelectingArea = false;
+            selectionStart = null;
+            selectionEnd = null;
+            isDraggingBuilding = false;
+            render();
+        }
+        
+        // 查找指定位置的建筑（返回type和index）
+        function findBuildingAtPosition(gameX, gameY) {
+            const gx = Math.floor(gameX);
+            const gy = Math.floor(gameY);
+            
+            // 检查各类型建筑
+            for (const type of ['qi', 'bao', 'keng', 'kuang']) {
+                const size = BUILDING_CONFIG[type].size;
+                for (let i = 0; i < buildings[type].length; i++) {
+                    const b = buildings[type][i];
+                    if (gx >= b.x && gx < b.x + size && gy >= b.y && gy < b.y + size) {
+                        return { type, index: i, building: b };
+                    }
+                }
+            }
+            return null;
+        }
+        
+        // 检查建筑是否已被选中
+        function isBuildingSelected(type, index) {
+            return selectedBuildings.some(s => s.type === type && s.index === index);
+        }
+        
+        // 切换建筑选中状态
+        function toggleBuildingSelection(type, index, building) {
+            const existingIndex = selectedBuildings.findIndex(s => s.type === type && s.index === index);
+            if (existingIndex >= 0) {
+                selectedBuildings.splice(existingIndex, 1);
+            } else {
+                selectedBuildings.push({ type, index, building: {...building} });
+            }
+            render();
+        }
+        
+        // 获取框选区域内的所有建筑
+        function getBuildingsInSelectionArea(start, end) {
+            const minX = Math.min(start.x, end.x);
+            const maxX = Math.max(start.x, end.x);
+            const minY = Math.min(start.y, end.y);
+            const maxY = Math.max(start.y, end.y);
+            
+            const result = [];
+            for (const type of ['qi', 'bao', 'keng', 'kuang']) {
+                const size = BUILDING_CONFIG[type].size;
+                for (let i = 0; i < buildings[type].length; i++) {
+                    const b = buildings[type][i];
+                    // 建筑中心点在框选区域内
+                    const cx = b.x + size / 2;
+                    const cy = b.y + size / 2;
+                    if (cx >= minX && cx <= maxX && cy >= minY && cy <= maxY) {
+                        result.push({ type, index: i, building: {...b} });
+                    }
+                }
+            }
+            return result;
+        }
+        
+        // 验证拖动后的位置是否合法
+        function validateDragPlacement(draggedBuildings, dx, dy) {
+            // 先临时移除被拖动的建筑
+            const removedBuildings = {};
+            for (const sel of draggedBuildings) {
+                if (!removedBuildings[sel.type]) removedBuildings[sel.type] = [];
+                removedBuildings[sel.type].push(sel.index);
+            }
+            
+            // 暂存原始建筑数据
+            const originalBuildings = JSON.parse(JSON.stringify(buildings));
+            
+            // 从数组中移除（按索引从大到小排序后移除）
+            for (const type in removedBuildings) {
+                removedBuildings[type].sort((a, b) => b - a);
+                for (const idx of removedBuildings[type]) {
+                    buildings[type].splice(idx, 1);
+                }
+            }
+            
+            // 重建缓存
+            updateCoverage();
+            
+            // 验证每个建筑的新位置
+            let allValid = true;
+            let errorMsg = '';
+            for (const sel of draggedBuildings) {
+                const newX = sel.building.x + dx;
+                const newY = sel.building.y + dy;
+                const validation = validatePlacement(sel.type, newX, newY);
+                if (!validation.valid) {
+                    allValid = false;
+                    errorMsg = validation.message;
+                    break;
+                }
+            }
+            
+            // 恢复原始建筑数据
+            buildings = originalBuildings;
+            updateCoverage();
+            
+            return { valid: allValid, message: errorMsg };
+        }
+        
+        // 执行建筑拖动
+        function executeDrag(draggedBuildings, dx, dy) {
+            // 更新每个被拖动建筑的坐标
+            for (const sel of draggedBuildings) {
+                buildings[sel.type][sel.index].x += dx;
+                buildings[sel.type][sel.index].y += dy;
+            }
+            
+            // 更新选中建筑列表中的坐标引用
+            for (let i = 0; i < selectedBuildings.length; i++) {
+                selectedBuildings[i].building.x += dx;
+                selectedBuildings[i].building.y += dy;
+            }
+            
+            updateCoverage();
+            updateStats();
+            render();
         }
         
         function alignToGrid(pos, type) {
             const size = BUILDING_CONFIG[type].size;
             if (type === 'bao' || type === 'kuang') {
-                // 对齐到偶数坐标，使用floor确保对齐更稳定
-                return { x: Math.floor(pos.x / 2) * 2, y: Math.floor(pos.y / 2) * 2 };
+                // 堡和矿：直接使用当前坐标，不再强制偶数对齐
+                // 这样可以贴着坑的任意边放置
+                return { x: pos.x, y: pos.y };
             }
             // 旗和坑：以点击位置为中心放置
             return { x: pos.x - Math.floor(size / 2), y: pos.y - Math.floor(size / 2) };
@@ -1037,6 +1590,11 @@
             
             if (x < 0 || y < 0 || x + size > GAME_SIZE || y + size > GAME_SIZE) {
                 return { valid: false, message: '❌ 超出地图范围(0-1199)' };
+            }
+            
+            // 检查是否与NPC建筑重叠
+            if (isOverlapWithNPC(x, y, size)) {
+                return { valid: false, message: '❌ 不能与NPC建筑重叠' };
             }
             
             if (type === 'qi') {
@@ -1173,6 +1731,21 @@
             return x1 < x2 + s2 && x1 + s1 > x2 && y1 < y2 + s2 && y1 + s1 > y2;
         }
         
+        // 检查是否与NPC建筑重叠
+        function isOverlapWithNPC(x, y, size) {
+            // 检查四个方向NPC
+            for (const npc of Object.values(NPC_BUILDINGS)) {
+                if (isOverlap(x, y, size, npc.x, npc.y, npc.size)) {
+                    return true;
+                }
+            }
+            // 检查王城
+            if (isOverlap(x, y, size, WANG_CHENG.x, WANG_CHENG.y, WANG_CHENG.size)) {
+                return true;
+            }
+            return false;
+        }
+        
         // ========== 操作 ==========
         
         // 获取某联盟堡的下一个序号
@@ -1215,6 +1788,21 @@
         }
         
         function deleteAtPosition(gameX, gameY) {
+            // 检查是否点击了NPC建筑
+            for (const [direction, npc] of Object.entries(NPC_BUILDINGS)) {
+                if (gameX >= npc.x && gameX < npc.x + npc.size && gameY >= npc.y && gameY < npc.y + npc.size) {
+                    showValidationMessage(`🏛️ NPC-${npc.name} 不可删除`);
+                    return;
+                }
+            }
+            
+            // 检查是否点击了王城
+            if (gameX >= WANG_CHENG.x && gameX < WANG_CHENG.x + WANG_CHENG.size && 
+                gameY >= WANG_CHENG.y && gameY < WANG_CHENG.y + WANG_CHENG.size) {
+                showValidationMessage(`🏛️ ${WANG_CHENG.name} 不可删除`);
+                return;
+            }
+            
             for (const type of ['bao', 'kuang', 'keng', 'qi']) {
                 const size = BUILDING_CONFIG[type].size;
                 for (let i = buildings[type].length - 1; i >= 0; i--) {
@@ -1305,7 +1893,7 @@
         
         function render() {
             ctx.save();
-            ctx.fillStyle = '#0f0f2a';
+            ctx.fillStyle = '#F0F8FF';
             ctx.fillRect(0, 0, canvas.width, canvas.height);
             
             ctx.translate(canvas.width / 2, canvas.height / 2);
@@ -1314,7 +1902,11 @@
             ctx.translate(-canvas.width / 2, -canvas.height / 2);
             
             drawGrid();
+            drawSpecialZones();  // 绘制特殊区域背景（沃土→黑土→红土）
             drawBoundary();
+            
+            // 绘制NPC建筑（固定显示）
+            drawNPCBuildings();
             
             buildings.qi.forEach(b => drawBuilding('qi', b));
             buildings.keng.forEach(b => drawBuilding('keng', b));
@@ -1329,17 +1921,87 @@
                 drawPreview(currentTool, previewPos.x, previewPos.y, validation.valid);
             }
             
-            if (hoveredBuilding) drawBuildingHighlight(hoveredBuilding.type, hoveredBuilding.building.x, hoveredBuilding.building.y);
+            if (hoveredBuilding) drawBuildingHighlight(hoveredBuilding.type, hoveredBuilding.building.x, hoveredBuilding.building.y, hoveredBuilding.building);
+            
+            // 绘制选中建筑高亮
+            drawSelectedBuildings();
+            
+            // 绘制框选区域
+            drawSelectionArea();
+            
+            // 绘制拖动预览
+            drawDragPreview();
             
             ctx.restore();
         }
         
+        // 绘制选中的建筑高亮
+        function drawSelectedBuildings() {
+            if (selectedBuildings.length === 0) return;
+            
+            for (const sel of selectedBuildings) {
+                const size = BUILDING_CONFIG[sel.type].size;
+                const pos = gameToCanvas(sel.building.x, sel.building.y);
+                const pSize = size * CELL_SIZE;
+                
+                // 绘制选中边框
+                ctx.strokeStyle = '#00d4ff';
+                ctx.lineWidth = 3;
+                ctx.setLineDash([]);
+                ctx.strokeRect(pos.x - pSize - 1, pos.y - pSize - 1, pSize + 2, pSize + 2);
+                
+                // 绘制选中角标
+                ctx.fillStyle = '#00d4ff';
+                const cornerSize = 6;
+                ctx.fillRect(pos.x - pSize - 1, pos.y - pSize - 1, cornerSize, cornerSize);
+                ctx.fillRect(pos.x - cornerSize + 1, pos.y - pSize - 1, cornerSize, cornerSize);
+                ctx.fillRect(pos.x - pSize - 1, pos.y - cornerSize + 1, cornerSize, cornerSize);
+                ctx.fillRect(pos.x - cornerSize + 1, pos.y - cornerSize + 1, cornerSize, cornerSize);
+            }
+        }
+        
+        // 绘制框选区域
+        function drawSelectionArea() {
+            if (!isSelectingArea || !selectionStart || !selectionEnd) return;
+            
+            const startPos = gameToCanvas(selectionStart.x, selectionStart.y);
+            const endPos = gameToCanvas(selectionEnd.x, selectionEnd.y);
+            
+            const x = Math.min(startPos.x, endPos.x);
+            const y = Math.min(startPos.y, endPos.y);
+            const w = Math.abs(endPos.x - startPos.x);
+            const h = Math.abs(endPos.y - startPos.y);
+            
+            // 半透明填充
+            ctx.fillStyle = 'rgba(0, 212, 255, 0.1)';
+            ctx.fillRect(x, y, w, h);
+            
+            // 虚线边框
+            ctx.strokeStyle = '#00d4ff';
+            ctx.lineWidth = 2;
+            ctx.setLineDash([5, 3]);
+            ctx.strokeRect(x, y, w, h);
+            ctx.setLineDash([]);
+        }
+        
+        // 绘制拖动预览
+        function drawDragPreview() {
+            if (!isDraggingBuilding || !dragBuildingStart || selectedBuildings.length === 0) return;
+            
+            // 获取当前鼠标位置并计算偏移
+            const rect = canvas.getBoundingClientRect();
+            // 这里无法直接获取鼠标位置，需要在mousemove时记录
+        }
+        
         function drawCanvasWatermark() {
+            // 如果水印已被移除，则不绘制
+            if (watermarkRemoved) return;
+            
             // 在画布上绘制半透明水印
             ctx.save();
-            ctx.globalAlpha = 0.08;
+            ctx.globalAlpha = 0.06;
             ctx.font = 'bold 60px Arial';
-            ctx.fillStyle = '#fff';
+            ctx.fillStyle = '#2980b9';
             ctx.textAlign = 'center';
             ctx.textBaseline = 'middle';
             
@@ -1356,7 +2018,7 @@
                 ctx.save();
                 ctx.translate(pos.x, pos.y);
                 ctx.rotate(-15 * Math.PI / 180);
-                ctx.fillText('2607 高原兔', 0, 0);
+                ctx.fillText('2607全民代表大会', 0, 0);
                 ctx.restore();
             });
             
@@ -1378,10 +2040,10 @@
                 
                 // 每10格加粗
                 if (i % 10 === 0) {
-                    ctx.strokeStyle = '#4a4a7a';
+                    ctx.strokeStyle = '#A8C8D8';
                     ctx.lineWidth = 1;
                 } else {
-                    ctx.strokeStyle = '#2a2a5a';
+                    ctx.strokeStyle = '#C8E0EC';
                     ctx.lineWidth = 0.5;
                 }
                 
@@ -1397,18 +2059,46 @@
             }
             
             // 中心点标记
-            ctx.fillStyle = 'rgba(0, 212, 255, 0.5)';
+            ctx.fillStyle = 'rgba(41, 128, 185, 0.4)';
             ctx.beginPath();
             ctx.arc(centerCanvasX, centerCanvasY, 8, 0, Math.PI * 2);
             ctx.fill();
-            ctx.strokeStyle = '#00d4ff';
+            ctx.strokeStyle = '#2980b9';
             ctx.lineWidth = 2;
             ctx.stroke();
             
             ctx.font = '12px Arial';
             ctx.fillStyle = '#00d4ff';
             ctx.textAlign = 'left';
-            ctx.fillText('(600,600)', centerCanvasX + 12, centerCanvasY - 5);
+            ctx.fillText('', centerCanvasX + 12, centerCanvasY - 5);
+        }
+        
+        // 绘制特殊区域背景（沃土→黑土→红土，从外到内）
+        function drawSpecialZones() {
+            for (const zone of SPECIAL_ZONES) {
+                const pos = gameToCanvas(zone.x, zone.y);
+                const zoneSize = zone.size * CELL_SIZE;
+                const drawX = pos.x - zoneSize;
+                const drawY = pos.y - zoneSize;
+                
+                // 绘制区域背景
+                ctx.fillStyle = zone.color;
+                ctx.fillRect(drawX, drawY, zoneSize, zoneSize);
+                
+                // 绘制区域边框
+                ctx.strokeStyle = zone.border;
+                ctx.lineWidth = 2;
+                ctx.setLineDash([8, 4]);
+                ctx.strokeRect(drawX + 0.5, drawY + 0.5, zoneSize - 1, zoneSize - 1);
+                ctx.setLineDash([]);
+                
+                // 绘制区域名称（小字体，在右上角）
+                ctx.font = 'bold 10px Arial';
+                ctx.fillStyle = zone.border;
+                ctx.textAlign = 'right';
+                ctx.textBaseline = 'top';
+                ctx.fillText(zone.name, drawX + zoneSize - 5, drawY + 5);
+            }
         }
         
         function drawBoundary() {
@@ -1451,6 +2141,56 @@
             ctx.fillText('(1199, 0)', x + 5, y + h - 5);
         }
         
+        function drawNPCBuildings() {
+            // 先绘制王城（底层）
+            const wcPos = gameToCanvas(WANG_CHENG.x, WANG_CHENG.y);
+            const wcSize = WANG_CHENG.size * CELL_SIZE;
+            const wcDrawX = wcPos.x - wcSize;
+            const wcDrawY = wcPos.y - wcSize;
+            
+            // 王城填充
+            ctx.fillStyle = WANG_CHENG.color;
+            ctx.fillRect(wcDrawX, wcDrawY, wcSize, wcSize);
+            
+            // 王城边框
+            ctx.strokeStyle = WANG_CHENG.border;
+            ctx.lineWidth = 2;
+            ctx.setLineDash([5, 3]);
+            ctx.strokeRect(wcDrawX + 0.5, wcDrawY + 0.5, wcSize - 1, wcSize - 1);
+            ctx.setLineDash([]);
+            
+            // 王城名称
+            ctx.font = 'bold 16px Arial';
+            ctx.fillStyle = 'rgba(255, 215, 0, 1)';
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+            ctx.fillText(WANG_CHENG.name, wcDrawX + wcSize / 2, wcDrawY + wcSize / 2);
+            
+            // 绘制四个方向的NPC建筑（每个是一个2×2格子）
+            for (const [direction, npc] of Object.entries(NPC_BUILDINGS)) {
+                const pos = gameToCanvas(npc.x, npc.y);
+                const pSize = npc.size * CELL_SIZE;
+                const drawX = pos.x - pSize;
+                const drawY = pos.y - pSize;
+                
+                // 填充
+                ctx.fillStyle = npc.color;
+                ctx.fillRect(drawX, drawY, pSize, pSize);
+                
+                // 边框
+                ctx.strokeStyle = npc.border;
+                ctx.lineWidth = 2;
+                ctx.strokeRect(drawX + 0.5, drawY + 0.5, pSize - 1, pSize - 1);
+                
+                // 在格子中心绘制方向名称
+                ctx.font = 'bold 12px Arial';
+                ctx.fillStyle = '#fff';
+                ctx.textAlign = 'center';
+                ctx.textBaseline = 'middle';
+                ctx.fillText(npc.name, drawX + pSize / 2, drawY + pSize / 2);
+            }
+        }
+        
         function drawBuilding(type, building) {
             const gameX = building.x;
             const gameY = building.y;
@@ -1488,7 +2228,7 @@
             if (type === 'qi') {
                 const centerPos = gameToCanvas(gameX + 3, gameY + 3);
                 const cx = centerPos.x - CELL_SIZE, cy = centerPos.y - CELL_SIZE;
-                ctx.fillStyle = '#0a0a1f';
+                ctx.fillStyle = '#E8F0F5';
                 ctx.fillRect(cx, cy, CELL_SIZE, CELL_SIZE);
                 ctx.strokeStyle = 'rgba(255,0,0,0.6)';
                 ctx.lineWidth = 1;
@@ -1557,8 +2297,18 @@
             }
         }
         
-        function drawBuildingHighlight(type, gameX, gameY) {
-            const size = BUILDING_CONFIG[type].size;
+        function drawBuildingHighlight(type, gameX, gameY, buildingData) {
+            // 获取建筑尺寸
+            let size;
+            if (type === 'npc') {
+                // NPC建筑的尺寸从buildingData中获取
+                size = buildingData && buildingData.size ? buildingData.size : 2;
+            } else if (BUILDING_CONFIG[type]) {
+                size = BUILDING_CONFIG[type].size;
+            } else {
+                return; // 未知类型，不绘制
+            }
+            
             const pos = gameToCanvas(gameX, gameY);
             const pSize = size * CELL_SIZE;
             ctx.strokeStyle = '#fff';
@@ -1762,17 +2512,19 @@
             tempCtx.scale(scale, scale);
             
             // 复制当前canvas内容
-            tempCtx.fillStyle = '#0f0f2a';
+            tempCtx.fillStyle = '#F0F8FF';
             tempCtx.fillRect(0, 0, canvas.width, canvas.height);
             tempCtx.drawImage(canvas, 0, 0);
             
-            // 添加版权水印
-            tempCtx.globalAlpha = 0.3;
-            tempCtx.font = 'bold 24px Arial';
-            tempCtx.fillStyle = '#fff';
-            tempCtx.textAlign = 'right';
-            tempCtx.textBaseline = 'bottom';
-            tempCtx.fillText('© 2607 高原兔', canvas.width - 20, canvas.height - 20);
+            // 添加版权水印（如果未去除）
+            if (!watermarkRemoved) {
+                tempCtx.globalAlpha = 0.3;
+                tempCtx.font = 'bold 24px Arial';
+                tempCtx.fillStyle = '#fff';
+                tempCtx.textAlign = 'right';
+                tempCtx.textBaseline = 'bottom';
+                tempCtx.fillText('© 2607全民代表大会', canvas.width - 20, canvas.height - 20);
+            }
             
             // 导出为图片
             const link = document.createElement('a');
