@@ -1,0 +1,1909 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="author" content="2607 高原兔">
+    <meta name="copyright" content="© 2026 2607 高原兔 版权所有">
+    <title>管理助手 | 2607 高原兔</title>
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><defs><linearGradient id='g' x1='0%25' y1='0%25' x2='100%25' y2='100%25'><stop offset='0%25' style='stop-color:%2300d4ff'/><stop offset='100%25' style='stop-color:%230066cc'/></linearGradient></defs><circle cx='50' cy='50' r='45' fill='url(%23g)'/><ellipse cx='50' cy='50' rx='45' ry='18' fill='none' stroke='%23fff' stroke-width='2' opacity='0.6'/><ellipse cx='50' cy='50' rx='18' ry='45' fill='none' stroke='%23fff' stroke-width='2' opacity='0.6'/><path d='M10 35 Q50 25 90 35' fill='none' stroke='%234ecca3' stroke-width='3' opacity='0.8'/><path d='M10 65 Q50 75 90 65' fill='none' stroke='%234ecca3' stroke-width='3' opacity='0.8'/></svg>">
+    <style>
+        /* 
+         * ============================================
+         * 管理助手 - 旗堡坑矿布局工具
+         * © 2026 2607 高原兔 版权所有
+         * 未经授权禁止复制、修改或分发
+         * ============================================
+         */
+        * { margin: 0; padding: 0; box-sizing: border-box; user-select: none; -webkit-user-select: none; }
+        html, body { height: 100%; overflow: hidden; touch-action: none; }
+        body {
+            font-family: 'Microsoft YaHei', 'PingFang SC', sans-serif;
+            background: #1a1a2e;
+            display: flex;
+            color: #fff;
+        }
+        
+        /* 响应式布局 */
+        @media (max-width: 768px) {
+            body { flex-direction: column; }
+            .toolbar { 
+                width: 100% !important; min-width: 100% !important; 
+                flex-direction: row !important; flex-wrap: wrap;
+                padding: 8px !important; gap: 6px !important;
+                max-height: 180px; overflow-y: auto;
+            }
+            .toolbar h2 { display: none; }
+            .tool-section, .alliance-section, .rotation-control { 
+                flex: 1 1 auto; min-width: 120px; padding: 6px !important; 
+            }
+            .stats-panel, .action-btns, .shortcuts { display: none; }
+            .rules-panel { display: none; }
+            .main-area { flex: 1; }
+            .header { padding: 4px 8px !important; }
+            .header h1 { font-size: 12px !important; }
+            .tool-btn { padding: 6px !important; font-size: 10px !important; }
+            .alliance-btn { padding: 4px !important; font-size: 9px !important; }
+        }
+        
+        .toolbar {
+            width: 200px;
+            min-width: 200px;
+            background: rgba(0,0,0,0.3);
+            padding: 12px;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            border-right: 1px solid rgba(255,255,255,0.1);
+            overflow-y: auto;
+        }
+        .toolbar h2 { color: #00d4ff; font-size: 16px; text-align: center; padding-bottom: 8px; border-bottom: 1px solid rgba(255,255,255,0.1); }
+        .tool-section { background: rgba(255,255,255,0.05); padding: 10px; border-radius: 8px; }
+        .tool-section h3 { font-size: 11px; color: #888; margin-bottom: 6px; }
+        .tool-btn {
+            width: 100%; padding: 8px; margin-bottom: 4px;
+            border: 2px solid transparent; border-radius: 6px;
+            cursor: pointer; font-weight: bold; font-size: 12px;
+            display: flex; align-items: center; gap: 6px;
+            transition: all 0.2s;
+        }
+        .tool-btn:hover { transform: scale(1.02); }
+        .tool-btn.active { border-color: #fff; box-shadow: 0 0 10px rgba(255,255,255,0.3); }
+        .tool-btn-qi { background: linear-gradient(135deg, #6495ED, #4169E1); color: #fff; }
+        .tool-btn-bao { background: linear-gradient(135deg, #4ecca3, #2ed573); color: #fff; }
+        .tool-btn-keng { background: linear-gradient(135deg, #ff6b6b, #ee5253); color: #fff; }
+        .tool-btn-kuang { background: linear-gradient(135deg, #ffd93d, #f39c12); color: #333; }
+        .tool-btn-delete { background: linear-gradient(135deg, #636e72, #2d3436); color: #fff; }
+        .tool-btn-move { background: linear-gradient(135deg, #a29bfe, #6c5ce7); color: #fff; }
+        .tool-btn-pointer { background: linear-gradient(135deg, #fd79a8, #e84393); color: #fff; }
+        .tool-icon { width: 20px; height: 20px; display: flex; align-items: center; justify-content: center; font-size: 11px; }
+        
+        /* 联盟选择 */
+        .alliance-section { background: rgba(255,255,255,0.05); padding: 10px; border-radius: 8px; }
+        .alliance-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 4px; }
+        .alliance-btn {
+            padding: 8px 4px; border: 2px solid transparent; border-radius: 6px;
+            cursor: pointer; font-weight: bold; font-size: 10px;
+            display: flex; flex-direction: column; align-items: center; gap: 2px;
+            transition: all 0.2s;
+        }
+        .alliance-btn:hover { transform: scale(1.05); }
+        .alliance-btn.active { border-color: #fff; box-shadow: 0 0 10px rgba(255,255,255,0.5); }
+        .alliance-color { width: 20px; height: 20px; border-radius: 4px; border: 1px solid rgba(255,255,255,0.3); }
+        
+        .rotation-control { background: rgba(255,255,255,0.05); padding: 10px; border-radius: 8px; }
+        .rotation-control h3 { font-size: 11px; color: #888; margin-bottom: 6px; }
+        .rotation-slider { width: 100%; margin: 6px 0; }
+        .rotation-value { text-align: center; color: #00d4ff; font-weight: bold; font-size: 16px; }
+        .rotation-presets { display: flex; gap: 4px; flex-wrap: wrap; margin-top: 6px; }
+        .rotation-preset { padding: 4px 8px; background: rgba(255,255,255,0.1); border: none; border-radius: 4px; color: #fff; cursor: pointer; font-size: 10px; }
+        .rotation-preset:hover { background: rgba(255,255,255,0.2); }
+        .rotation-preset.active { background: #00d4ff; color: #000; }
+        
+        .stats-panel { background: rgba(255,255,255,0.05); padding: 10px; border-radius: 8px; }
+        .stat-row { display: flex; justify-content: space-between; padding: 3px 0; font-size: 11px; }
+        .stat-label { color: #888; }
+        .stat-value { color: #00d4ff; font-weight: bold; }
+        .stat-value.success { color: #4ecca3; }
+        .stat-value.warning { color: #ffd93d; }
+        .stat-value.error { color: #ff6b6b; }
+        
+        .action-btns { display: flex; flex-direction: column; gap: 4px; }
+        .action-btn { padding: 6px; border: none; border-radius: 4px; cursor: pointer; font-size: 11px; }
+        .btn-clear { background: #ff6b6b; color: #fff; }
+        .btn-export { background: #4ecca3; color: #fff; }
+        .btn-auto { background: #ffd93d; color: #333; }
+        .btn-center { background: #a29bfe; color: #fff; }
+        
+        .shortcuts { font-size: 9px; color: #666; padding: 6px; background: rgba(255,255,255,0.03); border-radius: 4px; }
+        .shortcuts kbd { background: rgba(255,255,255,0.1); padding: 1px 4px; border-radius: 2px; }
+        
+        .main-area { flex: 1; display: flex; flex-direction: column; overflow: hidden; }
+        .header { padding: 8px 15px; background: rgba(0,0,0,0.2); display: flex; justify-content: space-between; align-items: center; }
+        .header h1 { color: #00d4ff; font-size: 16px; }
+        .header-info { display: flex; gap: 12px; font-size: 11px; color: #888; }
+        .header-info span { background: rgba(255,255,255,0.1); padding: 3px 8px; border-radius: 4px; }
+        .header-info .highlight { background: rgba(0, 212, 255, 0.2); color: #00d4ff; font-weight: bold; }
+        
+        .canvas-wrapper { flex: 1; overflow: hidden; background: #0a0a1f; position: relative; }
+        canvas { display: block; cursor: crosshair; }
+        
+        .rules-panel {
+            width: 220px; min-width: 220px;
+            background: rgba(0,0,0,0.3);
+            padding: 12px;
+            border-left: 1px solid rgba(255,255,255,0.1);
+            overflow-y: auto;
+        }
+        .rules-panel h2 { color: #00d4ff; font-size: 14px; margin-bottom: 10px; }
+        
+        /* 版权水印 */
+        .copyright-watermark {
+            position: fixed; bottom: 10px; right: 10px;
+            color: rgba(255,255,255,0.15); font-size: 11px;
+            pointer-events: none; z-index: 9999;
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.5);
+        }
+        .copyright-footer {
+            position: fixed; bottom: 0; left: 0; right: 0;
+            background: rgba(0,0,0,0.8); color: #888;
+            text-align: center; padding: 4px; font-size: 10px;
+            border-top: 1px solid rgba(255,255,255,0.1);
+            z-index: 1000;
+        }
+        .copyright-footer a { color: #00d4ff; text-decoration: none; }
+        @media (max-width: 768px) {
+            .copyright-footer { font-size: 9px; padding: 3px; }
+            .copyright-watermark { font-size: 9px; bottom: 25px; }
+        }
+        
+        /* 弹窗样式 */
+        .modal-overlay {
+            position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(0,0,0,0.8); z-index: 2000;
+            display: none; justify-content: center; align-items: center;
+        }
+        .modal-overlay.show { display: flex; }
+        .modal {
+            background: #1a1a2e; border-radius: 12px; padding: 20px;
+            max-width: 500px; width: 90%; max-height: 80vh;
+            border: 2px solid #00d4ff; box-shadow: 0 0 30px rgba(0,212,255,0.3);
+        }
+        .modal h3 { color: #00d4ff; margin-bottom: 15px; font-size: 16px; }
+        .modal-tabs { display: flex; gap: 8px; margin-bottom: 15px; }
+        .modal-tab {
+            padding: 8px 16px; border: none; border-radius: 6px;
+            background: rgba(255,255,255,0.1); color: #888; cursor: pointer;
+            font-size: 12px;
+        }
+        .modal-tab.active { background: #00d4ff; color: #000; }
+        .modal textarea {
+            width: 100%; height: 150px; background: rgba(0,0,0,0.3);
+            border: 1px solid rgba(255,255,255,0.2); border-radius: 6px;
+            color: #fff; padding: 10px; font-size: 12px; resize: none;
+            font-family: inherit;
+        }
+        .modal textarea:focus { outline: none; border-color: #00d4ff; }
+        .modal-hint { color: #888; font-size: 10px; margin: 8px 0; }
+        .modal-preview {
+            max-height: 120px; overflow-y: auto; background: rgba(0,0,0,0.3);
+            border-radius: 6px; padding: 8px; margin: 10px 0;
+        }
+        .modal-preview-item {
+            display: flex; justify-content: space-between; padding: 4px 0;
+            border-bottom: 1px solid rgba(255,255,255,0.1); font-size: 11px;
+        }
+        .modal-preview-item:last-child { border-bottom: none; }
+        .modal-preview-num { color: #00d4ff; font-weight: bold; }
+        .modal-preview-name { color: #fff; }
+        .modal-btns { display: flex; gap: 10px; margin-top: 15px; }
+        .modal-btn {
+            flex: 1; padding: 10px; border: none; border-radius: 6px;
+            cursor: pointer; font-weight: bold; font-size: 12px;
+        }
+        .modal-btn-primary { background: #00d4ff; color: #000; }
+        .modal-btn-secondary { background: rgba(255,255,255,0.1); color: #fff; }
+        
+        /* 登录界面样式 */
+        .login-overlay {
+            position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+            background: linear-gradient(135deg, #1a1a2e 0%, #0a0a1f 100%);
+            z-index: 9999; display: flex; justify-content: center; align-items: center;
+        }
+        .login-overlay.hidden { display: none; }
+        .login-box {
+            background: rgba(0,0,0,0.4); border-radius: 16px; padding: 40px;
+            border: 2px solid rgba(0,212,255,0.3); box-shadow: 0 0 60px rgba(0,212,255,0.2);
+            text-align: center; min-width: 320px;
+        }
+        .login-box h2 { color: #00d4ff; font-size: 24px; margin-bottom: 8px; }
+        .login-box .subtitle { color: #888; font-size: 12px; margin-bottom: 30px; }
+        .login-input {
+            width: 100%; padding: 12px 16px; margin-bottom: 16px;
+            background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.2);
+            border-radius: 8px; color: #fff; font-size: 14px;
+            transition: border-color 0.3s;
+        }
+        .login-input:focus { outline: none; border-color: #00d4ff; }
+        .login-input::placeholder { color: #666; }
+        .login-btn {
+            width: 100%; padding: 14px; background: linear-gradient(135deg, #00d4ff, #0099cc);
+            border: none; border-radius: 8px; color: #000; font-size: 14px;
+            font-weight: bold; cursor: pointer; transition: transform 0.2s, box-shadow 0.2s;
+        }
+        .login-btn:hover { transform: translateY(-2px); box-shadow: 0 4px 20px rgba(0,212,255,0.4); }
+        .login-btn:active { transform: translateY(0); }
+        .login-error {
+            color: #ff6b6b; font-size: 12px; margin-top: 12px;
+            min-height: 18px; transition: opacity 0.3s;
+        }
+        .login-footer { color: #555; font-size: 10px; margin-top: 30px; }
+        
+        .rule-item { background: rgba(255,255,255,0.05); padding: 8px; border-radius: 6px; margin-bottom: 6px; border-left: 3px solid #4ecca3; }
+        .rule-item.warning { border-left-color: #ffd93d; }
+        .rule-item.info { border-left-color: #6495ED; }
+        .rule-item h4 { color: #fff; font-size: 11px; margin-bottom: 3px; }
+        .rule-item p { color: #888; font-size: 9px; line-height: 1.4; }
+        
+        .coord-info { background: rgba(0,212,255,0.1); padding: 8px; border-radius: 6px; margin-bottom: 8px; border: 1px solid rgba(0,212,255,0.3); }
+        .coord-info h4 { color: #00d4ff; font-size: 11px; margin-bottom: 4px; }
+        .coord-info p { color: #aaa; font-size: 9px; line-height: 1.5; }
+        
+        .building-info {
+            position: fixed; background: rgba(0,0,0,0.95); color: #fff;
+            padding: 10px 14px; border-radius: 8px; font-size: 11px;
+            pointer-events: none; z-index: 1001; display: none;
+            border: 2px solid #00d4ff; min-width: 140px;
+        }
+        .building-info-title { font-size: 13px; font-weight: bold; margin-bottom: 6px; padding-bottom: 4px; border-bottom: 1px solid rgba(255,255,255,0.2); }
+        .building-info-coord { color: #00d4ff; font-size: 18px; font-weight: bold; text-align: center; margin: 6px 0; }
+        .building-info-note { color: #888; font-size: 9px; text-align: center; }
+        .building-info-status { margin-top: 4px; padding-top: 4px; border-top: 1px solid rgba(255,255,255,0.1); font-size: 10px; }
+        .building-info-status.active { color: #4ecca3; }
+        .building-info-status.inactive { color: #636e72; }
+        
+        .tooltip {
+            position: fixed; background: rgba(0,0,0,0.95); color: #fff;
+            padding: 8px 12px; border-radius: 6px; font-size: 11px;
+            pointer-events: none; z-index: 1000; display: none;
+            border: 1px solid rgba(255,255,255,0.2); line-height: 1.5;
+        }
+        .tooltip.error { background: rgba(255,107,107,0.95); border-color: #ff6b6b; }
+        .tooltip.success { background: rgba(30, 30, 60, 0.95); border-color: #4ecca3; }
+        
+        /* 边界警告 */
+        .boundary-warning {
+            position: absolute; bottom: 10px; left: 50%; transform: translateX(-50%);
+            background: rgba(255, 107, 107, 0.9); color: #fff;
+            padding: 6px 12px; border-radius: 4px; font-size: 11px;
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <!-- 登录界面 -->
+    <div class="login-overlay" id="login-overlay">
+        <div class="login-box">
+            <h2>🌍 管理助手</h2>
+            <div class="subtitle">请输入账号密码登录</div>
+            <input type="text" class="login-input" id="login-username" placeholder="用户名" autocomplete="off">
+            <input type="password" class="login-input" id="login-password" placeholder="密码" autocomplete="off">
+            <button class="login-btn" onclick="handleLogin()">登 录</button>
+            <div class="login-error" id="login-error"></div>
+            <div class="login-footer">© 2607 高原兔 版权所有</div>
+        </div>
+    </div>
+    
+    <div class="toolbar">
+        <h2>🌍 管理助手</h2>
+        
+        <div class="alliance-section">
+            <h3>🏴 选择联盟</h3>
+            <div class="alliance-grid" id="alliance-grid">
+                <!-- 联盟按钮由JS生成 -->
+            </div>
+        </div>
+        
+        <div class="tool-section">
+            <h3>选择建筑</h3>
+            <button class="tool-btn tool-btn-qi active" onclick="selectTool('qi')" id="tool-qi">
+                <span class="tool-icon">🚩</span><span>旗 (7×7)</span>
+            </button>
+            <button class="tool-btn tool-btn-bao" onclick="selectTool('bao')" id="tool-bao">
+                <span class="tool-icon">🏰</span><span>堡 (2×2)</span>
+            </button>
+            <button class="tool-btn tool-btn-keng" onclick="selectTool('keng')" id="tool-keng">
+                <span class="tool-icon">⭕</span><span>坑 (3×3)</span>
+            </button>
+            <button class="tool-btn tool-btn-kuang" onclick="selectTool('kuang')" id="tool-kuang">
+                <span class="tool-icon">💎</span><span>矿 (2×2)</span>
+            </button>
+        </div>
+        
+        <div class="tool-section">
+            <h3>工具</h3>
+            <button class="tool-btn tool-btn-pointer" onclick="selectTool('pointer')" id="tool-pointer">
+                <span class="tool-icon">👆</span><span>查看坐标</span>
+            </button>
+            <button class="tool-btn tool-btn-move" onclick="selectTool('move')" id="tool-move">
+                <span class="tool-icon">✋</span><span>移动画布</span>
+            </button>
+            <button class="tool-btn tool-btn-delete" onclick="selectTool('delete')" id="tool-delete">
+                <span class="tool-icon">🗑️</span><span>删除建筑</span>
+            </button>
+        </div>
+        
+        <div class="rotation-control">
+            <h3>🔄 画布旋转</h3>
+            <div class="rotation-value"><span id="rotation-display">0</span>°</div>
+            <input type="range" class="rotation-slider" id="rotation-slider" min="0" max="360" value="0" step="15" oninput="setRotation(this.value)">
+            <div class="rotation-presets">
+                <button class="rotation-preset active" onclick="setRotation(0)">0°</button>
+                <button class="rotation-preset" onclick="setRotation(45)">45°</button>
+                <button class="rotation-preset" onclick="setRotation(90)">90°</button>
+                <button class="rotation-preset" onclick="setRotation(180)">180°</button>
+            </div>
+        </div>
+        
+        <div class="stats-panel">
+            <h3>统计</h3>
+            <div id="alliance-stats">
+                <!-- 联盟统计由JS生成 -->
+            </div>
+            <div style="border-top: 1px solid rgba(255,255,255,0.1); margin-top: 6px; padding-top: 6px;">
+                <div class="stat-row"><span class="stat-label">🏰 堡(生效)</span><span class="stat-value success" id="stat-bao-active">0</span></div>
+                <div class="stat-row"><span class="stat-label">🏰 堡(未生效)</span><span class="stat-value warning" id="stat-bao-inactive">0</span></div>
+                <div class="stat-row"><span class="stat-label">⭕ 坑</span><span class="stat-value" id="stat-keng">0</span></div>
+                <div class="stat-row"><span class="stat-label">💎 矿</span><span class="stat-value" id="stat-kuang">0</span></div>
+            </div>
+        </div>
+        
+        <div class="action-btns">
+            <button class="action-btn btn-center" onclick="centerView()">回到中心</button>
+            <button class="action-btn btn-auto" onclick="autoFillBao()">自动填充堡</button>
+            <button class="action-btn btn-auto" onclick="openNameMatcher()">🏰 分配名称</button>
+            <button class="action-btn btn-export" onclick="exportLayout()">📤 导出JSON</button>
+            <button class="action-btn btn-export" onclick="importLayout()">📥 导入JSON</button>
+            <button class="action-btn btn-export" onclick="saveAsImage()">🖼️ 保存图片</button>
+            <button class="action-btn btn-clear" onclick="clearAll()">清空全部</button>
+        </div>
+        <input type="file" id="import-file" accept=".json" style="display:none" onchange="handleImport(event)">
+        
+        <div class="shortcuts">
+            <div><kbd>1</kbd>旗 <kbd>2</kbd>堡 <kbd>3</kbd>坑 <kbd>4</kbd>矿</div>
+            <div><kbd>P</kbd>查看 <kbd>D</kbd>删除 <kbd>空格</kbd>移动</div>
+            <div><kbd>Q</kbd>/<kbd>E</kbd>切换联盟 <kbd>C</kbd>回中心</div>
+        </div>
+    </div>
+    
+    <div class="main-area">
+        <div class="header">
+            <h1>🏯 旗堡坑矿</h1>
+            <div class="header-info">
+                <span class="highlight">坐标: <span id="mouse-game">(600, 600)</span></span>
+                <span>缩放: <span id="zoom-level">100%</span></span>
+                <span id="boundary-status"></span>
+            </div>
+        </div>
+        <div class="canvas-wrapper" id="canvas-wrapper">
+            <canvas id="canvas"></canvas>
+            <div class="boundary-warning" id="boundary-warning">⚠ 超出地图边界</div>
+        </div>
+    </div>
+    
+    <div class="rules-panel">
+        <h2>📋 规则</h2>
+        
+        <div class="coord-info">
+            <h4>📍 坐标系统</h4>
+            <p>• 右下角: <strong>(0, 0)</strong><br>
+               • 左上角: <strong>(1199, 1199)</strong><br>
+               • 旗/坑: <strong>中心坐标</strong><br>
+               • 堡/矿: <strong>右下角坐标</strong></p>
+        </div>
+        
+        <div class="rule-item info"><h4>🚩 旗 7×7</h4><p>6联盟不同色 | 同盟相连=激活</p></div>
+        <div class="rule-item"><h4>🏰 堡 2×2</h4><p>旗内=绿(生效) | 旗外=灰(不生效)</p></div>
+        <div class="rule-item warning"><h4>⭕ 坑 3×3</h4><p>可放多个 | 不能重叠</p></div>
+        <div class="rule-item"><h4>💎 矿 2×2</h4><p>任意位置</p></div>
+        
+        <div class="rule-item warning">
+            <h4>💡 提示</h4>
+            <p id="validation-msg">悬停建筑查看坐标</p>
+        </div>
+    </div>
+    
+    <div class="tooltip" id="tooltip"></div>
+    <div class="building-info" id="building-info">
+        <div class="building-info-title" id="building-info-title">🚩 旗</div>
+        <div class="building-info-coord" id="building-info-coord">(100, 200)</div>
+        <div class="building-info-note" id="building-info-note">中心坐标</div>
+        <div class="building-info-status" id="building-info-status"></div>
+    </div>
+    
+    <!-- 版权信息 -->
+    <div class="copyright-watermark">© 2607 高原兔</div>
+    <div class="copyright-footer">
+        🌍 管理助手 v1.0 | © 2026 <strong>2607 高原兔</strong> 版权所有 | 未经授权禁止复制分发
+    </div>
+    
+    <!-- 名称分配弹窗 -->
+    <div class="modal-overlay" id="name-modal">
+        <div class="modal">
+            <h3>🏰 堡垒名称分配</h3>
+            <div class="modal-tabs">
+                <button class="modal-tab active" onclick="switchModalTab(0)">红盟</button>
+                <button class="modal-tab" onclick="switchModalTab(1)">蓝盟</button>
+                <button class="modal-tab" onclick="switchModalTab(2)">绿盟</button>
+                <button class="modal-tab" onclick="switchModalTab(3)">黄盟</button>
+                <button class="modal-tab" onclick="switchModalTab(4)">紫盟</button>
+                <button class="modal-tab" onclick="switchModalTab(5)">橙盟</button>
+            </div>
+            <textarea id="name-input" placeholder="输入人员名称，每行一个或用空格分隔&#10;例如：&#10;张三&#10;李四&#10;王五"></textarea>
+            <div class="modal-hint">💡 名称将按顺序分配给当前联盟的堡，从序号1开始</div>
+            <div class="modal-preview" id="name-preview"></div>
+            <div class="modal-btns">
+                <button class="modal-btn modal-btn-secondary" onclick="closeNameMatcher()">取消</button>
+                <button class="modal-btn modal-btn-secondary" onclick="clearBaoNames()">清除名称</button>
+                <button class="modal-btn modal-btn-primary" onclick="applyNames()">应用分配</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        /**
+         * ============================================
+         * 管理助手 - 旗堡坑矿布局工具
+         * © 2026 2607 高原兔 版权所有
+         * 未经授权禁止复制、修改或分发本程序
+         * ============================================
+         */
+        
+        // 版权保护措施
+        (function() {
+            // 禁用右键菜单
+            document.addEventListener('contextmenu', function(e) {
+                if (e.target.tagName !== 'CANVAS') e.preventDefault();
+            });
+            // 禁用F12和Ctrl+Shift+I
+            document.addEventListener('keydown', function(e) {
+                if (e.key === 'F12' || (e.ctrlKey && e.shiftKey && e.key === 'I')) {
+                    e.preventDefault();
+                }
+            });
+            // 控制台警告
+            console.log('%c⚠️ 版权声明', 'color: #e74c3c; font-size: 20px; font-weight: bold;');
+            console.log('%c本程序由 2607 高原兔 开发，未经授权禁止复制、修改或分发。', 'color: #f39c12; font-size: 14px;');
+        })();
+        
+        // ========== 登录验证 ==========
+        const AUTH_USER = '2607';
+        const AUTH_PASS = 'godm';
+        
+        function checkLogin() {
+            return sessionStorage.getItem('loggedIn') === 'true';
+        }
+        
+        function handleLogin() {
+            const username = document.getElementById('login-username').value.trim();
+            const password = document.getElementById('login-password').value;
+            const errorEl = document.getElementById('login-error');
+            
+            if (username === AUTH_USER && password === AUTH_PASS) {
+                sessionStorage.setItem('loggedIn', 'true');
+                document.getElementById('login-overlay').classList.add('hidden');
+                errorEl.textContent = '';
+                initApp();
+            } else {
+                errorEl.textContent = '用户名或密码错误';
+                document.getElementById('login-password').value = '';
+            }
+        }
+        
+        // 回车键登录
+        document.addEventListener('DOMContentLoaded', function() {
+            const usernameInput = document.getElementById('login-username');
+            const passwordInput = document.getElementById('login-password');
+            
+            usernameInput.addEventListener('keydown', function(e) {
+                if (e.key === 'Enter') passwordInput.focus();
+            });
+            passwordInput.addEventListener('keydown', function(e) {
+                if (e.key === 'Enter') handleLogin();
+            });
+            
+            // 检查是否已登录
+            if (checkLogin()) {
+                document.getElementById('login-overlay').classList.add('hidden');
+                initApp();
+            } else {
+                usernameInput.focus();
+            }
+        });
+        
+        function initApp() {
+            // 延迟初始化，确保DOM完全加载
+            setTimeout(init, 100);
+        }
+        
+        const canvasWrapper = document.getElementById('canvas-wrapper');
+        const canvas = document.getElementById('canvas');
+        const ctx = canvas.getContext('2d');
+        const tooltip = document.getElementById('tooltip');
+        const buildingInfo = document.getElementById('building-info');
+        const boundaryWarning = document.getElementById('boundary-warning');
+        
+        // 配置
+        const CELL_SIZE = 10;
+        const GAME_SIZE = 1200;
+        const MAX_COORD = 1199;
+        
+        // 联盟配置（6个联盟）
+        const ALLIANCES = [
+            { id: 0, name: '红盟', color: '#e74c3c', colorActive: 'rgba(231, 76, 60, 0.5)', colorInactive: 'rgba(231, 76, 60, 0.2)', borderActive: '#e74c3c', borderInactive: '#7a3d3d' },
+            { id: 1, name: '蓝盟', color: '#3498db', colorActive: 'rgba(52, 152, 219, 0.5)', colorInactive: 'rgba(52, 152, 219, 0.2)', borderActive: '#3498db', borderInactive: '#2a5a7a' },
+            { id: 2, name: '绿盟', color: '#2ecc71', colorActive: 'rgba(46, 204, 113, 0.5)', colorInactive: 'rgba(46, 204, 113, 0.2)', borderActive: '#2ecc71', borderInactive: '#1e7a46' },
+            { id: 3, name: '黄盟', color: '#f1c40f', colorActive: 'rgba(241, 196, 15, 0.5)', colorInactive: 'rgba(241, 196, 15, 0.2)', borderActive: '#f1c40f', borderInactive: '#9a7d0a' },
+            { id: 4, name: '紫盟', color: '#9b59b6', colorActive: 'rgba(155, 89, 182, 0.5)', colorInactive: 'rgba(155, 89, 182, 0.2)', borderActive: '#9b59b6', borderInactive: '#5d3570' },
+            { id: 5, name: '橙盟', color: '#e67e22', colorActive: 'rgba(230, 126, 34, 0.5)', colorInactive: 'rgba(230, 126, 34, 0.2)', borderActive: '#e67e22', borderInactive: '#8a4c14' }
+        ];
+        
+        const BUILDING_CONFIG = {
+            qi:    { size: 7, name: '旗', icon: '🚩', coordType: 'center' },
+            bao:   { size: 2, colorActive: '#4ecca3', colorInactive: '#636e72', border: '#2ed573', name: '堡', icon: '🏰', coordType: 'bottomRight' },
+            keng:  { size: 3, color: 'rgba(255, 107, 107, 0.6)', border: '#ee5253', name: '坑', icon: '⭕', coordType: 'center' },
+            kuang: { size: 2, color: '#ffd93d', border: '#f39c12', name: '矿', icon: '💎', coordType: 'bottomRight' }
+        };
+        
+        // 当前选中的联盟
+        let currentAlliance = 0;
+        
+        // 缓存激活的旗集合（按联盟分组）
+        let activeQiSets = {};  // { allianceId: Set }
+        
+        // 状态
+        let currentTool = 'qi';
+        let buildings = { qi: [], bao: [], keng: [], kuang: [] };
+        let panOffset = { x: 0, y: 0 };
+        let zoom = 1;
+        let rotation = 0;
+        let isDragging = false;
+        let dragStart = { x: 0, y: 0 };
+        let panStart = { x: 0, y: 0 };
+        let previewPos = null;
+        let hoveredBuilding = null;
+        
+        // 缓存（按联盟分组）
+        let qiCoverageByAlliance = {};  // { allianceId: Set }
+        let qiForbiddenCenters = new Set();
+        let kengCoverage = new Set();
+        
+        // ========== 初始化 ==========
+        
+        function init() {
+            initAllianceUI();
+            initAllianceStats();
+            resizeCanvas();
+            window.addEventListener('resize', resizeCanvas);
+            bindEvents();
+            render();
+        }
+        
+        function initAllianceUI() {
+            const grid = document.getElementById('alliance-grid');
+            grid.innerHTML = ALLIANCES.map((a, i) => `
+                <button class="alliance-btn ${i === 0 ? 'active' : ''}" onclick="selectAlliance(${i})" id="alliance-${i}" style="background: ${a.colorInactive};">
+                    <div class="alliance-color" style="background: ${a.color};"></div>
+                    <span>${a.name}</span>
+                </button>
+            `).join('');
+        }
+        
+        function initAllianceStats() {
+            const container = document.getElementById('alliance-stats');
+            container.innerHTML = ALLIANCES.map(a => `
+                <div class="stat-row">
+                    <span class="stat-label" style="color: ${a.color};">🚩 ${a.name}</span>
+                    <span class="stat-value" id="stat-alliance-${a.id}">0/0</span>
+                </div>
+            `).join('');
+        }
+        
+        function selectAlliance(id) {
+            currentAlliance = id;
+            document.querySelectorAll('.alliance-btn').forEach((btn, i) => {
+                btn.classList.toggle('active', i === id);
+            });
+            // 更新旗按钮的颜色提示
+            const qiBtn = document.getElementById('tool-qi');
+            qiBtn.style.background = `linear-gradient(135deg, ${ALLIANCES[id].color}, ${ALLIANCES[id].borderInactive})`;
+            render();
+        }
+        
+        function resizeCanvas() {
+            canvas.width = canvasWrapper.clientWidth;
+            canvas.height = canvasWrapper.clientHeight;
+            render();
+        }
+        
+        function bindEvents() {
+            // 鼠标事件
+            canvas.addEventListener('mousemove', onMouseMove);
+            canvas.addEventListener('mousedown', onMouseDown);
+            canvas.addEventListener('mouseup', onMouseUp);
+            canvas.addEventListener('mouseleave', onMouseLeave);
+            
+            // 触摸事件支持（手机端）
+            canvas.addEventListener('touchstart', onTouchStart, { passive: false });
+            canvas.addEventListener('touchmove', onTouchMove, { passive: false });
+            canvas.addEventListener('touchend', onTouchEnd, { passive: false });
+            canvas.addEventListener('wheel', onWheel, { passive: false });
+            canvas.addEventListener('contextmenu', e => e.preventDefault());
+            document.addEventListener('keydown', onKeyDown);
+            document.addEventListener('keyup', onKeyUp);
+        }
+        
+        // ========== 坐标转换 ==========
+        
+        function screenToGame(screenX, screenY) {
+            const rect = canvas.getBoundingClientRect();
+            
+            // 相对于画布中心
+            let relX = screenX - rect.left - canvas.width / 2;
+            let relY = screenY - rect.top - canvas.height / 2;
+            
+            // 除以缩放
+            relX /= zoom;
+            relY /= zoom;
+            
+            // 反向旋转
+            if (rotation !== 0) {
+                const rad = -rotation * Math.PI / 180;
+                const newX = relX * Math.cos(rad) - relY * Math.sin(rad);
+                const newY = relX * Math.sin(rad) + relY * Math.cos(rad);
+                relX = newX;
+                relY = newY;
+            }
+            
+            // 减去平移
+            relX -= panOffset.x;
+            relY -= panOffset.y;
+            
+            // 转换为游戏坐标
+            // 画布中心 = 游戏(600, 600)
+            // 画布右(+X) = 游戏X减小
+            // 画布下(+Y) = 游戏Y减小
+            const gameX = 600 - Math.floor(relX / CELL_SIZE);
+            const gameY = 600 - Math.floor(relY / CELL_SIZE);
+            
+            return { x: gameX, y: gameY };
+        }
+        
+        function gameToCanvas(gameX, gameY) {
+            // 游戏(600,600) = 画布中心
+            const canvasX = canvas.width / 2 + (600 - gameX) * CELL_SIZE + panOffset.x;
+            const canvasY = canvas.height / 2 + (600 - gameY) * CELL_SIZE + panOffset.y;
+            return { x: canvasX, y: canvasY };
+        }
+        
+        function isInBounds(gameX, gameY) {
+            return gameX >= 0 && gameX <= MAX_COORD && gameY >= 0 && gameY <= MAX_COORD;
+        }
+        
+        function clampCoord(val) {
+            return Math.max(0, Math.min(MAX_COORD, val));
+        }
+        
+        function getBuildingDisplayCoord(type, gameX, gameY) {
+            const config = BUILDING_CONFIG[type];
+            const size = config.size;
+            
+            if (config.coordType === 'center') {
+                return { x: gameX + Math.floor(size / 2), y: gameY + Math.floor(size / 2) };
+            } else {
+                return { x: gameX, y: gameY };
+            }
+        }
+        
+        // ========== 限制平移范围 ==========
+        
+        function clampPanOffset() {
+            // 计算地图边界在画布中的位置
+            // 游戏(0,0)应该在画布右下方向
+            // 游戏(1199,1199)应该在画布左上方向
+            
+            // 限制不能拖出太远
+            const mapPixelSize = GAME_SIZE * CELL_SIZE; // 12000像素
+            const maxPan = mapPixelSize / 2; // 6000像素
+            
+            panOffset.x = Math.max(-maxPan, Math.min(maxPan, panOffset.x));
+            panOffset.y = Math.max(-maxPan, Math.min(maxPan, panOffset.y));
+        }
+        
+        // ========== 事件处理 ==========
+        
+        function onMouseMove(e) {
+            const gamePos = screenToGame(e.clientX, e.clientY);
+            const inBounds = isInBounds(gamePos.x, gamePos.y);
+            
+            // 显示坐标（始终显示，即使超出范围）
+            document.getElementById('mouse-game').textContent = `(${gamePos.x}, ${gamePos.y})`;
+            
+            // 超出边界警告
+            boundaryWarning.style.display = inBounds ? 'none' : 'block';
+            
+            // 移动画布
+            if (currentTool === 'move' && isDragging) {
+                const dx = (e.clientX - dragStart.x) / zoom;
+                const dy = (e.clientY - dragStart.y) / zoom;
+                panOffset.x = panStart.x + dx;
+                panOffset.y = panStart.y + dy;
+                clampPanOffset();
+                render();
+                return;
+            }
+            
+            // 建筑放置工具
+            if (['qi', 'bao', 'keng', 'kuang'].includes(currentTool)) {
+                previewPos = alignToGrid(gamePos, currentTool);
+                const validation = validatePlacement(currentTool, previewPos.x, previewPos.y);
+                const coord = getBuildingDisplayCoord(currentTool, previewPos.x, previewPos.y);
+                const coordNote = BUILDING_CONFIG[currentTool].coordType === 'center' ? '中心' : '右下角';
+                showTooltip(e.clientX, e.clientY, 
+                    `${validation.message}\n坐标(${coordNote}): (${coord.x}, ${coord.y})`, 
+                    validation.valid);
+                hideBuildingInfo();
+                hoveredBuilding = null;
+            } else {
+                previewPos = null;
+                // 查找悬停的建筑（仅在非放置工具时）
+                hoveredBuilding = findBuildingAt(gamePos.x, gamePos.y);
+                
+                if (hoveredBuilding) {
+                    showBuildingInfo(e.clientX, e.clientY, hoveredBuilding);
+                    hideTooltip();
+                } else if (currentTool === 'pointer') {
+                    hideBuildingInfo();
+                    const status = inBounds ? '有效范围' : '超出边界';
+                    showTooltip(e.clientX, e.clientY, `坐标: (${gamePos.x}, ${gamePos.y})\n${status}`, inBounds);
+                } else {
+                    hideBuildingInfo();
+                    hideTooltip();
+                }
+            }
+            
+            render();
+        }
+        
+        function findBuildingAt(gameX, gameY) {
+            // 检测范围稍微宽松一点，使用 <= 而不是 <
+            for (const type of ['bao', 'kuang', 'keng', 'qi']) {
+                const config = BUILDING_CONFIG[type];
+                const size = config.size;
+                for (const b of buildings[type]) {
+                    // 检查鼠标是否在建筑范围内（包含边界）
+                    if (gameX >= b.x && gameX <= b.x + size - 1 && gameY >= b.y && gameY <= b.y + size - 1) {
+                        return { type, building: b };
+                    }
+                }
+            }
+            return null;
+        }
+        
+        function showBuildingInfo(screenX, screenY, info) {
+            const config = BUILDING_CONFIG[info.type];
+            const coord = getBuildingDisplayCoord(info.type, info.building.x, info.building.y);
+            const coordNote = config.coordType === 'center' ? '中心坐标' : '右下角坐标';
+            
+            const statusEl = document.getElementById('building-info-status');
+            let borderColor;
+            
+            if (info.type === 'qi') {
+                const alliance = info.building.alliance;
+                const allianceConfig = ALLIANCES[alliance];
+                const qKey = `${info.building.x},${info.building.y}`;
+                const isActive = activeQiSets[alliance] && activeQiSets[alliance].has(qKey);
+                
+                document.getElementById('building-info-title').innerHTML = `${config.icon} ${allianceConfig.name}`;
+                statusEl.textContent = isActive ? '✓ 激活' : '✗ 未激活';
+                statusEl.className = 'building-info-status ' + (isActive ? 'active' : 'inactive');
+                borderColor = isActive ? allianceConfig.borderActive : allianceConfig.borderInactive;
+            } else {
+                document.getElementById('building-info-title').innerHTML = `${config.icon} ${config.name}`;
+                if (info.type === 'bao') {
+                    const inQi = isBaoInQi(info.building.x, info.building.y);
+                    statusEl.textContent = inQi ? '✓ 生效中' : '✗ 未生效';
+                    statusEl.className = 'building-info-status ' + (inQi ? 'active' : 'inactive');
+                } else {
+                    statusEl.textContent = '';
+                }
+                borderColor = config.border;
+            }
+            
+            document.getElementById('building-info-coord').textContent = `(${coord.x}, ${coord.y})`;
+            document.getElementById('building-info-note').textContent = coordNote;
+            
+            buildingInfo.style.borderColor = borderColor;
+            buildingInfo.style.left = (screenX + 15) + 'px';
+            buildingInfo.style.top = (screenY - 10) + 'px';
+            buildingInfo.style.display = 'block';
+        }
+        
+        function hideBuildingInfo() { buildingInfo.style.display = 'none'; }
+        
+        function onMouseDown(e) {
+            if (e.button === 2) {
+                const gamePos = screenToGame(e.clientX, e.clientY);
+                deleteAtPosition(gamePos.x, gamePos.y);
+                return;
+            }
+            
+            if (currentTool === 'move') {
+                isDragging = true;
+                dragStart = { x: e.clientX, y: e.clientY };
+                panStart = { x: panOffset.x, y: panOffset.y };
+                canvas.style.cursor = 'grabbing';
+                return;
+            }
+            
+            if (currentTool === 'delete') {
+                const gamePos = screenToGame(e.clientX, e.clientY);
+                deleteAtPosition(gamePos.x, gamePos.y);
+                return;
+            }
+            
+            if (currentTool === 'pointer') return;
+            
+            if (['qi', 'bao', 'keng', 'kuang'].includes(currentTool) && previewPos) {
+                const validation = validatePlacement(currentTool, previewPos.x, previewPos.y);
+                if (validation.valid) {
+                    placeBuilding(currentTool, previewPos.x, previewPos.y);
+                }
+            }
+        }
+        
+        function onMouseUp() {
+            isDragging = false;
+            if (currentTool === 'move') canvas.style.cursor = 'grab';
+        }
+        
+        function onMouseLeave() {
+            previewPos = null;
+            hoveredBuilding = null;
+            hideTooltip();
+            hideBuildingInfo();
+            boundaryWarning.style.display = 'none';
+            render();
+        }
+        
+        // ========== 触摸事件（手机端）==========
+        
+        let lastTouchDistance = 0;
+        let touchStartTime = 0;
+        
+        function getTouchPos(e) {
+            const touch = e.touches[0] || e.changedTouches[0];
+            return { clientX: touch.clientX, clientY: touch.clientY };
+        }
+        
+        function onTouchStart(e) {
+            e.preventDefault();
+            touchStartTime = Date.now();
+            
+            if (e.touches.length === 2) {
+                // 双指缩放
+                const dx = e.touches[0].clientX - e.touches[1].clientX;
+                const dy = e.touches[0].clientY - e.touches[1].clientY;
+                lastTouchDistance = Math.hypot(dx, dy);
+                return;
+            }
+            
+            const pos = getTouchPos(e);
+            
+            if (currentTool === 'move') {
+                isDragging = true;
+                dragStart = { x: pos.clientX, y: pos.clientY };
+                panStart = { x: panOffset.x, y: panOffset.y };
+            } else {
+                // 模拟鼠标移动来更新预览
+                onMouseMove({ clientX: pos.clientX, clientY: pos.clientY });
+            }
+        }
+        
+        function onTouchMove(e) {
+            e.preventDefault();
+            
+            if (e.touches.length === 2) {
+                // 双指缩放
+                const dx = e.touches[0].clientX - e.touches[1].clientX;
+                const dy = e.touches[0].clientY - e.touches[1].clientY;
+                const distance = Math.hypot(dx, dy);
+                if (lastTouchDistance > 0) {
+                    const scale = distance / lastTouchDistance;
+                    zoom = Math.max(0.2, Math.min(3, zoom * scale));
+                    document.getElementById('zoom-level').textContent = Math.round(zoom * 100) + '%';
+                    render();
+                }
+                lastTouchDistance = distance;
+                return;
+            }
+            
+            const pos = getTouchPos(e);
+            
+            if (currentTool === 'move' && isDragging) {
+                const dx = (pos.clientX - dragStart.x) / zoom;
+                const dy = (pos.clientY - dragStart.y) / zoom;
+                panOffset.x = panStart.x + dx;
+                panOffset.y = panStart.y + dy;
+                clampPanOffset();
+                render();
+            } else {
+                onMouseMove({ clientX: pos.clientX, clientY: pos.clientY });
+            }
+        }
+        
+        function onTouchEnd(e) {
+            e.preventDefault();
+            lastTouchDistance = 0;
+            
+            const touchDuration = Date.now() - touchStartTime;
+            const pos = getTouchPos(e);
+            
+            if (currentTool === 'move') {
+                isDragging = false;
+            } else if (touchDuration < 300) {
+                // 短按视为点击，放置建筑
+                onMouseMove({ clientX: pos.clientX, clientY: pos.clientY });
+                if (['qi', 'bao', 'keng', 'kuang'].includes(currentTool) && previewPos) {
+                    const validation = validatePlacement(currentTool, previewPos.x, previewPos.y);
+                    if (validation.valid) {
+                        placeBuilding(currentTool, previewPos.x, previewPos.y);
+                    }
+                } else if (currentTool === 'delete') {
+                    const gamePos = screenToGame(pos.clientX, pos.clientY);
+                    deleteAtPosition(gamePos.x, gamePos.y);
+                }
+            }
+            
+            hideTooltip();
+            render();
+        }
+        
+        function onWheel(e) {
+            e.preventDefault();
+            const delta = e.deltaY > 0 ? -0.1 : 0.1;
+            zoom = Math.max(0.2, Math.min(3, zoom + delta));
+            document.getElementById('zoom-level').textContent = Math.round(zoom * 100) + '%';
+            render();
+        }
+        
+        function onKeyDown(e) {
+            switch(e.key.toLowerCase()) {
+                case '1': selectTool('qi'); break;
+                case '2': selectTool('bao'); break;
+                case '3': selectTool('keng'); break;
+                case '4': selectTool('kuang'); break;
+                case 'p': selectTool('pointer'); break;
+                case 'd': selectTool('delete'); break;
+                case 'c': centerView(); break;
+                case ' ': e.preventDefault(); selectTool('move'); break;
+                case 'q': selectAlliance((currentAlliance - 1 + ALLIANCES.length) % ALLIANCES.length); break;
+                case 'e': selectAlliance((currentAlliance + 1) % ALLIANCES.length); break;
+            }
+        }
+        
+        function onKeyUp(e) { if (e.key === ' ') selectTool('qi'); }
+        
+        // ========== 控制 ==========
+        
+        function centerView() {
+            panOffset = { x: 0, y: 0 };
+            render();
+            showValidationMessage('已回到中心 (600, 600)');
+        }
+        
+        function setRotation(deg) {
+            rotation = parseInt(deg);
+            document.getElementById('rotation-slider').value = rotation;
+            document.getElementById('rotation-display').textContent = rotation;
+            document.querySelectorAll('.rotation-preset').forEach(btn => {
+                btn.classList.toggle('active', parseInt(btn.textContent) === rotation);
+            });
+            render();
+        }
+        
+        function selectTool(tool) {
+            currentTool = tool;
+            document.querySelectorAll('.tool-btn').forEach(btn => btn.classList.remove('active'));
+            const toolBtn = document.getElementById('tool-' + tool);
+            if (toolBtn) toolBtn.classList.add('active');
+            canvas.style.cursor = tool === 'move' ? 'grab' : tool === 'delete' ? 'not-allowed' : tool === 'pointer' ? 'help' : 'crosshair';
+        }
+        
+        function alignToGrid(pos, type) {
+            const size = BUILDING_CONFIG[type].size;
+            if (type === 'bao' || type === 'kuang') {
+                // 对齐到偶数坐标，使用floor确保对齐更稳定
+                return { x: Math.floor(pos.x / 2) * 2, y: Math.floor(pos.y / 2) * 2 };
+            }
+            // 旗和坑：以点击位置为中心放置
+            return { x: pos.x - Math.floor(size / 2), y: pos.y - Math.floor(size / 2) };
+        }
+        
+        // ========== 验证 ==========
+        
+        function validatePlacement(type, x, y) {
+            const size = BUILDING_CONFIG[type].size;
+            
+            if (x < 0 || y < 0 || x + size > GAME_SIZE || y + size > GAME_SIZE) {
+                return { valid: false, message: '❌ 超出地图范围(0-1199)' };
+            }
+            
+            if (type === 'qi') {
+                // 检查是否与现有旗重叠（完全相同位置）
+                for (const q of buildings.qi) {
+                    if (q.x === x && q.y === y) return { valid: false, message: '❌ 位置已有旗' };
+                }
+                // 旗可以随意放置，但显示是否激活
+                const allianceName = ALLIANCES[currentAlliance].name;
+                const sameAllianceQi = getQiByAlliance(currentAlliance);
+                const willBeActive = sameAllianceQi.length === 0 || isAdjacentToExistingQi(x, y, currentAlliance);
+                return { valid: true, message: willBeActive ? `✓ ${allianceName}（激活）` : `⚠ ${allianceName}（未激活）` };
+            }
+            
+            if (type === 'bao') {
+                for (let dx = 0; dx < size; dx++) {
+                    for (let dy = 0; dy < size; dy++) {
+                        const key = `${x + dx},${y + dy}`;
+                        if (kengCoverage.has(key)) return { valid: false, message: '❌ 堡不能建在坑上' };
+                        if (qiForbiddenCenters.has(key)) return { valid: false, message: '❌ 堡不能覆盖旗中心' };
+                    }
+                }
+                for (const b of buildings.bao) { if (isOverlap(x, y, size, b.x, b.y, size)) return { valid: false, message: '❌ 堡不能重叠' }; }
+                for (const k of buildings.kuang) { if (isOverlap(x, y, size, k.x, k.y, 2)) return { valid: false, message: '❌ 堡不能与矿重叠' }; }
+                return { valid: true, message: isBaoInQi(x, y) ? '✓ 堡（生效）' : '⚠ 堡（不生效）' };
+            }
+            
+            if (type === 'keng') {
+                // 检查是否与其他坑重叠
+                for (const k of buildings.keng) { if (isOverlap(x, y, size, k.x, k.y, 3)) return { valid: false, message: '❌ 坑不能重叠' }; }
+                // 检查是否与堡/矿重叠
+                for (let dx = 0; dx < size; dx++) {
+                    for (let dy = 0; dy < size; dy++) {
+                        for (const b of buildings.bao) { if (isOverlap(x + dx, y + dy, 1, b.x, b.y, 2)) return { valid: false, message: '❌ 坑不能与堡重叠' }; }
+                        for (const k of buildings.kuang) { if (isOverlap(x + dx, y + dy, 1, k.x, k.y, 2)) return { valid: false, message: '❌ 坑不能与矿重叠' }; }
+                    }
+                }
+                return { valid: true, message: '✓ 可以放置坑' };
+            }
+            
+            if (type === 'kuang') {
+                for (let dx = 0; dx < size; dx++) {
+                    for (let dy = 0; dy < size; dy++) {
+                        if (kengCoverage.has(`${x + dx},${y + dy}`)) return { valid: false, message: '❌ 矿不能建在坑上' };
+                    }
+                }
+                for (const k of buildings.kuang) { if (isOverlap(x, y, size, k.x, k.y, 2)) return { valid: false, message: '❌ 矿不能重叠' }; }
+                for (const b of buildings.bao) { if (isOverlap(x, y, size, b.x, b.y, 2)) return { valid: false, message: '❌ 矿不能与堡重叠' }; }
+                return { valid: true, message: '✓ 可以放置矿' };
+            }
+            
+            return { valid: false, message: '未知错误' };
+        }
+        
+        // 检查是否与同联盟的现有旗相邻
+        function isAdjacentToExistingQi(x, y, alliance = currentAlliance) {
+            for (const q of buildings.qi) {
+                if (q.alliance === alliance && Math.abs(x - q.x) <= 7 && Math.abs(y - q.y) <= 7) return true;
+            }
+            return false;
+        }
+        
+        // 获取某联盟的旗
+        function getQiByAlliance(alliance) {
+            return buildings.qi.filter(q => q.alliance === alliance);
+        }
+        
+        // 获取某联盟所有激活的旗（形成连通区域的旗）
+        function getActiveQiSetForAlliance(alliance) {
+            const allianceQi = getQiByAlliance(alliance);
+            if (allianceQi.length === 0) return new Set();
+            if (allianceQi.length === 1) return new Set([`${allianceQi[0].x},${allianceQi[0].y}`]);
+            
+            // 找到最大的连通分量
+            const allQi = allianceQi.map(q => ({ x: q.x, y: q.y, key: `${q.x},${q.y}` }));
+            const visited = new Set();
+            let largestComponent = [];
+            
+            for (const start of allQi) {
+                if (visited.has(start.key)) continue;
+                
+                const component = [];
+                const queue = [start];
+                visited.add(start.key);
+                component.push(start.key);
+                
+                while (queue.length > 0) {
+                    const current = queue.shift();
+                    for (const other of allQi) {
+                        if (!visited.has(other.key) && Math.abs(current.x - other.x) <= 7 && Math.abs(current.y - other.y) <= 7) {
+                            visited.add(other.key);
+                            queue.push(other);
+                            component.push(other.key);
+                        }
+                    }
+                }
+                
+                if (component.length > largestComponent.length) {
+                    largestComponent = component;
+                }
+            }
+            
+            return new Set(largestComponent);
+        }
+        
+        // 更新所有联盟的激活旗集合
+        function updateActiveQiSets() {
+            activeQiSets = {};
+            for (const alliance of ALLIANCES) {
+                activeQiSets[alliance.id] = getActiveQiSetForAlliance(alliance.id);
+            }
+        }
+        
+        // 检查旗是否激活
+        function isQiActiveByKey(qKey, alliance) {
+            return activeQiSets[alliance] && activeQiSets[alliance].has(qKey);
+        }
+        
+        function isBaoInQi(bx, by) {
+            // 检查堡是否在任何激活旗的覆盖范围内
+            for (let dx = 0; dx < 2; dx++) {
+                for (let dy = 0; dy < 2; dy++) {
+                    const key = `${bx + dx},${by + dy}`;
+                    // 检查所有联盟的覆盖范围
+                    for (const allianceId in qiCoverageByAlliance) {
+                        if (qiCoverageByAlliance[allianceId].has(key) && !qiForbiddenCenters.has(key)) return true;
+                    }
+                }
+            }
+            return false;
+        }
+        
+        function isOverlap(x1, y1, s1, x2, y2, s2) {
+            return x1 < x2 + s2 && x1 + s1 > x2 && y1 < y2 + s2 && y1 + s1 > y2;
+        }
+        
+        // ========== 操作 ==========
+        
+        // 获取某联盟堡的下一个序号
+        function getNextBaoIndex(alliance) {
+            const baosOfAlliance = buildings.bao.filter(b => b.alliance === alliance);
+            return baosOfAlliance.length + 1;
+        }
+        
+        // 判断堡所属的联盟（通过它在哪个联盟的旗覆盖范围内）
+        function getBaoAlliance(bx, by) {
+            for (let dx = 0; dx < 2; dx++) {
+                for (let dy = 0; dy < 2; dy++) {
+                    const key = `${bx + dx},${by + dy}`;
+                    for (const allianceId in qiCoverageByAlliance) {
+                        if (qiCoverageByAlliance[allianceId].has(key) && !qiForbiddenCenters.has(key)) {
+                            return parseInt(allianceId);
+                        }
+                    }
+                }
+            }
+            return null; // 不在任何旗上
+        }
+        
+        function placeBuilding(type, x, y) {
+            if (type === 'qi') {
+                buildings[type].push({ x, y, alliance: currentAlliance });
+            } else if (type === 'bao') {
+                // 堡有联盟归属和序号
+                const alliance = getBaoAlliance(x, y);
+                const index = alliance !== null ? getNextBaoIndex(alliance) : null;
+                buildings[type].push({ x, y, alliance, index, name: '' });
+            } else {
+                buildings[type].push({ x, y });
+            }
+            updateCoverage();
+            updateStats();
+            render();
+            const coord = getBuildingDisplayCoord(type, x, y);
+            showValidationMessage(`${BUILDING_CONFIG[type].icon} → (${coord.x}, ${coord.y})`);
+        }
+        
+        function deleteAtPosition(gameX, gameY) {
+            for (const type of ['bao', 'kuang', 'keng', 'qi']) {
+                const size = BUILDING_CONFIG[type].size;
+                for (let i = buildings[type].length - 1; i >= 0; i--) {
+                    const b = buildings[type][i];
+                    if (gameX >= b.x && gameX < b.x + size && gameY >= b.y && gameY < b.y + size) {
+                        const coord = getBuildingDisplayCoord(type, b.x, b.y);
+                        buildings[type].splice(i, 1);
+                        updateCoverage(); updateStats(); render();
+                        showValidationMessage(`删除 ${BUILDING_CONFIG[type].icon} (${coord.x}, ${coord.y})`);
+                        return;
+                    }
+                }
+            }
+        }
+        
+        function updateCoverage() {
+            qiCoverageByAlliance = {};
+            qiForbiddenCenters = new Set();
+            kengCoverage = new Set();
+            
+            // 更新所有联盟的激活旗集合
+            updateActiveQiSets();
+            
+            // 按联盟计算覆盖范围（只有激活的旗才提供覆盖）
+            for (const alliance of ALLIANCES) {
+                qiCoverageByAlliance[alliance.id] = new Set();
+            }
+            
+            for (const q of buildings.qi) {
+                const qKey = `${q.x},${q.y}`;
+                const alliance = q.alliance;
+                if (activeQiSets[alliance] && activeQiSets[alliance].has(qKey)) {
+                    for (let dx = 0; dx < 7; dx++) {
+                        for (let dy = 0; dy < 7; dy++) {
+                            qiCoverageByAlliance[alliance].add(`${q.x + dx},${q.y + dy}`);
+                        }
+                    }
+                }
+                qiForbiddenCenters.add(`${q.x + 3},${q.y + 3}`);
+            }
+            
+            for (const k of buildings.keng) {
+                for (let dx = 0; dx < 3; dx++) for (let dy = 0; dy < 3; dy++) kengCoverage.add(`${k.x + dx},${k.y + dy}`);
+            }
+        }
+        
+        function autoFillBao() {
+            if (buildings.qi.length === 0) { showValidationMessage('请先放置旗'); return; }
+            let kengCenter = buildings.keng.length > 0 ? { x: buildings.keng[0].x + 1.5, y: buildings.keng[0].y + 1.5 } : { x: 600, y: 600 };
+            const candidates = [], checked = new Set();
+            // 合并所有联盟的覆盖范围
+            const allCoverage = new Set();
+            for (const allianceId in qiCoverageByAlliance) {
+                for (const key of qiCoverageByAlliance[allianceId]) {
+                    allCoverage.add(key);
+                }
+            }
+            for (const key of allCoverage) {
+                const [ax, ay] = key.split(',').map(Number);
+                const bx = Math.floor(ax / 2) * 2, by = Math.floor(ay / 2) * 2;
+                for (let ox = -2; ox <= 2; ox += 2) {
+                    for (let oy = -2; oy <= 2; oy += 2) {
+                        const x = bx + ox, y = by + oy, posKey = `${x},${y}`;
+                        if (!checked.has(posKey)) {
+                            checked.add(posKey);
+                            if (validatePlacement('bao', x, y).valid && isBaoInQi(x, y)) {
+                                candidates.push({ x, y, dist: Math.hypot(x + 1 - kengCenter.x, y + 1 - kengCenter.y) });
+                            }
+                        }
+                    }
+                }
+            }
+            candidates.sort((a, b) => a.dist - b.dist);
+            let placed = 0;
+            for (const pos of candidates) {
+                if (validatePlacement('bao', pos.x, pos.y).valid) { 
+                    const alliance = getBaoAlliance(pos.x, pos.y);
+                    const index = alliance !== null ? getNextBaoIndex(alliance) : null;
+                    buildings.bao.push({ x: pos.x, y: pos.y, alliance, index, name: '' }); 
+                    placed++; 
+                }
+            }
+            updateCoverage(); updateStats(); render();
+            showValidationMessage(`自动填充了 ${placed} 个堡`);
+        }
+        
+        // ========== 渲染 ==========
+        
+        function render() {
+            ctx.save();
+            ctx.fillStyle = '#0f0f2a';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+            
+            ctx.translate(canvas.width / 2, canvas.height / 2);
+            ctx.scale(zoom, zoom);
+            ctx.rotate(rotation * Math.PI / 180);
+            ctx.translate(-canvas.width / 2, -canvas.height / 2);
+            
+            drawGrid();
+            drawBoundary();
+            
+            buildings.qi.forEach(b => drawBuilding('qi', b));
+            buildings.keng.forEach(b => drawBuilding('keng', b));
+            buildings.kuang.forEach(b => drawBuilding('kuang', b));
+            buildings.bao.forEach(b => drawBuilding('bao', b));
+            
+            // 绘制画布内水印
+            drawCanvasWatermark();
+            
+            if (previewPos && ['qi', 'bao', 'keng', 'kuang'].includes(currentTool)) {
+                const validation = validatePlacement(currentTool, previewPos.x, previewPos.y);
+                drawPreview(currentTool, previewPos.x, previewPos.y, validation.valid);
+            }
+            
+            if (hoveredBuilding) drawBuildingHighlight(hoveredBuilding.type, hoveredBuilding.building.x, hoveredBuilding.building.y);
+            
+            ctx.restore();
+        }
+        
+        function drawCanvasWatermark() {
+            // 在画布上绘制半透明水印
+            ctx.save();
+            ctx.globalAlpha = 0.08;
+            ctx.font = 'bold 60px Arial';
+            ctx.fillStyle = '#fff';
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+            
+            // 在多个位置绘制水印
+            const positions = [
+                { x: canvas.width * 0.25, y: canvas.height * 0.3 },
+                { x: canvas.width * 0.75, y: canvas.height * 0.3 },
+                { x: canvas.width * 0.5, y: canvas.height * 0.6 },
+                { x: canvas.width * 0.25, y: canvas.height * 0.8 },
+                { x: canvas.width * 0.75, y: canvas.height * 0.8 }
+            ];
+            
+            positions.forEach(pos => {
+                ctx.save();
+                ctx.translate(pos.x, pos.y);
+                ctx.rotate(-15 * Math.PI / 180);
+                ctx.fillText('2607 高原兔', 0, 0);
+                ctx.restore();
+            });
+            
+            ctx.restore();
+        }
+        
+        function drawGrid() {
+            const centerCanvasX = canvas.width / 2 + panOffset.x;
+            const centerCanvasY = canvas.height / 2 + panOffset.y;
+            
+            // 计算需要绘制的网格范围（足够大以覆盖缩放和平移）
+            const viewSize = Math.max(canvas.width, canvas.height) / zoom;
+            const gridRange = Math.ceil(viewSize / CELL_SIZE) + 50;
+            
+            // 绘制网格
+            for (let i = -gridRange; i <= gridRange; i++) {
+                const x = centerCanvasX + i * CELL_SIZE;
+                const y = centerCanvasY + i * CELL_SIZE;
+                
+                // 每10格加粗
+                if (i % 10 === 0) {
+                    ctx.strokeStyle = '#4a4a7a';
+                    ctx.lineWidth = 1;
+                } else {
+                    ctx.strokeStyle = '#2a2a5a';
+                    ctx.lineWidth = 0.5;
+                }
+                
+                ctx.beginPath();
+                ctx.moveTo(x, centerCanvasY - gridRange * CELL_SIZE);
+                ctx.lineTo(x, centerCanvasY + gridRange * CELL_SIZE);
+                ctx.stroke();
+                
+                ctx.beginPath();
+                ctx.moveTo(centerCanvasX - gridRange * CELL_SIZE, y);
+                ctx.lineTo(centerCanvasX + gridRange * CELL_SIZE, y);
+                ctx.stroke();
+            }
+            
+            // 中心点标记
+            ctx.fillStyle = 'rgba(0, 212, 255, 0.5)';
+            ctx.beginPath();
+            ctx.arc(centerCanvasX, centerCanvasY, 8, 0, Math.PI * 2);
+            ctx.fill();
+            ctx.strokeStyle = '#00d4ff';
+            ctx.lineWidth = 2;
+            ctx.stroke();
+            
+            ctx.font = '12px Arial';
+            ctx.fillStyle = '#00d4ff';
+            ctx.textAlign = 'left';
+            ctx.fillText('(600,600)', centerCanvasX + 12, centerCanvasY - 5);
+        }
+        
+        function drawBoundary() {
+            // 绘制地图边界 (0-1199)
+            const topLeft = gameToCanvas(1199, 1199);
+            const bottomRight = gameToCanvas(0, 0);
+            
+            // 因为游戏坐标Y向上增大，画布Y向下增大
+            // topLeft 在画布上方，bottomRight 在画布下方
+            const x = topLeft.x - GAME_SIZE * CELL_SIZE;
+            const y = topLeft.y - GAME_SIZE * CELL_SIZE;
+            const w = GAME_SIZE * CELL_SIZE;
+            const h = GAME_SIZE * CELL_SIZE;
+            
+            // 边界框
+            ctx.strokeStyle = 'rgba(255, 107, 107, 0.5)';
+            ctx.lineWidth = 3;
+            ctx.setLineDash([10, 5]);
+            ctx.strokeRect(x, y, w, h);
+            ctx.setLineDash([]);
+            
+            // 四角标签
+            ctx.font = '11px Arial';
+            ctx.fillStyle = 'rgba(255, 255, 255, 0.6)';
+            
+            // 左上角 (1199, 1199)
+            ctx.textAlign = 'left';
+            ctx.fillText('(1199, 1199)', x + 5, y + 15);
+            
+            // 右下角 (0, 0)
+            ctx.textAlign = 'right';
+            ctx.fillText('(0, 0)', x + w - 5, y + h - 5);
+            
+            // 右上角 (0, 1199)
+            ctx.textAlign = 'right';
+            ctx.fillText('(0, 1199)', x + w - 5, y + 15);
+            
+            // 左下角 (1199, 0)
+            ctx.textAlign = 'left';
+            ctx.fillText('(1199, 0)', x + 5, y + h - 5);
+        }
+        
+        function drawBuilding(type, building) {
+            const gameX = building.x;
+            const gameY = building.y;
+            const config = BUILDING_CONFIG[type];
+            const size = config.size;
+            const pos = gameToCanvas(gameX, gameY);
+            const pSize = size * CELL_SIZE;
+            const drawX = pos.x - pSize;
+            const drawY = pos.y - pSize;
+            
+            // 确定填充颜色
+            let fillColor, borderColor;
+            if (type === 'qi') {
+                const qKey = `${gameX},${gameY}`;
+                const alliance = building.alliance;
+                const allianceConfig = ALLIANCES[alliance];
+                const isActive = activeQiSets[alliance] && activeQiSets[alliance].has(qKey);
+                fillColor = isActive ? allianceConfig.colorActive : allianceConfig.colorInactive;
+                borderColor = isActive ? allianceConfig.borderActive : allianceConfig.borderInactive;
+            } else if (type === 'bao') {
+                fillColor = isBaoInQi(gameX, gameY) ? config.colorActive : config.colorInactive;
+                borderColor = config.border;
+            } else {
+                fillColor = config.color;
+                borderColor = config.border;
+            }
+            
+            ctx.fillStyle = fillColor;
+            ctx.fillRect(drawX, drawY, pSize, pSize);
+            
+            ctx.strokeStyle = borderColor;
+            ctx.lineWidth = type === 'qi' ? 2 : 1;
+            ctx.strokeRect(drawX + 0.5, drawY + 0.5, pSize - 1, pSize - 1);
+            
+            if (type === 'qi') {
+                const centerPos = gameToCanvas(gameX + 3, gameY + 3);
+                const cx = centerPos.x - CELL_SIZE, cy = centerPos.y - CELL_SIZE;
+                ctx.fillStyle = '#0a0a1f';
+                ctx.fillRect(cx, cy, CELL_SIZE, CELL_SIZE);
+                ctx.strokeStyle = 'rgba(255,0,0,0.6)';
+                ctx.lineWidth = 1;
+                ctx.beginPath();
+                ctx.moveTo(cx + 2, cy + 2); ctx.lineTo(cx + CELL_SIZE - 2, cy + CELL_SIZE - 2);
+                ctx.moveTo(cx + CELL_SIZE - 2, cy + 2); ctx.lineTo(cx + 2, cy + CELL_SIZE - 2);
+                ctx.stroke();
+            }
+            
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+            if (type === 'keng') { 
+                ctx.font = 'bold 10px Arial';
+                ctx.fillStyle = '#fff'; 
+                ctx.fillText('坑', drawX + pSize/2, drawY + pSize/2); 
+            }
+            if (type === 'kuang') { 
+                ctx.font = 'bold 10px Arial';
+                ctx.fillStyle = '#333'; 
+                ctx.fillText('矿', drawX + pSize/2, drawY + pSize/2); 
+            }
+            if (type === 'bao') {
+                // 获取坐标
+                const coord = getBuildingDisplayCoord('bao', building.x, building.y);
+                const hasIndex = building.index !== null && building.index !== undefined;
+                const hasName = building.name && building.name.trim();
+                
+                // 根据联盟获取颜色
+                const allianceColor = building.alliance !== null && building.alliance !== undefined 
+                    ? ALLIANCES[building.alliance].borderActive 
+                    : '#888';
+                
+                // 多行显示：序号、名称、坐标
+                const centerX = drawX + pSize / 2;
+                const lineHeight = pSize / 4; // 每行高度
+                
+                if (hasIndex || hasName) {
+                    // 第一行：序号
+                    if (hasIndex) {
+                        ctx.font = 'bold 8px Arial';
+                        ctx.fillStyle = allianceColor;
+                        ctx.fillText(building.index.toString(), centerX, drawY + lineHeight * 0.9);
+                    }
+                    
+                    // 第二行：名称（截断显示，最多4字符）
+                    if (hasName) {
+                        let displayName = building.name;
+                        if (displayName.length > 4) {
+                            displayName = displayName.substring(0, 3) + '…';
+                        }
+                        ctx.font = 'bold 7px Arial';
+                        ctx.fillStyle = '#fff';
+                        ctx.fillText(displayName, centerX, drawY + lineHeight * 2);
+                    }
+                    
+                    // 第三行：坐标
+                    ctx.font = '5px Arial';
+                    ctx.fillStyle = 'rgba(255,255,255,0.6)';
+                    ctx.fillText(`${coord.x},${coord.y}`, centerX, drawY + lineHeight * 3.1);
+                } else {
+                    // 无序号时只显示坐标
+                    ctx.font = '6px Arial';
+                    ctx.fillStyle = 'rgba(255,255,255,0.5)';
+                    ctx.fillText(`${coord.x},${coord.y}`, centerX, drawY + pSize / 2);
+                }
+            }
+        }
+        
+        function drawBuildingHighlight(type, gameX, gameY) {
+            const size = BUILDING_CONFIG[type].size;
+            const pos = gameToCanvas(gameX, gameY);
+            const pSize = size * CELL_SIZE;
+            ctx.strokeStyle = '#fff';
+            ctx.lineWidth = 3;
+            ctx.setLineDash([5, 3]);
+            ctx.strokeRect(pos.x - pSize - 2, pos.y - pSize - 2, pSize + 4, pSize + 4);
+            ctx.setLineDash([]);
+        }
+        
+        function drawPreview(type, gameX, gameY, valid) {
+            const size = BUILDING_CONFIG[type].size;
+            const config = BUILDING_CONFIG[type];
+            const pos = gameToCanvas(gameX, gameY);
+            const pSize = size * CELL_SIZE;
+            const drawX = pos.x - pSize, drawY = pos.y - pSize;
+            
+            // 确定预览颜色
+            let previewColor;
+            if (!valid) {
+                previewColor = 'rgba(255,0,0,0.4)';
+            } else if (type === 'qi') {
+                const allianceConfig = ALLIANCES[currentAlliance];
+                const sameAllianceQi = getQiByAlliance(currentAlliance);
+                const willBeActive = sameAllianceQi.length === 0 || isAdjacentToExistingQi(gameX, gameY, currentAlliance);
+                previewColor = willBeActive ? allianceConfig.colorActive : allianceConfig.colorInactive;
+            } else if (type === 'bao') {
+                previewColor = isBaoInQi(gameX, gameY) ? config.colorActive : config.colorInactive;
+            } else {
+                previewColor = config.color || config.colorActive;
+            }
+            
+            ctx.globalAlpha = 0.6;
+            ctx.fillStyle = previewColor;
+            ctx.fillRect(drawX, drawY, pSize, pSize);
+            ctx.strokeStyle = valid ? '#fff' : '#ff0000';
+            ctx.lineWidth = 2;
+            ctx.setLineDash([5, 3]);
+            ctx.strokeRect(drawX, drawY, pSize, pSize);
+            ctx.setLineDash([]);
+            ctx.globalAlpha = 1;
+        }
+        
+        // ========== UI ==========
+        
+        function showTooltip(x, y, message, valid) {
+            tooltip.innerHTML = message.replace(/\n/g, '<br>');
+            tooltip.className = 'tooltip ' + (valid ? 'success' : 'error');
+            tooltip.style.left = (x + 15) + 'px';
+            tooltip.style.top = (y + 15) + 'px';
+            tooltip.style.display = 'block';
+        }
+        
+        function hideTooltip() { tooltip.style.display = 'none'; }
+        function showValidationMessage(msg) { document.getElementById('validation-msg').textContent = msg; }
+        
+        function updateStats() {
+            // 按联盟统计旗的数量
+            for (const alliance of ALLIANCES) {
+                const allianceQi = getQiByAlliance(alliance.id);
+                const activeCount = activeQiSets[alliance.id] ? activeQiSets[alliance.id].size : 0;
+                const totalCount = allianceQi.length;
+                const el = document.getElementById(`stat-alliance-${alliance.id}`);
+                if (el) {
+                    el.textContent = `${activeCount}/${totalCount}`;
+                    el.className = 'stat-value ' + (activeCount === totalCount && totalCount > 0 ? 'success' : totalCount > 0 ? 'warning' : '');
+                }
+            }
+            
+            // 统计坑和矿
+            document.getElementById('stat-keng').textContent = buildings.keng.length;
+            document.getElementById('stat-kuang').textContent = buildings.kuang.length;
+            
+            // 统计堡的生效/未生效数量
+            let baoActiveCount = 0, baoInactiveCount = 0;
+            for (const b of buildings.bao) { 
+                if (isBaoInQi(b.x, b.y)) baoActiveCount++; 
+                else baoInactiveCount++; 
+            }
+            document.getElementById('stat-bao-active').textContent = baoActiveCount;
+            document.getElementById('stat-bao-inactive').textContent = baoInactiveCount;
+        }
+        
+        function clearAll() {
+            if (confirm('确定清空？')) {
+                buildings = { qi: [], bao: [], keng: [], kuang: [] };
+                updateCoverage(); updateStats(); render();
+                showValidationMessage('已清空');
+            }
+        }
+        
+        function exportLayout() {
+            const exportData = { rotation, alliances: ALLIANCES.map(a => a.name), buildings: {} };
+            for (const type of ['qi', 'bao', 'keng', 'kuang']) {
+                exportData.buildings[type] = buildings[type].map(b => {
+                    const coord = getBuildingDisplayCoord(type, b.x, b.y);
+                    const data = { gameX: b.x, gameY: b.y, displayX: coord.x, displayY: coord.y };
+                    if (type === 'qi') {
+                        data.alliance = b.alliance;
+                        data.allianceName = ALLIANCES[b.alliance].name;
+                    }
+                    if (type === 'bao') {
+                        data.alliance = b.alliance;
+                        data.index = b.index;
+                        data.name = b.name || '';
+                    }
+                    return data;
+                });
+            }
+            const blob = new Blob([JSON.stringify(exportData, null, 2)], { type: 'application/json' });
+            const a = document.createElement('a');
+            a.href = URL.createObjectURL(blob);
+            a.download = 'layout-' + new Date().toISOString().slice(0,10) + '.json';
+            a.click();
+            showValidationMessage('已导出');
+        }
+        
+        // ========== 导入布局 ==========
+        function importLayout() {
+            document.getElementById('import-file').click();
+        }
+        
+        function handleImport(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+            
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                try {
+                    const data = JSON.parse(e.target.result);
+                    
+                    // 清空现有建筑
+                    buildings = { qi: [], bao: [], keng: [], kuang: [] };
+                    
+                    // 导入旗
+                    if (data.buildings && data.buildings.qi) {
+                        buildings.qi = data.buildings.qi.map(b => ({
+                            x: b.gameX,
+                            y: b.gameY,
+                            alliance: b.alliance || 0
+                        }));
+                    }
+                    
+                    // 导入堡（包含序号和名称）
+                    if (data.buildings && data.buildings.bao) {
+                        buildings.bao = data.buildings.bao.map(b => ({
+                            x: b.gameX,
+                            y: b.gameY,
+                            alliance: b.alliance !== undefined ? b.alliance : null,
+                            index: b.index || null,
+                            name: b.name || ''
+                        }));
+                    }
+                    
+                    // 导入坑
+                    if (data.buildings && data.buildings.keng) {
+                        buildings.keng = data.buildings.keng.map(b => ({
+                            x: b.gameX,
+                            y: b.gameY
+                        }));
+                    }
+                    
+                    // 导入矿
+                    if (data.buildings && data.buildings.kuang) {
+                        buildings.kuang = data.buildings.kuang.map(b => ({
+                            x: b.gameX,
+                            y: b.gameY
+                        }));
+                    }
+                    
+                    // 导入旋转角度
+                    if (data.rotation !== undefined) {
+                        rotation = data.rotation;
+                        document.getElementById('rotation-slider').value = rotation;
+                        document.getElementById('rotation-value').textContent = rotation + '°';
+                    }
+                    
+                    updateCoverage();
+                    updateStats();
+                    render();
+                    showValidationMessage(`已导入: 旗${buildings.qi.length} 堡${buildings.bao.length} 坑${buildings.keng.length} 矿${buildings.kuang.length}`);
+                    
+                } catch (err) {
+                    showValidationMessage('导入失败: JSON格式错误');
+                    console.error('Import error:', err);
+                }
+            };
+            reader.readAsText(file);
+            event.target.value = ''; // 清空，允许重复导入同一文件
+        }
+        
+        // ========== 保存为图片 ==========
+        function saveAsImage() {
+            // 创建临时canvas来绘制导出用图片
+            const tempCanvas = document.createElement('canvas');
+            const scale = 2; // 2倍清晰度
+            tempCanvas.width = canvas.width * scale;
+            tempCanvas.height = canvas.height * scale;
+            const tempCtx = tempCanvas.getContext('2d');
+            
+            // 缩放以获得更清晰的图片
+            tempCtx.scale(scale, scale);
+            
+            // 复制当前canvas内容
+            tempCtx.fillStyle = '#0f0f2a';
+            tempCtx.fillRect(0, 0, canvas.width, canvas.height);
+            tempCtx.drawImage(canvas, 0, 0);
+            
+            // 添加版权水印
+            tempCtx.globalAlpha = 0.3;
+            tempCtx.font = 'bold 24px Arial';
+            tempCtx.fillStyle = '#fff';
+            tempCtx.textAlign = 'right';
+            tempCtx.textBaseline = 'bottom';
+            tempCtx.fillText('© 2607 高原兔', canvas.width - 20, canvas.height - 20);
+            
+            // 导出为图片
+            const link = document.createElement('a');
+            link.download = 'layout-' + new Date().toISOString().slice(0,10) + '.png';
+            link.href = tempCanvas.toDataURL('image/png');
+            link.click();
+            
+            showValidationMessage('已保存图片');
+        }
+        
+        // ========== 名称分配功能 ==========
+        let currentModalAlliance = 0;
+        const namesByAlliance = { 0: '', 1: '', 2: '', 3: '', 4: '', 5: '' };
+        
+        function openNameMatcher() {
+            document.getElementById('name-modal').classList.add('show');
+            switchModalTab(currentModalAlliance);
+            updateNamePreview();
+        }
+        
+        function closeNameMatcher() {
+            document.getElementById('name-modal').classList.remove('show');
+        }
+        
+        function switchModalTab(allianceId) {
+            // 保存当前输入
+            namesByAlliance[currentModalAlliance] = document.getElementById('name-input').value;
+            
+            // 切换标签
+            currentModalAlliance = allianceId;
+            document.querySelectorAll('.modal-tab').forEach((tab, i) => {
+                tab.classList.toggle('active', i === allianceId);
+            });
+            
+            // 加载对应联盟的输入
+            document.getElementById('name-input').value = namesByAlliance[allianceId] || '';
+            updateNamePreview();
+        }
+        
+        function updateNamePreview() {
+            const previewDiv = document.getElementById('name-preview');
+            const input = document.getElementById('name-input').value;
+            const names = input.split(/[\s\n]+/).filter(n => n.trim());
+            
+            // 获取当前联盟的堡列表（按序号排序）
+            const baosOfAlliance = buildings.bao
+                .filter(b => b.alliance === currentModalAlliance && b.index)
+                .sort((a, b) => a.index - b.index);
+            
+            if (baosOfAlliance.length === 0) {
+                previewDiv.innerHTML = '<div style="color:#888;padding:8px;">当前联盟没有激活的堡</div>';
+                return;
+            }
+            
+            let html = '';
+            const maxShow = Math.min(10, Math.max(names.length, baosOfAlliance.length));
+            
+            for (let i = 0; i < maxShow; i++) {
+                const bao = baosOfAlliance[i];
+                const name = names[i] || '';
+                const indexDisplay = bao ? bao.index : (i + 1);
+                const nameDisplay = name || (bao ? (bao.name || '(未分配)') : '(无堡)');
+                const color = name ? '#00d4ff' : '#666';
+                
+                html += `<div class="modal-preview-item">
+                    <span class="modal-preview-num">${indexDisplay}号</span>
+                    <span class="modal-preview-name" style="color:${color}">${nameDisplay}</span>
+                </div>`;
+            }
+            
+            if (names.length > baosOfAlliance.length) {
+                html += `<div style="color:#ff6b6b;font-size:10px;padding:4px;">⚠️ 名称数(${names.length})多于堡数(${baosOfAlliance.length})</div>`;
+            } else if (baosOfAlliance.length > maxShow) {
+                html += `<div style="color:#888;font-size:10px;padding:4px;">... 还有 ${baosOfAlliance.length - maxShow} 个堡</div>`;
+            }
+            
+            previewDiv.innerHTML = html;
+        }
+        
+        function applyNames() {
+            // 保存当前输入
+            namesByAlliance[currentModalAlliance] = document.getElementById('name-input').value;
+            
+            let totalAssigned = 0;
+            
+            // 为每个联盟分配名称
+            for (let allianceId = 0; allianceId < 6; allianceId++) {
+                const names = (namesByAlliance[allianceId] || '').split(/[\s\n]+/).filter(n => n.trim());
+                
+                // 获取该联盟的堡列表（按序号排序）
+                const baosOfAlliance = buildings.bao
+                    .filter(b => b.alliance === allianceId && b.index)
+                    .sort((a, b) => a.index - b.index);
+                
+                // 分配名称
+                baosOfAlliance.forEach((bao, i) => {
+                    if (i < names.length) {
+                        bao.name = names[i];
+                        totalAssigned++;
+                    }
+                });
+            }
+            
+            closeNameMatcher();
+            render();
+            showValidationMessage(`已分配 ${totalAssigned} 个名称`);
+        }
+        
+        function clearBaoNames() {
+            // 清除当前联盟的名称
+            buildings.bao.forEach(b => {
+                if (b.alliance === currentModalAlliance) {
+                    b.name = '';
+                }
+            });
+            document.getElementById('name-input').value = '';
+            namesByAlliance[currentModalAlliance] = '';
+            updateNamePreview();
+            render();
+            showValidationMessage(`已清除${ALLIANCES[currentModalAlliance].name}堡的名称`);
+        }
+        
+        // 监听输入变化更新预览
+        document.addEventListener('DOMContentLoaded', function() {
+            const nameInput = document.getElementById('name-input');
+            if (nameInput) {
+                nameInput.addEventListener('input', updateNamePreview);
+            }
+        });
+        
+        // init() 改为在登录成功后由 initApp() 调用
+    </script>
+</body>
+</html>
