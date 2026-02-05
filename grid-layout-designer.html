@@ -683,10 +683,11 @@
         
         <div class="coord-info">
             <h4>📍 坐标系统</h4>
-            <p>• 右下角: <strong>(0, 0)</strong><br>
-               • 左上角: <strong>(1199, 1199)</strong><br>
+            <p>• X轴向上增大，Y轴向左增大<br>
+               • 右下<strong>(0,0)</strong> 左上<strong>(1199,1199)</strong><br>
+               • 右上<strong>(1199,0)</strong> 左下<strong>(0,1199)</strong><br>
                • 旗/坑: <strong>中心坐标</strong><br>
-               • 堡/矿: <strong>右下角坐标</strong></p>
+               • 堡/矿/NPC: <strong>(X最大,Y最小)</strong></p>
         </div>
         
         <div class="rule-item info"><h4>🚩 旗 7×7</h4><p>6联盟不同色 | 同盟相连=激活</p></div>
@@ -878,18 +879,22 @@
         
         // NPC建筑配置（固定显示，不可删除）
         // 小NPC：坐标为2×2格子的右下角坐标
+        // NPC建筑坐标（代码内部gameX对应Y轴向左，gameY对应X轴向上）
+        // 用户坐标(X,Y)转换为代码(gameX,gameY)=(Y,X)
         const NPC_BUILDINGS = {
-            west:  { name: '西', x: 594, y: 604, size: 2, color: 'rgba(128, 128, 128, 0.6)', border: '#666' },
-            south: { name: '南', x: 594, y: 594, size: 2, color: 'rgba(128, 128, 128, 0.6)', border: '#666' },
-            east:  { name: '东', x: 604, y: 594, size: 2, color: 'rgba(128, 128, 128, 0.6)', border: '#666' },
-            north: { name: '北', x: 604, y: 604, size: 2, color: 'rgba(128, 128, 128, 0.6)', border: '#666' }
+            west:  { name: '西', x: 604, y: 593, size: 2, color: 'rgba(128, 128, 128, 0.6)', border: '#666' },  // 显示(594,604) 范围X:593~594,Y:604~605
+            south: { name: '南', x: 594, y: 593, size: 2, color: 'rgba(128, 128, 128, 0.6)', border: '#666' },  // 显示(594,594) 范围X:593~594,Y:594~595
+            east:  { name: '东', x: 594, y: 603, size: 2, color: 'rgba(128, 128, 128, 0.6)', border: '#666' },  // 显示(604,594) 范围X:603~604,Y:594~595
+            north: { name: '北', x: 604, y: 603, size: 2, color: 'rgba(128, 128, 128, 0.6)', border: '#666' }   // 显示(604,604) 范围X:603~604,Y:604~605
         };
         
-        // 王城NPC：对角坐标(594,605)-(605,594)，12×12区域
+        // 王城NPC：12×12区域，中心坐标(599,600)
+        // 用户坐标范围：X=593~604, Y=594~605
+        // 代码坐标(gameX,gameY)=(594,593)，刚好覆盖东南西北四个角
         const WANG_CHENG = {
             name: '王城',
-            x: 594,      // 右下角x
-            y: 594,      // 右下角y
+            x: 594,      // 代码gameX (对应用户Y_min)
+            y: 593,      // 代码gameY (对应用户X_min)
             size: 12,    // 12×12
             color: 'rgba(255, 215, 0, 0.15)',  // 金色半透明
             border: 'rgba(255, 215, 0, 0.5)'
@@ -1057,9 +1062,10 @@
             relY -= panOffset.y;
             
             // 转换为游戏坐标
+            // 游戏坐标系：右下(0,0)、右上(1199,0)、左下(0,1199)、左上(1199,1199)
+            // X轴向上增大，Y轴向左增大
+            // 注：内部变量gameX实际对应Y轴(向左)，gameY对应X轴(向上)
             // 画布中心 = 游戏(600, 600)
-            // 画布右(+X) = 游戏X减小
-            // 画布下(+Y) = 游戏Y减小
             const gameX = 600 - Math.floor(relX / CELL_SIZE);
             const gameY = 600 - Math.floor(relY / CELL_SIZE);
             
@@ -1086,9 +1092,12 @@
             const size = config.size;
             
             if (config.coordType === 'center') {
+                // 旗、坑：显示中心坐标
                 return { x: gameX + Math.floor(size / 2), y: gameY + Math.floor(size / 2) };
             } else {
-                return { x: gameX, y: gameY };
+                // 堡、矿等2×2建筑：显示用户坐标(X_max, Y_min)
+                // gameY对应用户X轴，需要+size-1显示最大值
+                return { x: gameX, y: gameY + size - 1 };
             }
         }
         
@@ -1114,7 +1123,8 @@
             const inBounds = isInBounds(gamePos.x, gamePos.y);
             
             // 显示坐标（始终显示，即使超出范围）
-            document.getElementById('mouse-game').textContent = `(${gamePos.x}, ${gamePos.y})`;
+            // 注：gamePos.y对应X轴(向上)，gamePos.x对应Y轴(向左)，所以显示时交换顺序
+            document.getElementById('mouse-game').textContent = `(${gamePos.y}, ${gamePos.x})`;
             
             // 超出边界警告
             boundaryWarning.style.display = inBounds ? 'none' : 'block';
@@ -1183,7 +1193,7 @@
                 const coord = getBuildingDisplayCoord(currentTool, previewPos.x, previewPos.y);
                 const coordNote = BUILDING_CONFIG[currentTool].coordType === 'center' ? '中心' : '右下角';
                 showTooltip(e.clientX, e.clientY, 
-                    `${validation.message}\n坐标(${coordNote}): (${coord.x}, ${coord.y})`, 
+                    `${validation.message}\n坐标(${coordNote}): (${coord.y}, ${coord.x})`, 
                     validation.valid);
                 hideBuildingInfo();
                 hoveredBuilding = null;
@@ -1198,7 +1208,7 @@
                 } else if (currentTool === 'pointer') {
                     hideBuildingInfo();
                     const status = inBounds ? '有效范围' : '超出边界';
-                    showTooltip(e.clientX, e.clientY, `坐标: (${gamePos.x}, ${gamePos.y})\n${status}`, inBounds);
+                    showTooltip(e.clientX, e.clientY, `坐标: (${gamePos.y}, ${gamePos.x})\n${status}`, inBounds);
                 } else {
                     hideBuildingInfo();
                     hideTooltip();
@@ -1244,7 +1254,18 @@
             // 处理NPC建筑
             if (info.type === 'npc') {
                 document.getElementById('building-info-title').innerHTML = `🏛️ NPC-${info.building.name}`;
-                document.getElementById('building-info-coord').textContent = `(${info.building.x}, ${info.building.y})`;
+                
+                let npcDisplayX, npcDisplayY;
+                if (info.building.size > 2) {
+                    // 王城等大型建筑：显示中心坐标
+                    npcDisplayX = info.building.y + Math.floor(info.building.size / 2);
+                    npcDisplayY = info.building.x + Math.floor(info.building.size / 2);
+                } else {
+                    // 东南西北等2×2建筑：显示(X_max, Y_min)
+                    npcDisplayX = info.building.y + info.building.size - 1;
+                    npcDisplayY = info.building.x;
+                }
+                document.getElementById('building-info-coord').textContent = `(${npcDisplayX}, ${npcDisplayY})`;
                 document.getElementById('building-info-note').textContent = '固定建筑';
                 statusEl.textContent = '不可删除';
                 statusEl.className = 'building-info-status inactive';
@@ -1283,7 +1304,7 @@
                 borderColor = config.border;
             }
             
-            document.getElementById('building-info-coord').textContent = `(${coord.x}, ${coord.y})`;
+            document.getElementById('building-info-coord').textContent = `(${coord.y}, ${coord.x})`;
             document.getElementById('building-info-note').textContent = coordNote;
             
             buildingInfo.style.borderColor = borderColor;
@@ -1428,7 +1449,8 @@
         // 堡垒改名函数
         function renameBao(index, bao) {
             const currentName = bao.name || '';
-            const newName = prompt(`🏰 堡垒改名\n坐标: (${bao.x}, ${bao.y})\n请输入新名称（留空则清除名称）:`, currentName);
+            // 坐标显示交换：bao.y对应X轴，bao.x对应Y轴
+            const newName = prompt(`🏰 堡垒改名\n坐标: (${bao.y}, ${bao.x})\n请输入新名称（留空则清除名称）:`, currentName);
             
             if (newName !== null) {  // 用户没有点取消
                 buildings.bao[index].name = newName.trim();
@@ -2015,7 +2037,7 @@
             updateStats();
             render();
             const coord = getBuildingDisplayCoord(type, x, y);
-            showValidationMessage(`${BUILDING_CONFIG[type].icon} → (${coord.x}, ${coord.y})`);
+            showValidationMessage(`${BUILDING_CONFIG[type].icon} → (${coord.y}, ${coord.x})`);
         }
         
         function deleteAtPosition(gameX, gameY) {
@@ -2042,7 +2064,7 @@
                         const coord = getBuildingDisplayCoord(type, b.x, b.y);
                         buildings[type].splice(i, 1);
                         updateCoverage(); updateStats(); render();
-                        showValidationMessage(`删除 ${BUILDING_CONFIG[type].icon} (${coord.x}, ${coord.y})`);
+                        showValidationMessage(`删除 ${BUILDING_CONFIG[type].icon} (${coord.y}, ${coord.x})`);
                         return;
                     }
                 }
@@ -2351,25 +2373,25 @@
             ctx.strokeRect(x, y, w, h);
             ctx.setLineDash([]);
             
-            // 四角标签
+            // 四角标签 (X轴向上增大，Y轴向左增大)
             ctx.font = '11px Arial';
             ctx.fillStyle = 'rgba(255, 255, 255, 0.6)';
             
-            // 左上角 (1199, 1199)
+            // 左上角 (1199, 1199) - X大=上，Y大=左
             ctx.textAlign = 'left';
             ctx.fillText('(1199, 1199)', x + 5, y + 15);
             
-            // 右下角 (0, 0)
+            // 右下角 (0, 0) - X小=下，Y小=右
             ctx.textAlign = 'right';
             ctx.fillText('(0, 0)', x + w - 5, y + h - 5);
             
-            // 右上角 (0, 1199)
+            // 右上角 (1199, 0) - X大=上，Y小=右
             ctx.textAlign = 'right';
-            ctx.fillText('(0, 1199)', x + w - 5, y + 15);
+            ctx.fillText('(1199, 0)', x + w - 5, y + 15);
             
-            // 左下角 (1199, 0)
+            // 左下角 (0, 1199) - X小=下，Y大=左
             ctx.textAlign = 'left';
-            ctx.fillText('(1199, 0)', x + 5, y + h - 5);
+            ctx.fillText('(0, 1199)', x + 5, y + h - 5);
         }
         
         function drawNPCBuildings() {
@@ -2518,12 +2540,12 @@
                     // 第三行：坐标
                     ctx.font = '5px Arial';
                     ctx.fillStyle = 'rgba(255,255,255,0.6)';
-                    ctx.fillText(`${coord.x},${coord.y}`, centerX, drawY + lineHeight * 3.1);
+                    ctx.fillText(`${coord.y},${coord.x}`, centerX, drawY + lineHeight * 3.1);
                 } else {
                     // 无序号时只显示坐标
                     ctx.font = '6px Arial';
                     ctx.fillStyle = 'rgba(255,255,255,0.5)';
-                    ctx.fillText(`${coord.x},${coord.y}`, centerX, drawY + pSize / 2);
+                    ctx.fillText(`${coord.y},${coord.x}`, centerX, drawY + pSize / 2);
                 }
             }
         }
@@ -2635,7 +2657,8 @@
             for (const type of ['qi', 'bao', 'keng', 'kuang']) {
                 exportData.buildings[type] = buildings[type].map(b => {
                     const coord = getBuildingDisplayCoord(type, b.x, b.y);
-                    const data = { gameX: b.x, gameY: b.y, displayX: coord.x, displayY: coord.y };
+                    // 交换坐标：内部y对应显示X，内部x对应显示Y
+                    const data = { gameX: b.y, gameY: b.x, displayX: coord.y, displayY: coord.x };
                     if (type === 'qi') {
                         data.alliance = b.alliance;
                         data.allianceName = ALLIANCES[b.alliance].name;
