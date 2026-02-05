@@ -27,23 +27,229 @@
         /* 响应式布局 */
         @media (max-width: 768px) {
             body { flex-direction: column; }
+            
+            /* 顶部工具栏 - 紧凑横向布局 */
             .toolbar { 
                 width: 100% !important; min-width: 100% !important; 
                 flex-direction: row !important; flex-wrap: wrap;
-                padding: 8px !important; gap: 6px !important;
-                max-height: 180px; overflow-y: auto;
+                padding: 6px 8px !important; gap: 4px !important;
+                max-height: none; overflow-y: visible;
+                border-right: none; border-bottom: 1px solid #C8E0EC;
+                padding-bottom: 8px !important;
             }
             .toolbar h2 { display: none; }
-            .tool-section, .alliance-section, .rotation-control { 
-                flex: 1 1 auto; min-width: 120px; padding: 6px !important; 
+            
+            /* 联盟选择 - 横向排列 */
+            .alliance-section { 
+                flex: 0 0 100%; order: 1; padding: 4px 6px !important;
+                background: transparent;
             }
-            .action-btns { display: none; }
-            .rules-panel { display: none; }
-            .main-area { flex: 1; }
-            .header { padding: 4px 8px !important; }
-            .header h1 { font-size: 12px !important; }
-            .tool-btn { padding: 6px !important; font-size: 10px !important; }
-            .alliance-btn { padding: 4px !important; font-size: 9px !important; }
+            .alliance-section h3 { display: none; }
+            .alliance-grid { 
+                grid-template-columns: repeat(6, 1fr) !important; gap: 3px; 
+            }
+            .alliance-btn { 
+                padding: 6px 2px !important; font-size: 8px !important; 
+                border-radius: 4px;
+            }
+            .alliance-btn .alliance-name { font-size: 7px !important; }
+            
+            /* 建筑选择 - 紧凑图标按钮网格布局 */
+            .tool-section { 
+                flex: 1 1 auto; order: 2; padding: 2px 4px !important;
+                background: rgba(200,224,236,0.2); min-width: auto;
+                display: grid !important;
+                grid-template-columns: repeat(4, 1fr);
+                gap: 3px;
+                border-radius: 6px;
+            }
+            .tool-section h3 { display: none; }
+            .tool-section:first-of-type { order: 2; } /* 建筑选择 */
+            .tool-section:last-of-type { order: 3; }  /* 工具 */
+            .tool-btn { 
+                padding: 10px 4px !important; font-size: 9px !important; 
+                margin-bottom: 0 !important;
+                flex-direction: column !important;
+                justify-content: center;
+                width: auto !important;
+            }
+            .tool-btn span:last-child { 
+                display: block !important; 
+                font-size: 7px !important; 
+                white-space: nowrap;
+            }
+            .tool-icon { width: 20px !important; height: 20px !important; font-size: 16px !important; }
+            
+            /* 旋转控制 - 简化 */
+            .rotation-control { 
+                flex: 0 0 auto; order: 4; padding: 4px 8px !important;
+                display: flex; flex-direction: row !important; align-items: center; gap: 6px;
+                background: rgba(200,224,236,0.2); min-width: auto;
+                border-radius: 6px;
+            }
+            .rotation-control h3 { display: none; }
+            .rotation-value { font-size: 11px !important; margin: 0 !important; }
+            .rotation-slider { width: 60px !important; margin: 0 !important; }
+            .rotation-presets { display: none !important; }
+            
+            /* 桌面端操作按钮在手机端隐藏，由底部工具栏替代 */
+            .action-btns { display: none !important; }
+            
+            /* 右侧规则面板隐藏 */
+            .rules-panel { display: none !important; }
+            
+            /* 主区域 */
+            .main-area { flex: 1; padding-bottom: 56px; } /* 为底部工具栏留空间 */
+            
+            /* Header - 简化布局 */
+            .header { 
+                padding: 4px 8px !important; 
+                flex-wrap: wrap;
+            }
+            .header h1 { 
+                font-size: 11px !important; 
+                flex: 0 0 auto;
+            }
+            .header-info { 
+                flex: 1; justify-content: flex-end; 
+                gap: 6px !important; font-size: 10px !important;
+                flex-wrap: wrap;
+            }
+            .header-info span { padding: 2px 4px !important; }
+            .header-info > span:nth-child(n+3) { display: none; } /* 隐藏缩放后面的元素 */
+            #btn-zoom-out, #btn-zoom-in { width: 22px !important; height: 22px !important; }
+            #btn-zoom-reset { padding: 2px 4px !important; font-size: 9px !important; }
+            #btn-remove-watermark { display: none; } /* 移到底部工具栏 */
+            
+            /* 版权栏 */
+            .copyright-footer { 
+                display: none; /* 手机端隐藏底部版权栏，避免遮挡 */
+            }
+            .copyright-watermark { 
+                bottom: 60px; font-size: 8px; 
+            }
+            
+            /* 底部固定工具栏 */
+            .mobile-toolbar {
+                display: flex !important;
+            }
+        }
+        
+        /* 底部固定工具栏 - 默认隐藏，仅手机端显示 */
+        .mobile-toolbar {
+            display: none;
+            position: fixed;
+            bottom: 0; left: 0; right: 0;
+            background: rgba(255,255,255,0.95);
+            backdrop-filter: blur(10px);
+            border-top: 1px solid #C8E0EC;
+            padding: 6px 8px;
+            z-index: 999;
+            gap: 6px;
+            justify-content: space-around;
+            box-shadow: 0 -2px 10px rgba(0,0,0,0.1);
+        }
+        .mobile-toolbar-btn {
+            flex: 1;
+            max-width: 70px;
+            padding: 8px 4px;
+            border: none;
+            border-radius: 6px;
+            background: linear-gradient(135deg, #3498db, #2980b9);
+            color: #fff;
+            font-size: 9px;
+            cursor: pointer;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 2px;
+            transition: transform 0.2s;
+        }
+        .mobile-toolbar-btn:active { transform: scale(0.95); }
+        .mobile-toolbar-btn .mobile-icon { font-size: 16px; }
+        .mobile-toolbar-btn.btn-danger { background: linear-gradient(135deg, #e74c3c, #c0392b); }
+        .mobile-toolbar-btn.btn-success { background: linear-gradient(135deg, #27ae60, #219653); }
+        .mobile-toolbar-btn.btn-warning { background: linear-gradient(135deg, #f39c12, #e67e22); }
+        
+        /* 超小屏幕 (手机竖屏) 优化 */
+        @media (max-width: 480px) {
+            .toolbar {
+                padding: 4px 6px !important;
+            }
+            
+            /* 联盟按钮 - 更紧凑 */
+            .alliance-grid { 
+                grid-template-columns: repeat(6, 1fr) !important;
+                gap: 2px !important;
+            }
+            .alliance-btn { 
+                padding: 5px 1px !important; 
+                font-size: 10px !important;
+            }
+            .alliance-btn .alliance-name { display: none !important; }
+            
+            /* 工具按钮 - 更紧凑的网格 */
+            .tool-section {
+                grid-template-columns: repeat(4, 1fr) !important;
+                gap: 2px !important;
+            }
+            .tool-btn {
+                padding: 8px 2px !important;
+            }
+            .tool-btn span:last-child { 
+                font-size: 6px !important;
+            }
+            .tool-icon { font-size: 14px !important; }
+            
+            /* 旋转控制 - 更紧凑 */
+            .rotation-control {
+                padding: 2px 4px !important;
+            }
+            .rotation-value { font-size: 10px !important; }
+            .rotation-slider { width: 50px !important; }
+            
+            /* Header */
+            .header h1 { font-size: 10px !important; }
+            .header-info { gap: 4px !important; font-size: 9px !important; }
+            #btn-zoom-out, #btn-zoom-in { width: 20px !important; height: 20px !important; font-size: 12px !important; }
+            #zoom-level { min-width: 30px !important; font-size: 9px !important; }
+            
+            /* 底部工具栏 - 更紧凑 */
+            .mobile-toolbar {
+                padding: 4px 6px;
+                gap: 4px;
+            }
+            .mobile-toolbar-btn {
+                padding: 6px 2px;
+                font-size: 8px;
+                max-width: 60px;
+            }
+            .mobile-toolbar-btn .mobile-icon { font-size: 14px; }
+        }
+        
+        /* 横屏模式优化 */
+        @media (max-width: 768px) and (orientation: landscape) {
+            .toolbar {
+                max-height: 100px !important;
+                padding: 4px 8px !important;
+            }
+            .alliance-section {
+                flex: 0 0 auto !important;
+            }
+            .alliance-grid { 
+                grid-template-columns: repeat(6, 1fr) !important;
+            }
+            .tool-section {
+                grid-template-columns: repeat(8, 1fr) !important;
+            }
+            .tool-btn span:last-child { display: none !important; }
+            .rotation-control {
+                flex: 0 0 auto !important;
+            }
+            .main-area { padding-bottom: 44px; }
+            .mobile-toolbar { padding: 4px; }
+            .mobile-toolbar-btn { padding: 4px 2px; font-size: 8px; }
+            .mobile-toolbar-btn .mobile-icon { font-size: 12px; }
         }
         
         .toolbar {
@@ -175,10 +381,7 @@
             z-index: 1000;
         }
         .copyright-footer a { color: #2980b9; text-decoration: none; }
-        @media (max-width: 768px) {
-            .copyright-footer { font-size: 9px; padding: 3px; }
-            .copyright-watermark { font-size: 9px; bottom: 25px; }
-        }
+        /* 移动端版权样式由上方主要媒体查询处理 */
         
         /* 弹窗样式 */
         .modal-overlay {
@@ -515,6 +718,34 @@
     <div class="copyright-watermark">© 2607全民代表大会</div>
     <div class="copyright-footer">
         <span class="logo-earth">🌍</span> 管理助手 v1.0 | 版权：<strong>2607全民代表大会</strong> | 支持：2607管理委员会 | 技术：兔弟
+    </div>
+    
+    <!-- 移动端底部工具栏 -->
+    <div class="mobile-toolbar" id="mobile-toolbar">
+        <button class="mobile-toolbar-btn" onclick="centerView()">
+            <span class="mobile-icon">🎯</span>
+            <span>回中心</span>
+        </button>
+        <button class="mobile-toolbar-btn btn-success" onclick="exportLayout()">
+            <span class="mobile-icon">📤</span>
+            <span>导出</span>
+        </button>
+        <button class="mobile-toolbar-btn btn-success" onclick="importLayout()">
+            <span class="mobile-icon">📥</span>
+            <span>导入</span>
+        </button>
+        <button class="mobile-toolbar-btn" onclick="saveAsImage()">
+            <span class="mobile-icon">🖼️</span>
+            <span>保存图</span>
+        </button>
+        <button class="mobile-toolbar-btn btn-warning" onclick="removeWatermark()">
+            <span class="mobile-icon">🔓</span>
+            <span>去水印</span>
+        </button>
+        <button class="mobile-toolbar-btn btn-danger" onclick="clearAll()">
+            <span class="mobile-icon">🗑️</span>
+            <span>清空</span>
+        </button>
     </div>
     
     <!-- 名称分配弹窗 -->
