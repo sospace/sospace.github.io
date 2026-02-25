@@ -328,6 +328,304 @@
         .rotation-preset:hover { background: rgba(255,255,255,0.2); }
         .rotation-preset.active { background: #00d4ff; color: #000; }
         
+        /* 地图Tab页 */
+        .map-tabs {
+            display: flex; gap: 2px; background: rgba(44,62,80,0.1);
+            padding: 3px; border-radius: 8px 8px 0 0; margin: 0 15px;
+        }
+        .map-tab {
+            flex: 1; padding: 8px 12px; border: none; border-radius: 6px 6px 0 0;
+            cursor: pointer; font-weight: bold; font-size: 11px;
+            background: transparent; color: #7f8c8d;
+            transition: all 0.2s; text-align: center;
+            position: relative;
+        }
+        .map-tab:hover { background: rgba(255,255,255,0.3); color: #2c3e50; }
+        .map-tab.active { 
+            background: #fff; color: #e67e22; 
+            box-shadow: 0 -2px 8px rgba(0,0,0,0.1);
+        }
+        .map-tab.active::after {
+            content: ''; position: absolute; bottom: -3px; left: 10%; right: 10%;
+            height: 3px; background: #e67e22; border-radius: 3px 3px 0 0;
+        }
+        .map-tab .map-size { font-size: 9px; color: #95a5a6; font-weight: normal; }
+        .map-tab.active .map-size { color: #e67e22; }
+        
+        /* 联盟成员管理 */
+        .members-section { background: rgba(200,224,236,0.3); padding: 10px; border-radius: 8px; margin-top: 8px; }
+        .members-section h3 { font-size: 11px; color: #2c3e50; margin-bottom: 6px; font-weight: bold; display: flex; justify-content: space-between; align-items: center; }
+        .members-header { display: flex; gap: 4px; margin-bottom: 6px; }
+        .members-input { flex: 1; padding: 6px 8px; border: 1px solid #ccc; border-radius: 4px; font-size: 11px; }
+        .members-input::placeholder { color: #999; }
+        .members-add-btn { padding: 6px 10px; background: #27ae60; color: #fff; border: none; border-radius: 4px; cursor: pointer; font-size: 11px; }
+        .members-add-btn:hover { background: #219a52; }
+        .members-list { max-height: 200px; overflow-y: auto; }
+        .member-item { 
+            display: flex; align-items: center; padding: 6px 8px; margin: 2px 0; 
+            background: rgba(255,255,255,0.8); border-radius: 4px; cursor: grab;
+            border-left: 3px solid #3498db; font-size: 11px;
+            transition: all 0.2s;
+        }
+        .member-item:hover { background: rgba(52,152,219,0.2); }
+        .member-item.dragging { opacity: 0.5; cursor: grabbing; }
+        .member-item.placed { border-left-color: #27ae60; background: rgba(39,174,96,0.1); }
+        .member-item .member-name { flex: 1; font-weight: bold; color: #2c3e50; }
+        .member-item .member-power { color: #e74c3c; font-size: 10px; margin-right: 8px; }
+        .member-item .member-coord { color: #7f8c8d; font-size: 9px; margin-right: 8px; }
+        .member-item .member-delete { 
+            width: 18px; height: 18px; border: none; background: rgba(231,76,60,0.2); 
+            border-radius: 50%; cursor: pointer; font-size: 10px; color: #c0392b;
+        }
+        .member-item .member-delete:hover { background: rgba(231,76,60,0.4); }
+        .member-count { font-size: 10px; color: #7f8c8d; font-weight: normal; }
+        .member-sort-hint { font-size: 9px; color: #95a5a6; margin-top: 4px; }
+        
+        /* 拖拽预览 */
+        .drag-preview {
+            position: fixed; padding: 8px 12px; background: rgba(52,152,219,0.95);
+            color: #fff; border-radius: 6px; font-size: 12px; font-weight: bold;
+            pointer-events: none; z-index: 10000; box-shadow: 0 4px 12px rgba(0,0,0,0.4);
+            border: 2px solid #fff; transform: translate(-50%, -50%);
+        }
+        /* 拖拽中的body样式 */
+        body.dragging-member { cursor: grabbing !important; }
+        body.dragging-member * { cursor: grabbing !important; }
+        body.dragging-member #canvas-wrapper { cursor: copy !important; }
+        body.dragging-member #canvas-wrapper * { cursor: copy !important; }
+        
+        /* 时间轴 - 底部紧凑样式 */
+        .timeline-container {
+            position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%);
+            background: rgba(30,39,46,0.98); padding: 6px 12px; border-radius: 8px;
+            display: none; z-index: 1000; box-shadow: 0 -2px 15px rgba(0,0,0,0.3);
+            max-width: 90vw; min-width: 500px;
+        }
+        .timeline-container.active { display: flex; align-items: center; gap: 10px; }
+        .timeline-config {
+            display: flex; gap: 6px; align-items: center; flex-shrink: 0;
+        }
+        .timeline-config input {
+            width: 50px; padding: 3px 5px; border: 1px solid #555;
+            border-radius: 4px; background: #34495e; color: #fff; font-size: 10px;
+            text-align: center;
+        }
+        .timeline-config span { color: #95a5a6; font-size: 10px; }
+        .timeline-track-wrap {
+            flex: 1; display: flex; flex-direction: column; min-width: 200px;
+        }
+        .timeline-ruler {
+            display: flex; justify-content: space-between; padding: 0 6px;
+            font-size: 8px; color: #7f8c8d; margin-bottom: 2px;
+        }
+        .timeline-track {
+            position: relative; height: 24px; background: rgba(255,255,255,0.08);
+            border-radius: 4px; cursor: pointer;
+        }
+        .timeline-progress {
+            position: absolute; left: 0; top: 0; height: 100%;
+            background: rgba(52,152,219,0.3); border-radius: 4px 0 0 4px;
+        }
+        .timeline-point {
+            position: absolute; top: 50%; transform: translateY(-50%);
+            width: 8px; height: 8px; background: #555; border-radius: 50%;
+            cursor: pointer; transition: all 0.15s; z-index: 2;
+        }
+        .timeline-point:hover { background: #3498db; transform: translateY(-50%) scale(1.3); }
+        .timeline-point.active { 
+            background: #e74c3c; box-shadow: 0 0 8px rgba(231,76,60,0.6);
+            width: 10px; height: 10px;
+        }
+        .timeline-point.has-snapshot { background: #27ae60; }
+        .timeline-point.has-snapshot:hover { background: #2ecc71; }
+        .timeline-current {
+            position: absolute; top: -2px; bottom: -2px; width: 2px;
+            background: #e74c3c; z-index: 3; pointer-events: none;
+        }
+        .timeline-current::before {
+            content: ''; position: absolute; top: -4px; left: -4px;
+            border: 5px solid transparent; border-top-color: #e74c3c;
+        }
+        .timeline-actions {
+            display: flex; gap: 4px; flex-shrink: 0;
+        }
+        .timeline-btn {
+            padding: 4px 8px; border: none; border-radius: 4px;
+            cursor: pointer; font-size: 10px; background: #34495e; color: #fff;
+        }
+        .timeline-btn:hover { background: #3498db; }
+        .timeline-btn.save { background: #27ae60; }
+        .timeline-btn.save:hover { background: #2ecc71; }
+        .timeline-btn.clear { background: #c0392b; }
+        .timeline-btn.clear:hover { background: #e74c3c; }
+        .timeline-time-display {
+            font-size: 14px; font-weight: bold; color: #fff;
+            font-family: monospace; min-width: 45px; text-align: center;
+        }
+        .timeline-current-time {
+            color: #f39c12; font-size: 14px; font-weight: bold;
+        }
+        .timeline-actions {
+            display: flex; gap: 6px; margin-top: 8px;
+        }
+        .timeline-btn {
+            padding: 5px 10px; border: none; border-radius: 4px;
+            cursor: pointer; font-size: 10px; transition: all 0.2s;
+        }
+        .timeline-btn-save { background: #27ae60; color: #fff; }
+        .timeline-btn-save:hover { background: #219a52; }
+        .timeline-btn-clear { background: #e74c3c; color: #fff; }
+        .timeline-btn-clear:hover { background: #c0392b; }
+        .timeline-btn-toggle { background: #3498db; color: #fff; }
+        .timeline-btn-toggle:hover { background: #2980b9; }
+        
+        /* 成员管理弹窗 */
+        .member-modal-overlay {
+            position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(0,0,0,0.7); z-index: 10000;
+            display: none; justify-content: center; align-items: center;
+        }
+        .member-modal-overlay.active { display: flex; }
+        .member-modal {
+            background: #fff; border-radius: 12px; width: 90%; max-width: 900px;
+            max-height: 85vh; display: flex; flex-direction: column;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.3);
+        }
+        .member-modal-header {
+            padding: 15px 20px; border-bottom: 1px solid #eee;
+            display: flex; justify-content: space-between; align-items: center;
+        }
+        .member-modal-header h3 { margin: 0; color: #2c3e50; font-size: 18px; }
+        .member-modal-close {
+            width: 32px; height: 32px; border: none; background: #e74c3c;
+            color: #fff; border-radius: 50%; cursor: pointer; font-size: 18px;
+        }
+        .member-modal-body { flex: 1; overflow: hidden; display: flex; }
+        
+        /* 左侧：联盟和小队树 */
+        .member-sidebar {
+            width: 200px; border-right: 1px solid #eee; padding: 10px;
+            overflow-y: auto; background: #f8f9fa;
+        }
+        .alliance-tree-item {
+            padding: 8px 10px; margin: 2px 0; border-radius: 6px;
+            cursor: pointer; font-size: 12px; display: flex;
+            align-items: center; gap: 8px;
+        }
+        .alliance-tree-item:hover { background: rgba(0,0,0,0.05); }
+        .alliance-tree-item.active { background: rgba(52,152,219,0.2); }
+        .alliance-tree-item .alliance-dot {
+            width: 12px; height: 12px; border-radius: 50%;
+        }
+        .alliance-tree-item .count { 
+            margin-left: auto; background: #eee; padding: 2px 6px;
+            border-radius: 10px; font-size: 10px; color: #666;
+        }
+        .team-tree-item {
+            padding: 6px 10px 6px 30px; font-size: 11px; cursor: pointer;
+            color: #666; border-radius: 4px;
+        }
+        .team-tree-item:hover { background: rgba(0,0,0,0.03); }
+        .team-tree-item.active { background: rgba(52,152,219,0.15); color: #2980b9; }
+        .add-team-btn {
+            padding: 5px 10px; margin: 5px 0 5px 20px; font-size: 10px;
+            background: transparent; border: 1px dashed #ccc; border-radius: 4px;
+            cursor: pointer; color: #999;
+        }
+        .add-team-btn:hover { border-color: #3498db; color: #3498db; }
+        
+        /* 右侧：成员列表 */
+        .member-main { flex: 1; display: flex; flex-direction: column; overflow: hidden; }
+        .member-toolbar {
+            padding: 10px 15px; border-bottom: 1px solid #eee;
+            display: flex; gap: 10px; align-items: center; flex-wrap: wrap;
+        }
+        .member-search {
+            flex: 1; min-width: 150px; padding: 8px 12px; border: 1px solid #ddd;
+            border-radius: 6px; font-size: 12px;
+        }
+        .member-toolbar-btn {
+            padding: 8px 12px; border: none; border-radius: 6px;
+            cursor: pointer; font-size: 11px; font-weight: bold;
+        }
+        .member-toolbar-btn.primary { background: #3498db; color: #fff; }
+        .member-toolbar-btn.success { background: #27ae60; color: #fff; }
+        .member-toolbar-btn.warning { background: #f39c12; color: #fff; }
+        .member-toolbar-btn.danger { background: #e74c3c; color: #fff; }
+        
+        /* 成员列表 */
+        .member-list-container { flex: 1; overflow-y: auto; padding: 10px 15px; background: #fff; }
+        .member-list-header {
+            display: grid; grid-template-columns: 30px 1fr 80px 100px 100px 60px;
+            padding: 8px 10px; background: #f8f9fa; border-radius: 6px;
+            font-size: 11px; color: #666; font-weight: bold; margin-bottom: 5px;
+        }
+        .member-list-row {
+            display: grid; grid-template-columns: 30px 1fr 80px 100px 100px 60px;
+            padding: 10px; border-bottom: 1px solid #f0f0f0; align-items: center;
+            font-size: 12px; transition: background 0.2s; color: #333; background: #fff;
+        }
+        .member-list-row:hover { background: #f0f7ff; }
+        .member-list-row.dragging { opacity: 0.5; background: #e3f2fd; }
+        .member-list-row:nth-child(even) { background: #fafafa; }
+        .member-list-row:nth-child(even):hover { background: #f0f7ff; }
+        .member-alliance-badge {
+            display: inline-block; padding: 2px 8px; border-radius: 10px;
+            font-size: 10px; color: #fff;
+        }
+        .member-team-badge {
+            font-size: 10px; color: #666; background: #f0f0f0;
+            padding: 2px 6px; border-radius: 4px;
+        }
+        .member-role-badge {
+            font-size: 9px; padding: 2px 6px; border-radius: 4px;
+        }
+        .member-role-badge.leader { background: #f39c12; color: #fff; }
+        .member-role-badge.member { background: #bdc3c7; color: #666; }
+        .member-actions { display: flex; gap: 4px; }
+        .member-action-btn {
+            width: 24px; height: 24px; border: none; border-radius: 4px;
+            cursor: pointer; font-size: 12px;
+        }
+        .member-action-btn.edit { background: #3498db; color: #fff; }
+        .member-action-btn.delete { background: #e74c3c; color: #fff; }
+        .member-checkbox { width: 16px; height: 16px; cursor: pointer; }
+        
+        /* 批量导入面板 */
+        .batch-import-panel {
+            padding: 15px; background: #f8f9fa; border-radius: 8px; margin: 10px 15px;
+            display: none;
+        }
+        .batch-import-panel.active { display: block; }
+        .batch-import-panel textarea {
+            width: 100%; height: 120px; padding: 10px; border: 1px solid #ddd;
+            border-radius: 6px; font-size: 11px; resize: vertical;
+            font-family: monospace;
+        }
+        .batch-import-hint { font-size: 10px; color: #666; margin: 8px 0; }
+        .batch-import-alliance {
+            display: flex; gap: 8px; margin: 10px 0; flex-wrap: wrap;
+        }
+        .batch-alliance-btn {
+            padding: 6px 12px; border: 2px solid #ddd; border-radius: 6px;
+            cursor: pointer; font-size: 11px; background: #fff;
+            display: flex; align-items: center; gap: 6px;
+        }
+        .batch-alliance-btn:hover { border-color: #3498db; }
+        .batch-alliance-btn.selected { border-color: #2ecc71; background: rgba(46,204,113,0.1); }
+        
+        /* 空状态 */
+        .member-empty {
+            text-align: center; padding: 40px; color: #999;
+        }
+        .member-empty-icon { font-size: 48px; margin-bottom: 10px; }
+        
+        /* 统计信息 */
+        .member-stats {
+            padding: 10px 15px; border-top: 1px solid #eee;
+            display: flex; gap: 20px; font-size: 11px; color: #666;
+        }
+        
         .stats-panel { background: rgba(200,224,236,0.3); padding: 10px; border-radius: 8px; }
         .stat-row { display: flex; justify-content: space-between; padding: 3px 0; font-size: 11px; }
         .stat-label { color: #5a7a8a; }
@@ -346,7 +644,7 @@
         .shortcuts { font-size: 9px; color: #5a7a8a; padding: 6px; background: rgba(200,224,236,0.3); border-radius: 4px; }
         .shortcuts kbd { background: rgba(41,128,185,0.15); padding: 1px 4px; border-radius: 2px; color: #2980b9; }
         
-        .main-area { flex: 1; display: flex; flex-direction: column; overflow: hidden; }
+        .main-area { flex: 1; display: flex; flex-direction: column; overflow: hidden; padding-bottom: 36px; } /* 为底部状态栏留空间 */
         .header { padding: 8px 15px; background: rgba(255,255,255,0.8); display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #C8E0EC; }
         .header h1 { color: #2980b9; font-size: 16px; }
         .header-info { display: flex; gap: 12px; font-size: 11px; color: #5a7a8a; }
@@ -366,22 +664,450 @@
         }
         .rules-panel h2 { color: #2980b9; font-size: 14px; margin-bottom: 10px; }
         
-        /* 版权水印 */
+        /* 版权水印 - 移到状态栏内显示，不再遮挡画布 */
         .copyright-watermark {
-            position: fixed; bottom: 10px; right: 10px;
-            color: rgba(41, 128, 185, 0.2); font-size: 11px;
-            pointer-events: none; z-index: 9999;
-            text-shadow: 1px 1px 2px rgba(255,255,255,0.8);
+            display: none; /* 完全隐藏，版权信息已集成到状态栏 */
         }
         .copyright-footer {
-            position: fixed; bottom: 0; left: 0; right: 0;
-            background: rgba(255,255,255,0.9); color: #5a7a8a;
-            text-align: center; padding: 4px; font-size: 10px;
-            border-top: 1px solid #C8E0EC;
-            z-index: 1000;
+            display: none; /* 隐藏底部版权栏，已在状态栏中显示关键信息 */
         }
         .copyright-footer a { color: #2980b9; text-decoration: none; }
         /* 移动端版权样式由上方主要媒体查询处理 */
+        
+        /* 底部状态栏 */
+        .status-bar {
+            position: fixed;
+            bottom: 0; left: 0; right: 0;
+            height: 36px;
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+            border-top: 1px solid #2d4059;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 12px;
+            z-index: 990;
+            color: #fff;
+            font-size: 12px;
+        }
+        .status-bar-left {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .status-bar-right {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        .status-bar-item {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            padding: 4px 8px;
+            background: rgba(255,255,255,0.1);
+            border-radius: 4px;
+            font-size: 11px;
+        }
+        .status-bar-item.coord {
+            background: rgba(0,212,255,0.2);
+            color: #00d4ff;
+            font-weight: bold;
+            font-family: 'Consolas', monospace;
+        }
+        .status-bar-btn {
+            padding: 4px 10px;
+            border: none;
+            border-radius: 4px;
+            background: rgba(255,255,255,0.15);
+            color: #fff;
+            font-size: 11px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            transition: all 0.2s;
+        }
+        .status-bar-btn:hover { background: rgba(255,255,255,0.25); }
+        .status-bar-btn.active { background: #8e44ad; }
+        .status-bar-btn.draw { background: #27ae60; }
+        .status-bar-btn.draw.active { background: #e74c3c; }
+        .status-bar-select {
+            padding: 4px 8px;
+            border: none;
+            border-radius: 4px;
+            background: rgba(255,255,255,0.15);
+            color: #fff;
+            font-size: 11px;
+            cursor: pointer;
+        }
+        .status-bar-divider {
+            width: 1px;
+            height: 20px;
+            background: rgba(255,255,255,0.2);
+        }
+        
+        /* 旋转控制紧凑样式（用于header） */
+        .rotation-compact {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .rotation-compact input[type="range"] {
+            width: 60px;
+            height: 4px;
+            cursor: pointer;
+        }
+        .rotation-compact .rotation-val {
+            min-width: 35px;
+            text-align: center;
+            font-weight: bold;
+            color: #00d4ff;
+        }
+        .rotation-compact .rotation-btn {
+            padding: 2px 6px;
+            border: none;
+            border-radius: 3px;
+            background: rgba(255,255,255,0.15);
+            color: #fff;
+            font-size: 10px;
+            cursor: pointer;
+        }
+        .rotation-compact .rotation-btn:hover { background: rgba(255,255,255,0.25); }
+        .rotation-compact .rotation-btn.active { background: #00d4ff; color: #000; }
+        
+        /* 折叠面板样式 */
+        .collapsible-panel {
+            transition: max-height 0.3s ease;
+            overflow: hidden;
+        }
+        .collapsible-panel.collapsed {
+            max-height: 0 !important;
+        }
+        .panel-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            cursor: pointer;
+            padding: 8px;
+            background: rgba(200,224,236,0.3);
+            border-radius: 8px;
+            margin-bottom: 8px;
+        }
+        .panel-header:hover { background: rgba(200,224,236,0.5); }
+        .panel-header h3 { margin: 0; font-size: 12px; color: #5a7a8a; }
+        .panel-toggle { font-size: 10px; color: #888; }
+        
+        @media (max-width: 768px) {
+            .status-bar { height: 32px; padding: 0 8px; font-size: 10px; }
+            .status-bar-btn { padding: 3px 6px; font-size: 10px; }
+            .status-bar-item { padding: 2px 6px; font-size: 10px; }
+        }
+        
+        /* 倒计时面板样式 - 紧凑浮动窗口，右下角 */
+        .countdown-panel {
+            position: fixed;
+            bottom: 50px;
+            right: 10px;
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+            border-radius: 10px;
+            padding: 12px;
+            z-index: 2000;
+            min-width: 200px;
+            max-width: 240px;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.4);
+            display: none;
+            color: #fff;
+            cursor: move;
+            border: 1px solid rgba(0,212,255,0.3);
+            font-size: 12px;
+        }
+        .countdown-panel.active { display: block; }
+        .countdown-panel h3 {
+            text-align: center;
+            margin-bottom: 8px;
+            font-size: 12px;
+            color: #00d4ff;
+            cursor: move;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .countdown-panel h3 .close-btn {
+            background: none;
+            border: none;
+            color: #e74c3c;
+            font-size: 16px;
+            cursor: pointer;
+            padding: 0 4px;
+        }
+        .countdown-settings {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 8px;
+            justify-content: center;
+            align-items: center;
+        }
+        .countdown-input-group {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        .countdown-input-group label {
+            font-size: 10px;
+            color: #aaa;
+            margin-bottom: 3px;
+        }
+        .countdown-input-group input {
+            width: 50px;
+            padding: 5px;
+            font-size: 14px;
+            text-align: center;
+            border: 2px solid #3498db;
+            border-radius: 6px;
+            background: rgba(255,255,255,0.1);
+            color: #fff;
+            font-weight: bold;
+        }
+        .countdown-input-group input:focus {
+            outline: none;
+            border-color: #00d4ff;
+            box-shadow: 0 0 10px rgba(0,212,255,0.3);
+        }
+        .countdown-display {
+            text-align: center;
+            margin: 16px 0;
+        }
+        .countdown-number {
+            font-size: 56px;
+            font-weight: bold;
+            color: #00d4ff;
+            text-shadow: 0 0 15px rgba(0,212,255,0.5);
+            font-family: 'Consolas', monospace;
+        }
+        .countdown-status {
+            font-size: 14px;
+            color: #aaa;
+            margin-top: 8px;
+        }
+        .countdown-status.running { color: #2ecc71; }
+        .countdown-status.paused { color: #f39c12; }
+        .countdown-status.finished { color: #e74c3c; }
+        .countdown-buttons {
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+        .countdown-btn {
+            padding: 8px 16px;
+            font-size: 12px;
+            font-weight: bold;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.2s;
+            min-width: 60px;
+        }
+        .countdown-btn:hover { transform: translateY(-2px); }
+        .countdown-btn:active { transform: translateY(0); }
+        .countdown-btn.start { background: linear-gradient(135deg, #27ae60, #2ecc71); color: #fff; }
+        .countdown-btn.pause { background: linear-gradient(135deg, #f39c12, #f1c40f); color: #333; }
+        .countdown-btn.reset { background: linear-gradient(135deg, #3498db, #2980b9); color: #fff; }
+        .countdown-btn.close { background: linear-gradient(135deg, #7f8c8d, #95a5a6); color: #fff; }
+        .countdown-btn.save { background: linear-gradient(135deg, #9b59b6, #8e44ad); color: #fff; }
+        .countdown-btn:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
+        .countdown-presets {
+            display: flex;
+            gap: 4px;
+            justify-content: center;
+            margin-bottom: 8px;
+            flex-wrap: wrap;
+        }
+        .countdown-preset {
+            padding: 4px 8px;
+            font-size: 10px;
+            background: rgba(255,255,255,0.1);
+            border: 1px solid rgba(255,255,255,0.2);
+            border-radius: 4px;
+            color: #fff;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .countdown-preset:hover { background: rgba(0,212,255,0.2); border-color: #00d4ff; }
+        .countdown-overlay {
+            display: none;  /* 不再使用遮罩层 */
+        }
+        .countdown-voice-hint {
+            font-size: 11px;
+            color: #888;
+            text-align: center;
+            margin-top: 16px;
+            padding: 8px;
+            background: rgba(255,255,255,0.05);
+            border-radius: 6px;
+        }
+        
+        /* 快捷键提示条 */
+        .shortcut-bar {
+            position: fixed; bottom: 25px; left: 50%; transform: translateX(-50%);
+            background: rgba(44,62,80,0.9); padding: 6px 15px; border-radius: 20px;
+            display: flex; gap: 12px; font-size: 10px; color: #ecf0f1;
+            z-index: 999; box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+            transition: opacity 0.3s, transform 0.3s;
+        }
+        .shortcut-bar.hidden { opacity: 0; transform: translateX(-50%) translateY(20px); pointer-events: none; }
+        .shortcut-item { display: flex; align-items: center; gap: 4px; }
+        .shortcut-key {
+            background: rgba(255,255,255,0.2); padding: 2px 6px; border-radius: 4px;
+            font-family: monospace; font-weight: bold; min-width: 18px; text-align: center;
+        }
+        
+        /* Loading遮罩 */
+        .loading-overlay {
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(0,0,0,0.5);
+            z-index: 99999;
+            display: none;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+            gap: 15px;
+        }
+        .loading-overlay.active { display: flex; }
+        .loading-spinner {
+            width: 40px; height: 40px;
+            border: 4px solid rgba(255,255,255,0.3);
+            border-top-color: #00d4ff;
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+        }
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+        .loading-text {
+            color: #fff;
+            font-size: 14px;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.5);
+        }
+        
+        /* Toast提示 */
+        .toast-container {
+            position: fixed; top: 80px; right: 20px; z-index: 10002;
+            display: flex; flex-direction: column; gap: 8px;
+        }
+        .toast {
+            padding: 10px 16px; border-radius: 8px; font-size: 12px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15); display: flex; align-items: center; gap: 8px;
+            animation: toastIn 0.3s ease-out;
+            max-width: 280px;
+        }
+        .toast.success { background: #27ae60; color: #fff; }
+        .toast.info { background: #3498db; color: #fff; }
+        .toast.warning { background: #f39c12; color: #fff; }
+        .toast.error { background: #e74c3c; color: #fff; }
+        .toast-exit { animation: toastOut 0.3s ease-in forwards; }
+        @keyframes toastIn { from { opacity: 0; transform: translateX(20px); } to { opacity: 1; transform: translateX(0); } }
+        @keyframes toastOut { from { opacity: 1; transform: translateX(0); } to { opacity: 0; transform: translateX(20px); } }
+        
+        /* 操作反馈动画 */
+        .pulse-success { animation: pulseSuccess 0.5s ease-out; }
+        @keyframes pulseSuccess { 0% { box-shadow: 0 0 0 0 rgba(39,174,96,0.7); } 70% { box-shadow: 0 0 0 10px rgba(39,174,96,0); } 100% { box-shadow: 0 0 0 0 rgba(39,174,96,0); } }
+        
+        /* 联盟统计卡片 */
+        .alliance-stats {
+            background: rgba(255,255,255,0.95); padding: 8px 12px; border-radius: 8px;
+            margin-top: 8px; font-size: 10px; box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+        .alliance-stats-title { font-weight: bold; color: #2c3e50; margin-bottom: 6px; display: flex; justify-content: space-between; }
+        .alliance-stats-row { display: flex; justify-content: space-between; padding: 3px 0; border-bottom: 1px solid #f0f0f0; }
+        .alliance-stats-row:last-child { border-bottom: none; }
+        .stats-label { color: #7f8c8d; }
+        .stats-value { font-weight: bold; color: #2c3e50; }
+        .stats-value.highlight { color: #e67e22; }
+        
+        /* 欢迎引导 */
+        .welcome-overlay {
+            position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(0,0,0,0.6); z-index: 10003;
+            display: flex; justify-content: center; align-items: center;
+        }
+        .welcome-card {
+            background: #fff; padding: 30px 40px; border-radius: 16px;
+            text-align: center; max-width: 400px; box-shadow: 0 10px 40px rgba(0,0,0,0.3);
+        }
+        .welcome-card h2 { margin: 0 0 15px; color: #2c3e50; }
+        .welcome-card p { color: #7f8c8d; font-size: 14px; line-height: 1.6; margin-bottom: 20px; }
+        .welcome-btn {
+            padding: 12px 30px; background: #3498db; color: #fff; border: none;
+            border-radius: 8px; font-size: 14px; cursor: pointer; font-weight: bold;
+        }
+        .welcome-btn:hover { background: #2980b9; }
+        
+        /* 行军箭头工具 */
+        .arrow-tool-section {
+            background: rgba(155,89,182,0.15); padding: 10px; border-radius: 8px;
+            margin-top: 8px; border: 1px solid rgba(155,89,182,0.3);
+        }
+        .arrow-tool-section h3 {
+            font-size: 11px; color: #8e44ad; margin-bottom: 8px;
+            display: flex; justify-content: space-between; align-items: center;
+        }
+        .arrow-type-grid {
+            display: grid; grid-template-columns: repeat(3, 1fr); gap: 4px;
+        }
+        .arrow-type-btn {
+            padding: 6px 4px; border: 2px solid rgba(0,0,0,0.1); border-radius: 6px;
+            cursor: pointer; font-size: 9px; text-align: center;
+            background: rgba(255,255,255,0.5); transition: all 0.2s;
+        }
+        .arrow-type-btn:hover { border-color: rgba(0,0,0,0.3); }
+        .arrow-type-btn.active { border-color: #8e44ad; background: rgba(142,68,173,0.2); }
+        .arrow-type-btn .arrow-icon { font-size: 14px; display: block; margin-bottom: 2px; }
+        .arrow-actions {
+            display: flex; gap: 4px; margin-top: 8px;
+        }
+        .arrow-action-btn {
+            flex: 1; padding: 6px; border: none; border-radius: 4px;
+            cursor: pointer; font-size: 10px; font-weight: bold;
+        }
+        .arrow-action-btn.draw { background: #8e44ad; color: #fff; }
+        .arrow-action-btn.draw.active { background: #e74c3c; }
+        .arrow-action-btn.toggle { background: #34495e; color: #fff; }
+        .arrow-action-btn.clear { background: #c0392b; color: #fff; }
+        
+        /* 箭头绘制提示 */
+        .arrow-drawing-hint {
+            position: fixed; top: 100px; left: 50%; transform: translateX(-50%);
+            background: rgba(142,68,173,0.95); color: #fff; padding: 10px 20px;
+            border-radius: 8px; font-size: 12px; z-index: 1001;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.3); display: none;
+        }
+        .arrow-drawing-hint.active { display: block; }
+        .arrow-drawing-hint kbd {
+            background: rgba(255,255,255,0.2); padding: 2px 6px; border-radius: 4px;
+            margin: 0 3px;
+        }
+        
+        /* 箭头列表 */
+        .arrow-list {
+            max-height: 120px; overflow-y: auto; margin-top: 8px;
+        }
+        .arrow-list-item {
+            display: flex; align-items: center; gap: 6px; padding: 4px 6px;
+            background: rgba(255,255,255,0.5); border-radius: 4px; margin-bottom: 3px;
+            font-size: 10px; cursor: pointer;
+        }
+        .arrow-list-item:hover { background: rgba(255,255,255,0.8); }
+        .arrow-list-item.selected { background: rgba(142,68,173,0.2); border: 1px solid #8e44ad; }
+        .arrow-list-item .arrow-color {
+            width: 12px; height: 12px; border-radius: 50%;
+        }
+        .arrow-list-item .arrow-name { flex: 1; }
+        .arrow-list-item .arrow-delete {
+            width: 16px; height: 16px; border: none; border-radius: 50%;
+            background: #e74c3c; color: #fff; cursor: pointer; font-size: 10px;
+        }
         
         /* 弹窗样式 */
         .modal-overlay {
@@ -572,10 +1298,24 @@
     <div class="toolbar">
         <h2><span class="logo-earth">🌍</span> 管理助手</h2>
         
+        <!-- 地图选择移到header上方 -->
+        
         <div class="alliance-section">
-            <h3>🏴 选择联盟</h3>
+            <h3 style="display:flex;justify-content:space-between;align-items:center;">
+                🏴 选择联盟
+                <span id="save-indicator" style="font-size:9px;color:#27ae60;opacity:0;transition:opacity 0.3s;">✓ 已保存</span>
+            </h3>
             <div class="alliance-grid" id="alliance-grid">
                 <!-- 联盟按钮由JS生成 -->
+            </div>
+            <div class="alliance-stats">
+                <div class="alliance-stats-title">
+                    <span id="current-alliance-name">红盟</span>
+                    <span>统计</span>
+                </div>
+                <div id="alliance-stats-content">
+                    <!-- 统计内容由JS生成 -->
+                </div>
             </div>
         </div>
         
@@ -609,24 +1349,26 @@
             <button class="tool-btn tool-btn-delete" onclick="selectTool('delete')" id="tool-delete">
                 <span class="tool-icon">🗑️</span><span>删除建筑</span>
             </button>
+            <button class="tool-btn" onclick="toggleGridSnap()" id="btn-grid-snap" style="background:#27ae60;">
+                <span class="tool-icon">🧲</span><span>吸附:开</span>
+            </button>
         </div>
         
-        <div class="rotation-control">
-            <h3>🔄 画布旋转</h3>
-            <div class="rotation-value"><span id="rotation-display">45</span>°</div>
-            <input type="range" class="rotation-slider" id="rotation-slider" min="0" max="360" value="45" step="15" oninput="setRotation(this.value)">
-            <div class="rotation-presets">
-                <button class="rotation-preset active" onclick="setRotation(0)">0°</button>
-                <button class="rotation-preset" onclick="setRotation(45)">45°</button>
-                <button class="rotation-preset" onclick="setRotation(90)">90°</button>
-                <button class="rotation-preset" onclick="setRotation(180)">180°</button>
-            </div>
-        </div>
+        <!-- 成员列表隐藏在此，实际显示移到右侧面板 -->
+        <div id="members-list-left" style="display:none;"></div>
+        
+        <!-- 箭头列表（隐藏，数据仍由JS管理） -->
+        <div id="arrow-list" style="display:none;"></div>
+        <div id="arrow-type-grid" style="display:none;"></div>
         
         <div class="action-btns">
+            <div style="display:flex;gap:4px;margin-bottom:4px;">
+                <button class="action-btn" id="btn-undo" onclick="undo()" style="flex:1;background:#7f8c8d;color:#fff;" title="Ctrl+Z">↩️ 撤销</button>
+                <button class="action-btn" id="btn-redo" onclick="redo()" style="flex:1;background:#7f8c8d;color:#fff;" title="Ctrl+Y">↪️ 重做</button>
+            </div>
             <button class="action-btn btn-center" onclick="centerView()">回到中心</button>
-            <button class="action-btn btn-auto" onclick="autoFillBao()">自动填充堡</button>
-            <button class="action-btn btn-auto" onclick="openNameMatcher()">🏰 分配名称</button>
+            <button class="action-btn btn-auto" onclick="toggleTimeline()" id="btn-timeline" style="background:#9b59b6;">⏱️ 时间轴</button>
+            <button class="action-btn" onclick="openCountdownPanel()" style="background:#e74c3c;color:#fff;">🔊 倒计时</button>
             <button class="action-btn btn-export" onclick="exportLayout()">📤 导出JSON</button>
             <button class="action-btn btn-export" onclick="importLayout()">📥 导入JSON</button>
             <button class="action-btn btn-export" onclick="saveAsImage()">🖼️ 保存图片</button>
@@ -636,16 +1378,28 @@
     </div>
     
     <div class="main-area">
-        <div class="header">
-            <h1>🏯 地图设计</h1>
+        <!-- 地图Tab页 -->
+        <div class="map-tabs" id="map-tabs">
+            <!-- 由JS生成 -->
+        </div>
+        
+        <div class="header" style="border-radius: 0 0 8px 8px; margin-top: 0;">
+            <h1 id="map-title">🏯 地图设计</h1>
             <div class="header-info">
-                <span class="highlight">坐标: <span id="mouse-game">(600, 600)</span></span>
                 <span style="display:flex;align-items:center;gap:4px;">
                     缩放: 
                     <button id="btn-zoom-out" style="width:24px;height:24px;border:none;border-radius:4px;background:#2980b9;color:#fff;cursor:pointer;font-weight:bold;">−</button>
                     <span id="zoom-level" style="min-width:40px;text-align:center;">100%</span>
                     <button id="btn-zoom-in" style="width:24px;height:24px;border:none;border-radius:4px;background:#2980b9;color:#fff;cursor:pointer;font-weight:bold;">+</button>
                     <button id="btn-zoom-reset" style="padding:2px 6px;border:none;border-radius:4px;background:#5a7a8a;color:#fff;cursor:pointer;font-size:10px;">重置</button>
+                </span>
+                <span style="display:flex;align-items:center;gap:4px;">
+                    旋转: 
+                    <button onclick="setRotation(0)" class="rotation-preset-btn" style="padding:2px 6px;border:none;border-radius:3px;background:rgba(255,255,255,0.15);color:#fff;font-size:10px;cursor:pointer;">0°</button>
+                    <button onclick="setRotation(45)" class="rotation-preset-btn active" style="padding:2px 6px;border:none;border-radius:3px;background:#00d4ff;color:#000;font-size:10px;cursor:pointer;">45°</button>
+                    <button onclick="setRotation(90)" class="rotation-preset-btn" style="padding:2px 6px;border:none;border-radius:3px;background:rgba(255,255,255,0.15);color:#fff;font-size:10px;cursor:pointer;">90°</button>
+                    <input type="range" id="rotation-slider" min="0" max="360" value="45" step="15" oninput="setRotation(this.value)" style="width:50px;cursor:pointer;">
+                    <span id="rotation-display" style="min-width:28px;text-align:center;color:#00d4ff;font-weight:bold;">45</span>°
                 </span>
                 <button id="btn-remove-watermark" onclick="removeWatermark()" style="padding:2px 8px;border:none;border-radius:4px;background:#e67e22;color:#fff;cursor:pointer;font-size:10px;">🔓 去水印</button>
                 <span id="boundary-status"></span>
@@ -657,6 +1411,39 @@
         </div>
     </div>
     
+    <!-- 底部状态栏 -->
+    <div class="status-bar" id="status-bar">
+        <div class="status-bar-left">
+            <span style="color:#8e44ad;font-weight:bold;">🏹 路线:</span>
+            <select class="status-bar-select" id="status-arrow-type" onchange="selectArrowTypeFromStatus(this.value)">
+                <option value="attack">⚔️ 进攻</option>
+                <option value="defend">🛡️ 防守</option>
+                <option value="gather">📍 集结</option>
+                <option value="retreat">🏃 撤退</option>
+                <option value="scout">👁️ 侦查</option>
+            </select>
+            <button class="status-bar-btn draw" id="arrow-draw-btn" onclick="toggleArrowDrawing()">✏️ 绘制</button>
+            <button class="status-bar-btn" id="arrow-visibility-btn" onclick="toggleArrowsVisibility()">👁️ 显示</button>
+            <button class="status-bar-btn" id="btn-arrow-animation" onclick="toggleArrowAnimation()">⚡ 动画</button>
+            <button class="status-bar-btn" onclick="clearAllArrows()" style="color:#e74c3c;">🗑️ 清空</button>
+            <div class="status-bar-divider"></div>
+            <button class="status-bar-btn" onclick="openCountdownPanel()">🔊 倒计时</button>
+        </div>
+        <div class="status-bar-right">
+            <div class="status-bar-item">
+                <span id="status-arrow-count">路线: 0</span>
+            </div>
+            <div class="status-bar-item coord">
+                <span>坐标:</span>
+                <span id="mouse-game">(600, 600)</span>
+            </div>
+            <div class="status-bar-divider"></div>
+            <div class="status-bar-item" style="color:rgba(255,255,255,0.5);font-size:10px;">
+                <span>© sospace.top</span>
+            </div>
+        </div>
+    </div>
+    
     <div class="rules-panel">
         <h2>⌨️ 快捷键</h2>
         <div class="shortcuts">
@@ -665,43 +1452,65 @@
             <div><kbd>Q</kbd>/<kbd>E</kbd>切换联盟 <kbd>C</kbd>回中心 <kbd>Esc</kbd>取消选择</div>
         </div>
         
-        <h2>📊 统计</h2>
-        
-        <div class="stats-panel">
-            <div id="alliance-stats">
-                <!-- 联盟统计由JS生成 -->
-            </div>
-            <div style="border-top: 1px solid #C8E0EC; margin-top: 6px; padding-top: 6px;">
-                <div class="stat-row"><span class="stat-label">🏰 堡(生效)</span><span class="stat-value success" id="stat-bao-active">0</span></div>
-                <div class="stat-row"><span class="stat-label">🏰 堡(未生效)</span><span class="stat-value warning" id="stat-bao-inactive">0</span></div>
-                <div class="stat-row"><span class="stat-label">⭕ 坑</span><span class="stat-value" id="stat-keng">0</span></div>
-                <div class="stat-row"><span class="stat-label">💎 矿</span><span class="stat-value" id="stat-kuang">0</span></div>
+        <!-- 成员管理区域（移到右侧面板上方） -->
+        <div class="members-section" style="margin-top:8px;">
+            <h3 style="display:flex;justify-content:space-between;align-items:center;">
+                👥 成员 <span class="member-count" id="member-count">(0人)</span>
+                <button onclick="openMemberModal()" style="padding:4px 8px;font-size:10px;background:#3498db;color:#fff;border:none;border-radius:4px;cursor:pointer;">管理</button>
+            </h3>
+            <div class="member-sort-hint" style="margin-bottom:6px;">💡 拖拽成员到地图放置堡垒</div>
+            <div class="members-list" id="members-list" style="max-height:160px;">
+                <!-- 成员列表由JS生成 -->
             </div>
         </div>
         
-        <h2>📋 规则</h2>
-        
-        <div class="coord-info">
-            <h4>📍 坐标系统</h4>
-            <p>• X轴向上增大，Y轴向左增大<br>
-               • 右下<strong>(0,0)</strong> 左上<strong>(1199,1199)</strong><br>
-               • 右上<strong>(1199,0)</strong> 左下<strong>(0,1199)</strong><br>
-               • 旗/坑: <strong>中心坐标</strong><br>
-               • 堡/矿/NPC: <strong>(X最大,Y最小)</strong></p>
+        <!-- 统计面板（可折叠，默认收起） -->
+        <div class="panel-header" onclick="togglePanel('stats-panel-content')">
+            <h3>📊 统计</h3>
+            <span class="panel-toggle" id="stats-toggle">▼ 展开</span>
+        </div>
+        <div class="collapsible-panel collapsed" id="stats-panel-content" style="max-height:300px;">
+            <div class="stats-panel">
+                <div id="alliance-stats">
+                    <!-- 联盟统计由JS生成 -->
+                </div>
+                <div style="border-top: 1px solid #C8E0EC; margin-top: 6px; padding-top: 6px;">
+                    <div class="stat-row"><span class="stat-label">🏰 堡(生效)</span><span class="stat-value success" id="stat-bao-active">0</span></div>
+                    <div class="stat-row"><span class="stat-label">🏰 堡(未生效)</span><span class="stat-value warning" id="stat-bao-inactive">0</span></div>
+                    <div class="stat-row"><span class="stat-label">⭕ 坑</span><span class="stat-value" id="stat-keng">0</span></div>
+                    <div class="stat-row"><span class="stat-label">💎 矿</span><span class="stat-value" id="stat-kuang">0</span></div>
+                </div>
+            </div>
         </div>
         
-        <div class="rule-item info"><h4>🚩 旗 7×7</h4><p>6联盟不同色 | 同盟相连=激活</p></div>
-        <div class="rule-item"><h4>🏰 堡 2×2</h4><p>旗内=绿(生效) | 旗外=灰(不生效)</p></div>
-        <div class="rule-item warning"><h4>⭕ 坑 3×3</h4><p>可放多个 | 不能重叠</p></div>
-        <div class="rule-item"><h4>💎 矿 2×2</h4><p>任意位置</p></div>
-        <div class="rule-item" style="border-left-color: #666;"><h4>🏛️ NPC建筑</h4><p>东南西北四方 | 固定显示不可删除</p></div>
+        <!-- 规则面板（可折叠，默认收起） -->
+        <div class="panel-header" onclick="togglePanel('rules-panel-content')">
+            <h3>📋 规则</h3>
+            <span class="panel-toggle" id="rules-toggle">▼ 展开</span>
+        </div>
+        <div class="collapsible-panel collapsed" id="rules-panel-content" style="max-height:500px;">
+            <div class="coord-info">
+                <h4>📍 坐标系统</h4>
+                <p>• X轴向上增大，Y轴向左增大<br>
+                   • 右下<strong>(0,0)</strong> 左上<strong>(1199,1199)</strong><br>
+                   • 右上<strong>(1199,0)</strong> 左下<strong>(0,1199)</strong><br>
+                   • 旗/坑: <strong>中心坐标</strong><br>
+                   • 堡/矿/NPC: <strong>(X最大,Y最小)</strong></p>
+            </div>
+            
+            <div class="rule-item info"><h4>🚩 旗 7×7</h4><p>6联盟不同色 | 同盟相连=激活</p></div>
+            <div class="rule-item"><h4>🏰 堡 2×2</h4><p>旗内=绿(生效) | 旗外=灰(不生效)</p></div>
+            <div class="rule-item warning"><h4>⭕ 坑 3×3</h4><p>可放多个 | 不能重叠</p></div>
+            <div class="rule-item"><h4>💎 矿 2×2</h4><p>任意位置</p></div>
+            <div class="rule-item" style="border-left-color: #666;"><h4>🏛️ NPC建筑</h4><p>东南西北四方 | 固定显示不可删除</p></div>
+            
+            <h4 style="color:#2980b9;margin-top:10px;">🗺️ 特殊区域</h4>
+            <div class="rule-item" style="border-left-color: rgba(144, 238, 144, 0.8);"><h4>🌿 沃土</h4><p>淡绿色 | (450~749)</p></div>
+            <div class="rule-item" style="border-left-color: rgba(128, 128, 128, 0.8);"><h4>🪨 黑土</h4><p>淡灰色 | (552~647)</p></div>
+            <div class="rule-item" style="border-left-color: rgba(255, 100, 100, 0.8);"><h4>🔥 红土</h4><p>淡红色 | (586~613)</p></div>
+        </div>
         
-        <h2>🗺️ 特殊区域</h2>
-        <div class="rule-item" style="border-left-color: rgba(144, 238, 144, 0.8);"><h4>🌿 沃土</h4><p>淡绿色 | (450~749)</p></div>
-        <div class="rule-item" style="border-left-color: rgba(128, 128, 128, 0.8);"><h4>🪨 黑土</h4><p>淡灰色 | (552~647)</p></div>
-        <div class="rule-item" style="border-left-color: rgba(255, 100, 100, 0.8);"><h4>🔥 红土</h4><p>淡红色 | (586~613)</p></div>
-        
-        <div class="rule-item warning">
+        <div class="rule-item warning" style="margin-top:10px;">
             <h4>💡 提示</h4>
             <p id="validation-msg">悬停建筑查看坐标</p>
         </div>
@@ -715,14 +1524,181 @@
         <div class="building-info-status" id="building-info-status"></div>
     </div>
     
+    <!-- 成员管理弹窗 -->
+    <div class="member-modal-overlay" id="member-modal-overlay" onclick="closeMemberModal(event)">
+        <div class="member-modal" onclick="event.stopPropagation()">
+            <div class="member-modal-header">
+                <h3>👥 联盟成员管理</h3>
+                <button class="member-modal-close" onclick="closeMemberModal()">×</button>
+            </div>
+            <div class="member-modal-body">
+                <!-- 左侧：联盟树 -->
+                <div class="member-sidebar">
+                    <div class="alliance-tree-item active" onclick="filterByAlliance('all')" data-alliance="all">
+                        <span class="alliance-dot" style="background: linear-gradient(45deg, #e74c3c, #3498db, #2ecc71);"></span>
+                        <span>全部成员</span>
+                        <span class="count" id="count-all">0</span>
+                    </div>
+                    <div id="alliance-tree">
+                        <!-- 联盟列表由JS生成 -->
+                    </div>
+                </div>
+                
+                <!-- 右侧：成员列表 -->
+                <div class="member-main">
+                    <div class="member-toolbar">
+                        <input type="text" class="member-search" placeholder="🔍 搜索成员..." 
+                               id="member-search" oninput="filterMembers()">
+                        <button class="member-toolbar-btn success" onclick="toggleBatchImport()">📥 批量导入</button>
+                        <button class="member-toolbar-btn primary" onclick="openAddMemberForm()">➕ 添加</button>
+                        <button class="member-toolbar-btn" style="background:#9b59b6;color:#fff;" onclick="assignSelectedToTeam()">📁 分配小队</button>
+                        <button class="member-toolbar-btn warning" onclick="exportMembersCSV()">📤 导出</button>
+                        <button class="member-toolbar-btn danger" onclick="deleteSelectedMembers()">🗑️ 删除</button>
+                    </div>
+                    
+                    <!-- 批量导入面板 -->
+                    <div class="batch-import-panel" id="batch-import-panel">
+                        <div class="batch-import-hint">
+                            📝 每行一个成员，格式：<code>姓名+战力</code> 或 <code>姓名</code><br>
+                            例如：M神+1111 或 直接粘贴名单（会自动解析）
+                        </div>
+                        <textarea id="batch-import-text" placeholder="张三+1500&#10;李四+2000&#10;王五+800"></textarea>
+                        <div class="batch-import-hint">选择要导入到的联盟：</div>
+                        <div class="batch-import-alliance" id="batch-alliance-select">
+                            <!-- 联盟选择按钮由JS生成 -->
+                        </div>
+                        <div style="display:flex;gap:10px;margin-top:10px;">
+                            <button class="member-toolbar-btn success" onclick="doBatchImport()">✓ 确认导入</button>
+                            <button class="member-toolbar-btn" style="background:#95a5a6;color:#fff;" onclick="toggleBatchImport()">取消</button>
+                        </div>
+                    </div>
+                    
+                    <!-- 成员列表 -->
+                    <div class="member-list-header">
+                        <input type="checkbox" class="member-checkbox" id="select-all-members" onchange="toggleSelectAll()">
+                        <span>姓名</span>
+                        <span>战力</span>
+                        <span>联盟</span>
+                        <span>小队/角色</span>
+                        <span>操作</span>
+                    </div>
+                    <div class="member-list-container" id="member-list-container">
+                        <!-- 成员列表由JS生成 -->
+                    </div>
+                    
+                    <!-- 统计信息 -->
+                    <div class="member-stats" id="member-stats">
+                        <span>总计: <strong id="stat-total">0</strong> 人</span>
+                        <span>已放置: <strong id="stat-placed">0</strong> 人</span>
+                        <span>未放置: <strong id="stat-unplaced">0</strong> 人</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- 时间轴（底部） -->
+    <div class="timeline-container" id="timeline-container">
+        <div class="timeline-config">
+            <input type="text" id="timeline-start" value="19:00" placeholder="开始" onchange="updateTimelineConfig()">
+            <span>~</span>
+            <input type="text" id="timeline-end" value="24:00" placeholder="结束" onchange="updateTimelineConfig()">
+        </div>
+        <div class="timeline-track-wrap">
+            <div class="timeline-ruler" id="timeline-ruler"></div>
+            <div class="timeline-track" id="timeline-track" onclick="onTimelineClick(event)">
+                <div class="timeline-progress" id="timeline-progress"></div>
+                <div class="timeline-current" id="timeline-current-marker"></div>
+                <!-- 时间点由JS生成 -->
+            </div>
+        </div>
+        <div class="timeline-time-display" id="timeline-current">19:00</div>
+        <div class="timeline-actions">
+            <button class="timeline-btn save" onclick="saveTimelineSnapshot()" title="保存快照">💾</button>
+            <button class="timeline-btn clear" onclick="clearTimelineSnapshot()" title="清除快照">🗑️</button>
+            <button class="timeline-btn" onclick="toggleTimeline()" title="关闭">✕</button>
+        </div>
+    </div>
+    
     <!-- 版权信息 -->
     <div class="copyright-watermark">© 2607全民代表大会</div>
     <div class="copyright-footer">
-        <span class="logo-earth">🌍</span> 管理助手 v1.0 | 版权：<strong>2607全民代表大会</strong> | 支持：2607管理委员会 | 技术：兔弟
+        <span class="logo-earth">🌍</span> 沙盘演练系统 v1.3 | 版权：<strong>2607全民代表大会</strong> | 支持：2607管理委员会 | 技术：兔弟
+    </div>
+    
+    <!-- 快捷键提示条 -->
+    <div class="shortcut-bar" id="shortcut-bar">
+        <div class="shortcut-item"><span class="shortcut-key">1-4</span><span>建筑</span></div>
+        <div class="shortcut-item"><span class="shortcut-key">6</span><span>画路线</span></div>
+        <div class="shortcut-item"><span class="shortcut-key">D</span><span>删除</span></div>
+        <div class="shortcut-item"><span class="shortcut-key">空格</span><span>移动</span></div>
+        <div class="shortcut-item"><span class="shortcut-key">Q/E</span><span>联盟</span></div>
+        <div class="shortcut-item" style="cursor:pointer;opacity:0.6;" onclick="hideShortcutBar()">✕</div>
+    </div>
+    
+    <!-- Toast提示容器 -->
+    <div class="toast-container" id="toast-container"></div>
+    
+    <!-- Loading遮罩 -->
+    <div class="loading-overlay" id="loading-overlay">
+        <div class="loading-spinner"></div>
+        <div class="loading-text" id="loading-text">加载中...</div>
+    </div>
+    
+    <!-- 倒计时面板 -->
+    <div class="countdown-overlay" id="countdown-overlay" onclick="closeCountdownPanel()"></div>
+    <div class="countdown-panel" id="countdown-panel">
+        <h3>
+            <span>🔊 倒计时</span>
+            <button class="close-btn" onclick="closeCountdownPanel()">✕</button>
+        </h3>
+        
+        <div class="countdown-presets">
+            <button class="countdown-preset" onclick="setCountdownPreset(60, 0)">60→0</button>
+            <button class="countdown-preset" onclick="setCountdownPreset(45, 30)">45→30</button>
+            <button class="countdown-preset" onclick="setCountdownPreset(30, 0)">30→0</button>
+            <button class="countdown-preset" onclick="setCountdownPreset(10, 0)">10→0</button>
+        </div>
+        
+        <div class="countdown-settings">
+            <div class="countdown-input-group">
+                <label>开始</label>
+                <input type="number" id="countdown-start" value="45" min="1" max="999">
+            </div>
+            <div style="font-size:16px;color:#666;">→</div>
+            <div class="countdown-input-group">
+                <label>结束</label>
+                <input type="number" id="countdown-end" value="30" min="0" max="998">
+            </div>
+        </div>
+        
+        <div class="countdown-display" style="margin:8px 0;">
+            <div class="countdown-number" id="countdown-number" style="font-size:36px;">45</div>
+            <div class="countdown-status" id="countdown-status" style="font-size:10px;">准备就绪</div>
+        </div>
+        
+        <div class="countdown-buttons" style="gap:4px;">
+            <button class="countdown-btn start" id="countdown-start-btn" onclick="startCountdown()" style="padding:6px 10px;font-size:11px;">▶ 开始</button>
+            <button class="countdown-btn pause" id="countdown-pause-btn" onclick="pauseCountdown()" style="display:none;padding:6px 10px;font-size:11px;">⏸ 暂停</button>
+            <button class="countdown-btn reset" onclick="resetCountdown()" style="padding:6px 10px;font-size:11px;">🔄 重置</button>
+        </div>
+    </div>
+    
+    <!-- 箭头绘制提示 -->
+    <div class="arrow-drawing-hint" id="arrow-drawing-hint">
+        🏹 绘制模式：<kbd>按住拖动</kbd>绘制路线 | <kbd>松手</kbd>完成 | <kbd>双击线路</kbd>命名 | <kbd>Esc</kbd>取消
     </div>
     
     <!-- 移动端底部工具栏 -->
     <div class="mobile-toolbar" id="mobile-toolbar">
+        <button class="mobile-toolbar-btn" onclick="undo()" id="mobile-btn-undo">
+            <span class="mobile-icon">↩️</span>
+            <span>撤销</span>
+        </button>
+        <button class="mobile-toolbar-btn" onclick="redo()" id="mobile-btn-redo">
+            <span class="mobile-icon">↪️</span>
+            <span>重做</span>
+        </button>
         <button class="mobile-toolbar-btn" onclick="centerView()">
             <span class="mobile-icon">🎯</span>
             <span>回中心</span>
@@ -739,13 +1715,9 @@
             <span class="mobile-icon">🖼️</span>
             <span>保存图</span>
         </button>
-        <button class="mobile-toolbar-btn btn-warning" onclick="removeWatermark()">
-            <span class="mobile-icon">🔓</span>
-            <span>去水印</span>
-        </button>
-        <button class="mobile-toolbar-btn btn-danger" onclick="clearAll()">
-            <span class="mobile-icon">🗑️</span>
-            <span>清空</span>
+        <button class="mobile-toolbar-btn btn-danger" onclick="openCountdownPanel()">
+            <span class="mobile-icon">🔊</span>
+            <span>倒计时</span>
         </button>
     </div>
     
@@ -857,8 +1829,96 @@
         
         // 配置
         const CELL_SIZE = 10;
-        const GAME_SIZE = 1200;
-        const MAX_COORD = 1199;
+        const DEFAULT_GAME_SIZE = 1200;
+        let GAME_SIZE = 1200;
+        let MAX_COORD = 1199;
+        
+        // 多地图配置
+        const MAP_CONFIGS = {
+            wangcheng: {
+                id: 'wangcheng',
+                name: '王城',
+                size: 1200,
+                hasNPC: true,
+                bgImage: null,
+                description: '联盟攻城战，1200×1200'
+            },
+            binggongchang: {
+                id: 'binggongchang',
+                name: '兵工厂',
+                size: 800,
+                hasNPC: false,
+                bgImage: null,
+                description: '兵工厂争夺战，800×800'
+            },
+            xiagu: {
+                id: 'xiagu',
+                name: '峡谷会战',
+                size: 600,
+                hasNPC: false,
+                bgImage: null,
+                description: '峡谷会战，600×600'
+            },
+            shuanglong: {
+                id: 'shuanglong',
+                name: '霜龙',
+                size: 500,
+                hasNPC: false,
+                bgImage: null,
+                description: '霜龙战场，500×500'
+            }
+        };
+        
+        // 当前地图
+        let currentMapId = 'wangcheng';
+        
+        // 各地图的建筑数据
+        let mapBuildings = {
+            wangcheng: { qi: [], bao: [], keng: [], kuang: [] },
+            binggongchang: { qi: [], bao: [], keng: [], kuang: [] },
+            xiagu: { qi: [], bao: [], keng: [], kuang: [] },
+            shuanglong: { qi: [], bao: [], keng: [], kuang: [] }
+        };
+        
+        // 时间轴配置
+        let timelineConfig = {
+            enabled: false,
+            startTime: '19:00',
+            endTime: '24:00',
+            interval: 30,  // 每30分钟一个时间点
+            currentTime: '19:00'
+        };
+        
+        // 时间轴快照数据 { mapId: { 'HH:MM': { buildings: {...} } } }
+        let timelineSnapshots = {};
+        
+        // ========== 行军箭头系统 ==========
+        
+        // 箭头类型配置
+        const ARROW_TYPES = {
+            attack: { name: '进攻', icon: '⚔️', color: '#e74c3c', dash: [], width: 3 },
+            defend: { name: '防守', icon: '🛡️', color: '#3498db', dash: [8, 4], width: 3 },
+            gather: { name: '集结', icon: '📍', color: '#27ae60', dash: [4, 4], width: 2 },
+            retreat: { name: '撤退', icon: '🏃', color: '#f39c12', dash: [12, 6], width: 2 },
+            scout: { name: '侦查', icon: '👁️', color: '#9b59b6', dash: [2, 4], width: 1.5 }
+        };
+        
+        // 箭头数据 { id, type, allianceId, points: [{x,y}], label, mapId }
+        let arrows = [];
+        let arrowIdCounter = 0;
+        
+        // 绘制状态
+        let isDrawingArrow = false;
+        let arrowStartPoint = null;      // 箭头起点（按下时记录）
+        let arrowEndPoint = null;        // 箭头终点（拖动时预览）
+        let currentArrowType = 'attack';
+        let selectedArrow = null;
+        let arrowsVisible = true;
+        
+        // 箭头动画系统
+        let arrowAnimationOffset = 0;
+        let arrowAnimationEnabled = true;
+        const ARROW_SNAP_DISTANCE = 5;  // 箭头吸附到建筑的距离（格子数）
         
         // 联盟配置（6个联盟）
         const ALLIANCES = [
@@ -931,6 +1991,24 @@
         // 当前选中的联盟
         let currentAlliance = 0;
         
+        // 联盟成员列表
+        // { id, name, power, allianceId, teamId, role: 'leader'|'member', placedAt }
+        let allianceMembers = [];
+        let memberIdCounter = 0;
+        
+        // 小队列表 { id, name, allianceId }
+        let teams = [];
+        let teamIdCounter = 0;
+        
+        // 成员管理弹窗状态
+        let memberModalOpen = false;
+        let memberFilter = { alliance: 'all', search: '', team: 'all' };
+        
+        // 拖拽成员相关
+        let dragMember = null;
+        let dragPreviewEl = null;
+        let dragRenderPending = false;  // 拖拽渲染节流标志
+        
         // 缓存激活的旗集合（按联盟分组）
         let activeQiSets = {};  // { allianceId: Set }
         
@@ -963,20 +2041,1467 @@
         let qiForbiddenCenters = new Set();
         let kengCoverage = new Set();
         
+        // ========== 撤销/重做系统 ==========
+        let historyStack = [];       // 历史记录栈
+        let redoStack = [];          // 重做栈
+        const MAX_HISTORY = 50;      // 最大历史记录数
+        
+        // 保存当前状态到历史记录
+        function saveToHistory() {
+            const state = {
+                buildings: JSON.parse(JSON.stringify(buildings)),
+                arrows: JSON.parse(JSON.stringify(arrows)),
+                mapId: currentMapId
+            };
+            historyStack.push(state);
+            if (historyStack.length > MAX_HISTORY) {
+                historyStack.shift();
+            }
+            // 新操作后清空重做栈
+            redoStack = [];
+            updateUndoRedoButtons();
+        }
+        
+        // 撤销操作
+        function undo() {
+            if (historyStack.length === 0) {
+                showValidationMessage('⚠️ 没有可撤销的操作');
+                return;
+            }
+            
+            // 保存当前状态到重做栈
+            const currentState = {
+                buildings: JSON.parse(JSON.stringify(buildings)),
+                arrows: JSON.parse(JSON.stringify(arrows)),
+                mapId: currentMapId
+            };
+            redoStack.push(currentState);
+            
+            // 恢复上一个状态
+            const prevState = historyStack.pop();
+            buildings = prevState.buildings;
+            arrows = prevState.arrows;
+            
+            // 重新计算缓存
+            recalculateCache();
+            updateAllianceStats();
+            renderArrowList();
+            saveMapDataToStorage();
+            saveArrowsToStorage();
+            render();
+            
+            showValidationMessage('↩️ 已撤销');
+            updateUndoRedoButtons();
+        }
+        
+        // 重做操作
+        function redo() {
+            if (redoStack.length === 0) {
+                showValidationMessage('⚠️ 没有可重做的操作');
+                return;
+            }
+            
+            // 保存当前状态到历史栈
+            const currentState = {
+                buildings: JSON.parse(JSON.stringify(buildings)),
+                arrows: JSON.parse(JSON.stringify(arrows)),
+                mapId: currentMapId
+            };
+            historyStack.push(currentState);
+            
+            // 恢复重做状态
+            const nextState = redoStack.pop();
+            buildings = nextState.buildings;
+            arrows = nextState.arrows;
+            
+            // 重新计算缓存
+            recalculateCache();
+            updateAllianceStats();
+            renderArrowList();
+            saveMapDataToStorage();
+            saveArrowsToStorage();
+            render();
+            
+            showValidationMessage('↪️ 已重做');
+            updateUndoRedoButtons();
+        }
+        
+        // 更新撤销/重做按钮状态
+        function updateUndoRedoButtons() {
+            const undoBtn = document.getElementById('btn-undo');
+            const redoBtn = document.getElementById('btn-redo');
+            const mobileUndoBtn = document.getElementById('mobile-btn-undo');
+            const mobileRedoBtn = document.getElementById('mobile-btn-redo');
+            
+            const undoDisabled = historyStack.length === 0;
+            const redoDisabled = redoStack.length === 0;
+            
+            [undoBtn, mobileUndoBtn].forEach(btn => {
+                if (btn) {
+                    btn.disabled = undoDisabled;
+                    btn.style.opacity = undoDisabled ? '0.5' : '1';
+                }
+            });
+            [redoBtn, mobileRedoBtn].forEach(btn => {
+                if (btn) {
+                    btn.disabled = redoDisabled;
+                    btn.style.opacity = redoDisabled ? '0.5' : '1';
+                }
+            });
+        }
+        
         // ========== 初始化 ==========
         
         function init() {
+            initMapUI();  // 初始化地图选择UI
             initAllianceUI();
             initAllianceStats();
             initZoomButtons();
             resizeCanvas();
             window.addEventListener('resize', resizeCanvas);
             bindEvents();
+            setupCanvasDragDrop();  // 初始化成员拖拽放置
+            loadMembersFromStorage();  // 加载已保存的成员
+            loadMapDataFromStorage();  // 加载已保存的地图数据
             // 设置默认工具为移动画布
             selectTool('move');
             // 设置默认旋转角度
             setRotation(45);
             render();
+            
+            // 用户体验增强初始化
+            if (localStorage.getItem('shortcutBarHidden')) {
+                document.getElementById('shortcut-bar').classList.add('hidden');
+            }
+            updateAllianceStats();
+            
+            // 初始化行军箭头工具
+            initArrowTools();
+            loadArrowsFromStorage();
+            
+            // 启动箭头动画循环
+            startArrowAnimation();
+            
+            // 延迟显示欢迎引导
+            setTimeout(() => {
+                showWelcomeGuide();
+            }, 500);
+        }
+        
+        // 箭头动画循环
+        function startArrowAnimation() {
+            let lastTime = 0;
+            
+            function animateArrows(currentTime) {
+                if (arrowAnimationEnabled && arrowsVisible) {
+                    const delta = currentTime - lastTime;
+                    if (delta > 50) {  // 约20fps更新
+                        arrowAnimationOffset = (arrowAnimationOffset + 1) % 100;
+                        lastTime = currentTime;
+                        render();
+                    }
+                }
+                requestAnimationFrame(animateArrows);
+            }
+            
+            requestAnimationFrame(animateArrows);
+        }
+        
+        // 切换箭头动画
+        function toggleArrowAnimation() {
+            arrowAnimationEnabled = !arrowAnimationEnabled;
+            const btn = document.getElementById('btn-arrow-animation');
+            if (btn) {
+                btn.textContent = arrowAnimationEnabled ? '⚡ 动画:开' : '⚡ 动画:关';
+                btn.style.background = arrowAnimationEnabled ? '#27ae60' : '#7f8c8d';
+            }
+            showValidationMessage(arrowAnimationEnabled ? '⚡ 箭头动画已开启' : '⚡ 箭头动画已关闭');
+        }
+        
+        // ========== 地图管理 ==========
+        
+        function initMapUI() {
+            const tabs = document.getElementById('map-tabs');
+            tabs.innerHTML = Object.values(MAP_CONFIGS).map(map => `
+                <button class="map-tab ${map.id === currentMapId ? 'active' : ''}" 
+                        onclick="switchMap('${map.id}')" 
+                        id="map-${map.id}">
+                    ${map.name}
+                    <span class="map-size">${map.size}×${map.size}</span>
+                </button>
+            `).join('');
+            updateMapTitle();
+        }
+        
+        function switchMap(mapId) {
+            if (mapId === currentMapId) return;
+            
+            // 显示loading
+            showLoading('切换地图中...');
+            
+            // 使用setTimeout让loading先显示出来
+            setTimeout(() => {
+                try {
+                    // 保存当前地图的建筑数据
+                    mapBuildings[currentMapId] = JSON.parse(JSON.stringify(buildings));
+                    
+                    // 切换到新地图
+                    currentMapId = mapId;
+                    const mapConfig = MAP_CONFIGS[mapId];
+                    
+                    // 更新地图尺寸
+                    GAME_SIZE = mapConfig.size;
+                    MAX_COORD = mapConfig.size - 1;
+                    
+                    // 加载新地图的建筑数据
+                    buildings = mapBuildings[mapId] ? JSON.parse(JSON.stringify(mapBuildings[mapId])) : { qi: [], bao: [], keng: [], kuang: [] };
+                    
+                    // 更新UI
+                    document.querySelectorAll('.map-tab').forEach(btn => {
+                        btn.classList.toggle('active', btn.id === `map-${mapId}`);
+                    });
+                    
+                    updateMapTitle();
+                    
+                    // 重置视图
+                    panOffset = { x: 0, y: 0 };
+                    zoom = 1;
+                    updateZoomDisplay();
+                    
+                    // 更新缓存和渲染
+                    updateCaches();
+                    render();
+                    
+                    saveMapDataToStorage();
+                    showValidationMessage(`切换到 ${mapConfig.name}`);
+                } finally {
+                    hideLoading();
+                }
+            }, 10);
+        }
+        
+        function updateMapTitle() {
+            const mapConfig = MAP_CONFIGS[currentMapId];
+            const titleEl = document.getElementById('map-title');
+            if (titleEl) {
+                titleEl.innerHTML = `🏯 ${mapConfig.name} <span style="font-size:12px;color:#7f8c8d;font-weight:normal;">${mapConfig.size}×${mapConfig.size}</span>`;
+            }
+        }
+        
+        function saveMapDataToStorage() {
+            try {
+                // 保存当前地图数据
+                mapBuildings[currentMapId] = JSON.parse(JSON.stringify(buildings));
+                localStorage.setItem('mapBuildings', JSON.stringify(mapBuildings));
+                localStorage.setItem('currentMapId', currentMapId);
+            } catch (e) {
+                console.warn('保存地图数据失败:', e);
+            }
+        }
+        
+        function loadMapDataFromStorage() {
+            try {
+                const savedMapId = localStorage.getItem('currentMapId');
+                const savedMapBuildings = localStorage.getItem('mapBuildings');
+                
+                if (savedMapBuildings) {
+                    mapBuildings = JSON.parse(savedMapBuildings);
+                }
+                
+                if (savedMapId && MAP_CONFIGS[savedMapId]) {
+                    currentMapId = savedMapId;
+                    const mapConfig = MAP_CONFIGS[currentMapId];
+                    GAME_SIZE = mapConfig.size;
+                    MAX_COORD = mapConfig.size - 1;
+                    buildings = mapBuildings[currentMapId] || { qi: [], bao: [], keng: [], kuang: [] };
+                    
+                    // 更新UI
+                    document.querySelectorAll('.map-tab').forEach(btn => {
+                        btn.classList.toggle('active', btn.id === `map-${currentMapId}`);
+                    });
+                    updateMapTitle();
+                }
+                
+                // 加载时间轴数据
+                const savedTimeline = localStorage.getItem('timelineSnapshots');
+                if (savedTimeline) {
+                    timelineSnapshots = JSON.parse(savedTimeline);
+                }
+            } catch (e) {
+                console.warn('加载地图数据失败:', e);
+            }
+        }
+        
+        // ========== 行军箭头功能 ==========
+        
+        // 初始化箭头工具UI
+        function initArrowTools() {
+            const grid = document.getElementById('arrow-type-grid');
+            if (!grid) return;
+            
+            grid.innerHTML = Object.entries(ARROW_TYPES).map(([key, type]) => `
+                <button class="arrow-type-btn ${key === currentArrowType ? 'active' : ''}" 
+                        onclick="selectArrowType('${key}')" data-type="${key}">
+                    <span class="arrow-icon">${type.icon}</span>
+                    ${type.name}
+                </button>
+            `).join('');
+            
+            renderArrowList();
+        }
+        
+        // 选择箭头类型
+        function selectArrowType(type) {
+            currentArrowType = type;
+            document.querySelectorAll('.arrow-type-btn').forEach(btn => {
+                btn.classList.toggle('active', btn.dataset.type === type);
+            });
+            // 同步状态栏下拉框
+            const select = document.getElementById('status-arrow-type');
+            if (select) select.value = type;
+        }
+        
+        // 从状态栏选择箭头类型
+        function selectArrowTypeFromStatus(type) {
+            currentArrowType = type;
+            document.querySelectorAll('.arrow-type-btn').forEach(btn => {
+                btn.classList.toggle('active', btn.dataset.type === type);
+            });
+        }
+        
+        // 更新状态栏路线计数
+        function updateStatusArrowCount() {
+            const count = arrows.filter(a => a.mapId === currentMapId).length;
+            const el = document.getElementById('status-arrow-count');
+            if (el) el.textContent = `路线: ${count}`;
+        }
+        
+        // 切换折叠面板
+        function togglePanel(panelId) {
+            const panel = document.getElementById(panelId);
+            const toggleId = panelId.replace('-content', '-toggle').replace('-panel', '');
+            const toggle = document.getElementById(toggleId);
+            
+            if (panel) {
+                panel.classList.toggle('collapsed');
+                const isCollapsed = panel.classList.contains('collapsed');
+                if (toggle) {
+                    toggle.textContent = isCollapsed ? '▼ 展开' : '▲ 收起';
+                }
+            }
+        }
+        
+        // 切换箭头绘制模式
+        function toggleArrowDrawing() {
+            isDrawingArrow = !isDrawingArrow;
+            const btn = document.getElementById('arrow-draw-btn');
+            const hint = document.getElementById('arrow-drawing-hint');
+            
+            if (isDrawingArrow) {
+                btn.classList.add('active');
+                btn.textContent = '⏹️ 停止';
+                hint.classList.add('active');
+                arrowStartPoint = null;
+                arrowEndPoint = null;
+                selectTool('arrow'); // 切换到箭头工具
+                showToast('按住左键拖动绘制路线，松手完成', 'info', 3000);
+            } else {
+                btn.classList.remove('active');
+                btn.textContent = '✏️ 绘制';
+                hint.classList.remove('active');
+                arrowStartPoint = null;
+                arrowEndPoint = null;
+                render();
+            }
+        }
+        
+        // 开始绘制箭头（鼠标按下）
+        function startArrowDraw(gameX, gameY) {
+            const snappedPos = snapArrowToBuilding(gameX, gameY);
+            arrowStartPoint = snappedPos;
+            arrowEndPoint = snappedPos;
+            
+            if (snappedPos.snappedTo) {
+                showValidationMessage(`📍 起点吸附到 ${snappedPos.snappedTo}`);
+            }
+            render();
+        }
+        
+        // 更新箭头终点（鼠标移动）
+        function updateArrowEnd(gameX, gameY) {
+            if (!arrowStartPoint) return;
+            const snappedPos = snapArrowToBuilding(gameX, gameY);
+            arrowEndPoint = snappedPos;
+            render();
+        }
+        
+        // 完成箭头绘制（鼠标松开）
+        function finishArrowDraw(gameX, gameY) {
+            if (!arrowStartPoint) return;
+            
+            const snappedEnd = snapArrowToBuilding(gameX, gameY);
+            arrowEndPoint = snappedEnd;
+            
+            // 检查起点终点是否相同
+            if (arrowStartPoint.x === arrowEndPoint.x && arrowStartPoint.y === arrowEndPoint.y) {
+                arrowStartPoint = null;
+                arrowEndPoint = null;
+                render();
+                return;
+            }
+            
+            // 创建箭头
+            arrows.push({
+                id: ++arrowIdCounter,
+                type: currentArrowType,
+                allianceId: currentAlliance,
+                points: [
+                    { x: arrowStartPoint.x, y: arrowStartPoint.y },
+                    { x: arrowEndPoint.x, y: arrowEndPoint.y }
+                ],
+                label: '',
+                mapId: currentMapId
+            });
+            
+            if (snappedEnd.snappedTo) {
+                showValidationMessage(`📍 终点吸附到 ${snappedEnd.snappedTo}`);
+            }
+            
+            arrowStartPoint = null;
+            arrowEndPoint = null;
+            
+            renderArrowList();
+            saveArrowsToStorage();
+            render();
+            
+            const typeConfig = ARROW_TYPES[currentArrowType];
+            showToast(`${typeConfig.icon} 路线已创建（双击可命名）`, 'success');
+        }
+        
+        // 箭头吸附到附近建筑中心
+        function snapArrowToBuilding(gameX, gameY) {
+            let bestMatch = { x: gameX, y: gameY, snappedTo: null };
+            let minDistance = ARROW_SNAP_DISTANCE + 1;
+            
+            // 检查所有建筑类型
+            for (const buildType of ['qi', 'bao', 'keng', 'kuang']) {
+                for (const b of buildings[buildType]) {
+                    const size = BUILDING_CONFIG[buildType].size;
+                    // 计算建筑中心
+                    const centerX = b.x + Math.floor(size / 2);
+                    const centerY = b.y + Math.floor(size / 2);
+                    
+                    const distance = Math.sqrt(Math.pow(gameX - centerX, 2) + Math.pow(gameY - centerY, 2));
+                    
+                    if (distance < minDistance && distance <= ARROW_SNAP_DISTANCE) {
+                        minDistance = distance;
+                        const config = BUILDING_CONFIG[buildType];
+                        bestMatch = { 
+                            x: centerX, 
+                            y: centerY, 
+                            snappedTo: `${config.icon}${config.name}` 
+                        };
+                    }
+                }
+            }
+            
+            // 检查NPC建筑
+            for (const [key, npc] of Object.entries(NPC_BUILDINGS)) {
+                const centerX = npc.x + Math.floor(npc.size / 2);
+                const centerY = npc.y + Math.floor(npc.size / 2);
+                const distance = Math.sqrt(Math.pow(gameX - centerX, 2) + Math.pow(gameY - centerY, 2));
+                
+                if (distance < minDistance && distance <= ARROW_SNAP_DISTANCE) {
+                    minDistance = distance;
+                    bestMatch = { x: centerX, y: centerY, snappedTo: `NPC-${npc.name}` };
+                }
+            }
+            
+            // 检查王城
+            const wcCenterX = WANG_CHENG.x + Math.floor(WANG_CHENG.size / 2);
+            const wcCenterY = WANG_CHENG.y + Math.floor(WANG_CHENG.size / 2);
+            const wcDistance = Math.sqrt(Math.pow(gameX - wcCenterX, 2) + Math.pow(gameY - wcCenterY, 2));
+            
+            if (wcDistance < minDistance && wcDistance <= ARROW_SNAP_DISTANCE * 2) {  // 王城吸附范围更大
+                bestMatch = { x: wcCenterX, y: wcCenterY, snappedTo: WANG_CHENG.name };
+            }
+            
+            return bestMatch;
+        }
+        
+        // 取消箭头绘制
+        function cancelArrowDrawing() {
+            isDrawingArrow = false;
+            arrowStartPoint = null;
+            arrowEndPoint = null;
+            
+            const btn = document.getElementById('arrow-draw-btn');
+            const hint = document.getElementById('arrow-drawing-hint');
+            btn.classList.remove('active');
+            btn.textContent = '✏️ 绘制';
+            hint.classList.remove('active');
+            
+            render();
+        }
+        
+        // 双击箭头弹出命名
+        function renameArrow(arrowId) {
+            const arrow = arrows.find(a => a.id === arrowId);
+            if (!arrow) return;
+            
+            const typeConfig = ARROW_TYPES[arrow.type];
+            const newName = prompt(`给这条${typeConfig.name}路线命名：`, arrow.label || '');
+            
+            if (newName !== null) {
+                arrow.label = newName;
+                renderArrowList();
+                saveArrowsToStorage();
+                render();
+                showToast(`✏️ 路线已命名为「${newName || '无名'}」`, 'success');
+            }
+        }
+        
+        // 检测点击是否在箭头上
+        function findArrowAtPosition(gameX, gameY) {
+            const mapArrows = arrows.filter(a => a.mapId === currentMapId);
+            
+            for (const arrow of mapArrows) {
+                if (arrow.points.length < 2) continue;
+                
+                // 检查是否点击在线段附近
+                for (let i = 0; i < arrow.points.length - 1; i++) {
+                    const p1 = arrow.points[i];
+                    const p2 = arrow.points[i + 1];
+                    
+                    // 计算点到线段的距离
+                    const dist = pointToLineDistance(gameX, gameY, p1.x, p1.y, p2.x, p2.y);
+                    if (dist < 5) {  // 5格以内视为点击到
+                        return arrow;
+                    }
+                }
+            }
+            return null;
+        }
+        
+        // 点到线段距离
+        function pointToLineDistance(px, py, x1, y1, x2, y2) {
+            const A = px - x1;
+            const B = py - y1;
+            const C = x2 - x1;
+            const D = y2 - y1;
+            
+            const dot = A * C + B * D;
+            const lenSq = C * C + D * D;
+            let param = -1;
+            
+            if (lenSq !== 0) param = dot / lenSq;
+            
+            let xx, yy;
+            if (param < 0) {
+                xx = x1; yy = y1;
+            } else if (param > 1) {
+                xx = x2; yy = y2;
+            } else {
+                xx = x1 + param * C;
+                yy = y1 + param * D;
+            }
+            
+            const dx = px - xx;
+            const dy = py - yy;
+            return Math.sqrt(dx * dx + dy * dy);
+        }
+        
+        // 渲染箭头列表
+        function renderArrowList() {
+            const list = document.getElementById('arrow-list');
+            
+            const mapArrows = arrows.filter(a => a.mapId === currentMapId);
+            
+            // 更新状态栏计数
+            updateStatusArrowCount();
+            
+            if (!list) return;
+            
+            if (mapArrows.length === 0) {
+                list.innerHTML = '<div style="color:#999;font-size:9px;text-align:center;padding:8px;">暂无路线</div>';
+                return;
+            }
+            
+            list.innerHTML = mapArrows.map(arrow => {
+                const typeConfig = ARROW_TYPES[arrow.type];
+                const alliance = ALLIANCES[arrow.allianceId];
+                return `
+                    <div class="arrow-list-item ${selectedArrow === arrow.id ? 'selected' : ''}" 
+                         onclick="selectArrow(${arrow.id})">
+                        <span class="arrow-color" style="background:${alliance ? alliance.color : typeConfig.color};"></span>
+                        <span class="arrow-name">${typeConfig.icon} ${arrow.label || typeConfig.name}</span>
+                        <button class="arrow-delete" onclick="event.stopPropagation();deleteArrow(${arrow.id})">✕</button>
+                    </div>
+                `;
+            }).join('');
+        }
+        
+        // 选择箭头
+        function selectArrow(id) {
+            selectedArrow = selectedArrow === id ? null : id;
+            renderArrowList();
+            render();
+        }
+        
+        // 删除箭头
+        function deleteArrow(id) {
+            arrows = arrows.filter(a => a.id !== id);
+            if (selectedArrow === id) selectedArrow = null;
+            renderArrowList();
+            saveArrowsToStorage();
+            render();
+            showToast('路线已删除', 'info');
+        }
+        
+        // 清空所有箭头
+        function clearAllArrows() {
+            const mapArrows = arrows.filter(a => a.mapId === currentMapId);
+            if (mapArrows.length === 0) return;
+            
+            if (!confirm(`确定清空当前地图的 ${mapArrows.length} 条路线？`)) return;
+            
+            arrows = arrows.filter(a => a.mapId !== currentMapId);
+            selectedArrow = null;
+            renderArrowList();
+            saveArrowsToStorage();
+            render();
+            showToast('所有路线已清空', 'info');
+        }
+        
+        // 切换箭头显示/隐藏
+        function toggleArrowsVisibility() {
+            arrowsVisible = !arrowsVisible;
+            const btn = document.getElementById('arrow-visibility-btn');
+            btn.textContent = arrowsVisible ? '👁️' : '🚫';
+            btn.style.background = arrowsVisible ? '#34495e' : '#e74c3c';
+            render();
+        }
+        
+        // 绘制所有箭头
+        function drawArrows() {
+            if (!arrowsVisible) return;
+            
+            const mapArrows = arrows.filter(a => a.mapId === currentMapId);
+            
+            for (const arrow of mapArrows) {
+                drawArrow(arrow, arrow.id === selectedArrow);
+            }
+            
+            // 绘制正在创建的箭头预览
+            if (isDrawingArrow && arrowStartPoint) {
+                drawArrowPreview();
+            }
+        }
+        
+        // 绘制单个箭头
+        function drawArrow(arrow, isSelected) {
+            if (arrow.points.length < 2) return;
+            
+            const typeConfig = ARROW_TYPES[arrow.type];
+            const alliance = ALLIANCES[arrow.allianceId];
+            const color = alliance ? alliance.color : typeConfig.color;
+            
+            ctx.save();
+            
+            const canvasPoints = arrow.points.map(p => gameToCanvas(p.x, p.y));
+            
+            // 绘制发光底层（让箭头更明显）
+            if (typeConfig.dash.length > 0) {
+                ctx.beginPath();
+                ctx.strokeStyle = 'rgba(255,255,255,0.3)';
+                ctx.lineWidth = typeConfig.width * 2 + 2;
+                ctx.lineCap = 'round';
+                ctx.lineJoin = 'round';
+                drawArrowPath(canvasPoints);
+                ctx.stroke();
+            }
+            
+            // 绘制主路径线
+            ctx.beginPath();
+            ctx.strokeStyle = color;
+            ctx.lineWidth = typeConfig.width * (isSelected ? 1.5 : 1);
+            ctx.setLineDash(typeConfig.dash);
+            ctx.lineCap = 'round';
+            ctx.lineJoin = 'round';
+            
+            // 应用动画偏移（前进效果）
+            if (arrowAnimationEnabled && typeConfig.dash.length > 0) {
+                ctx.lineDashOffset = -arrowAnimationOffset;
+            }
+            
+            // 如果选中，添加发光效果
+            if (isSelected) {
+                ctx.shadowColor = color;
+                ctx.shadowBlur = 8;
+            }
+            
+            drawArrowPath(canvasPoints);
+            ctx.stroke();
+            ctx.setLineDash([]);
+            
+            // 绘制箭头头部
+            const lastPoint = canvasPoints[canvasPoints.length - 1];
+            const prevPoint = canvasPoints[canvasPoints.length - 2];
+            drawArrowHead(prevPoint.x, prevPoint.y, lastPoint.x, lastPoint.y, color, typeConfig.width * 3);
+            
+            // 绘制起点标记
+            const firstPoint = canvasPoints[0];
+            ctx.beginPath();
+            ctx.arc(firstPoint.x, firstPoint.y, 5, 0, Math.PI * 2);
+            ctx.fillStyle = color;
+            ctx.fill();
+            ctx.strokeStyle = '#fff';
+            ctx.lineWidth = 2;
+            ctx.stroke();
+            
+            // 绘制路径点（选中时）
+            if (isSelected) {
+                for (let i = 1; i < canvasPoints.length - 1; i++) {
+                    ctx.beginPath();
+                    ctx.arc(canvasPoints[i].x, canvasPoints[i].y, 4, 0, Math.PI * 2);
+                    ctx.fillStyle = '#fff';
+                    ctx.fill();
+                    ctx.strokeStyle = color;
+                    ctx.lineWidth = 2;
+                    ctx.stroke();
+                }
+            }
+            
+            // 绘制标签（在线段中间位置）
+            if (arrow.label) {
+                // 计算线段的真正中点
+                let labelX, labelY;
+                if (canvasPoints.length === 2) {
+                    // 两点线段，取中点
+                    labelX = (canvasPoints[0].x + canvasPoints[1].x) / 2;
+                    labelY = (canvasPoints[0].y + canvasPoints[1].y) / 2;
+                } else {
+                    // 多点路径，取中间点
+                    const midIndex = Math.floor(canvasPoints.length / 2);
+                    labelX = canvasPoints[midIndex].x;
+                    labelY = canvasPoints[midIndex].y;
+                }
+                
+                ctx.font = 'bold 11px Arial';
+                ctx.textAlign = 'center';
+                ctx.textBaseline = 'middle';
+                
+                // 背景（带圆角效果）
+                const textWidth = ctx.measureText(arrow.label).width;
+                const padding = 6;
+                const bgHeight = 18;
+                ctx.fillStyle = 'rgba(0,0,0,0.7)';
+                ctx.beginPath();
+                ctx.roundRect(labelX - textWidth/2 - padding, labelY - bgHeight/2, textWidth + padding * 2, bgHeight, 4);
+                ctx.fill();
+                
+                // 边框
+                ctx.strokeStyle = color;
+                ctx.lineWidth = 2;
+                ctx.stroke();
+                
+                // 文字
+                ctx.fillStyle = '#fff';
+                ctx.fillText(arrow.label, labelX, labelY);
+            }
+            
+            ctx.restore();
+        }
+        
+        // 绘制箭头路径（提取为单独函数）
+        function drawArrowPath(canvasPoints) {
+            if (canvasPoints.length === 2) {
+                ctx.moveTo(canvasPoints[0].x, canvasPoints[0].y);
+                ctx.lineTo(canvasPoints[1].x, canvasPoints[1].y);
+            } else {
+                ctx.moveTo(canvasPoints[0].x, canvasPoints[0].y);
+                for (let i = 1; i < canvasPoints.length - 1; i++) {
+                    const xc = (canvasPoints[i].x + canvasPoints[i + 1].x) / 2;
+                    const yc = (canvasPoints[i].y + canvasPoints[i + 1].y) / 2;
+                    ctx.quadraticCurveTo(canvasPoints[i].x, canvasPoints[i].y, xc, yc);
+                }
+                const last = canvasPoints[canvasPoints.length - 1];
+                const secondLast = canvasPoints[canvasPoints.length - 2];
+                ctx.quadraticCurveTo(secondLast.x, secondLast.y, last.x, last.y);
+            }
+        }
+        
+        // 绘制箭头头部
+        function drawArrowHead(fromX, fromY, toX, toY, color, size) {
+            const angle = Math.atan2(toY - fromY, toX - fromX);
+            
+            ctx.save();
+            ctx.translate(toX, toY);
+            ctx.rotate(angle);
+            
+            ctx.beginPath();
+            ctx.moveTo(0, 0);
+            ctx.lineTo(-size, -size/2);
+            ctx.lineTo(-size * 0.7, 0);
+            ctx.lineTo(-size, size/2);
+            ctx.closePath();
+            
+            ctx.fillStyle = color;
+            ctx.fill();
+            
+            ctx.restore();
+        }
+        
+        // 绘制箭头预览（拖动时）
+        function drawArrowPreview() {
+            if (!arrowStartPoint || !arrowEndPoint) return;
+            
+            const typeConfig = ARROW_TYPES[currentArrowType];
+            const alliance = ALLIANCES[currentAlliance];
+            const color = alliance ? alliance.color : typeConfig.color;
+            
+            ctx.save();
+            ctx.globalAlpha = 0.7;
+            
+            const startCanvas = gameToCanvas(arrowStartPoint.x, arrowStartPoint.y);
+            const endCanvas = gameToCanvas(arrowEndPoint.x, arrowEndPoint.y);
+            
+            // 绘制路径线
+            ctx.beginPath();
+            ctx.strokeStyle = color;
+            ctx.lineWidth = typeConfig.width * 1.5;
+            ctx.setLineDash(typeConfig.dash);
+            ctx.lineCap = 'round';
+            ctx.lineJoin = 'round';
+            
+            ctx.moveTo(startCanvas.x, startCanvas.y);
+            ctx.lineTo(endCanvas.x, endCanvas.y);
+            ctx.stroke();
+            ctx.setLineDash([]);
+            
+            // 绘制起点
+            ctx.beginPath();
+            ctx.arc(startCanvas.x, startCanvas.y, 6, 0, Math.PI * 2);
+            ctx.fillStyle = color;
+            ctx.fill();
+            ctx.strokeStyle = '#fff';
+            ctx.lineWidth = 2;
+            ctx.stroke();
+            
+            // 绘制终点（虚线圆）
+            ctx.beginPath();
+            ctx.arc(endCanvas.x, endCanvas.y, 6, 0, Math.PI * 2);
+            ctx.fillStyle = 'rgba(255,255,255,0.5)';
+            ctx.fill();
+            ctx.strokeStyle = color;
+            ctx.lineWidth = 2;
+            ctx.setLineDash([3, 3]);
+            ctx.stroke();
+            ctx.setLineDash([]);
+            
+            // 绘制箭头头
+            drawArrowHead(startCanvas.x, startCanvas.y, endCanvas.x, endCanvas.y, color, typeConfig.width * 4);
+            
+            ctx.restore();
+        }
+        
+        // 保存箭头数据
+        function saveArrowsToStorage() {
+            try {
+                localStorage.setItem('arrows', JSON.stringify(arrows));
+            } catch (e) {
+                console.warn('保存箭头数据失败:', e);
+            }
+        }
+        
+        // 加载箭头数据
+        function loadArrowsFromStorage() {
+            try {
+                const data = localStorage.getItem('arrows');
+                if (data) {
+                    arrows = JSON.parse(data);
+                    arrowIdCounter = Math.max(0, ...arrows.map(a => a.id), 0);
+                    renderArrowList();
+                }
+            } catch (e) {
+                console.warn('加载箭头数据失败:', e);
+            }
+        }
+        
+        // ========== 语音倒计时功能 ==========
+        
+        let countdownTimer = null;
+        let countdownCurrent = 45;
+        let countdownStart = 45;
+        let countdownEnd = 30;
+        let countdownRunning = false;
+        let countdownPaused = false;
+        let speechSynth = window.speechSynthesis;
+        let countdownVoice = null;
+        
+        // 初始化语音
+        function initCountdownVoice() {
+            if (!speechSynth) {
+                console.warn('浏览器不支持语音合成');
+                return;
+            }
+            
+            // 获取中文语音
+            const loadVoices = () => {
+                const voices = speechSynth.getVoices();
+                // 优先选择中文语音
+                countdownVoice = voices.find(v => v.lang.includes('zh') || v.lang.includes('CN')) || voices[0];
+            };
+            
+            loadVoices();
+            speechSynth.onvoiceschanged = loadVoices;
+        }
+        
+        // 打开倒计时面板
+        function openCountdownPanel() {
+            const panel = document.getElementById('countdown-panel');
+            panel.classList.add('active');
+            initCountdownVoice();
+            loadCountdownSettings();
+            updateCountdownDisplay();
+            initCountdownDrag();  // 初始化拖动
+            
+            // 预热语音引擎（延迟执行，等待语音加载）
+            setTimeout(precacheUtterances, 200);
+        }
+        
+        // 关闭倒计时面板（不停止倒计时，让它继续运行）
+        function closeCountdownPanel() {
+            document.getElementById('countdown-panel').classList.remove('active');
+        }
+        
+        // 倒计时面板拖动功能
+        let countdownDragOffset = { x: 0, y: 0 };
+        let isCountdownDragging = false;
+        
+        function initCountdownDrag() {
+            const panel = document.getElementById('countdown-panel');
+            
+            panel.onmousedown = (e) => {
+                // 不拖动按钮和输入框
+                if (e.target.tagName === 'BUTTON' || e.target.tagName === 'INPUT') return;
+                
+                isCountdownDragging = true;
+                countdownDragOffset.x = e.clientX - panel.offsetLeft;
+                countdownDragOffset.y = e.clientY - panel.offsetTop;
+                panel.style.cursor = 'grabbing';
+            };
+            
+            document.addEventListener('mousemove', (e) => {
+                if (!isCountdownDragging) return;
+                const panel = document.getElementById('countdown-panel');
+                panel.style.left = (e.clientX - countdownDragOffset.x) + 'px';
+                panel.style.top = (e.clientY - countdownDragOffset.y) + 'px';
+                panel.style.right = 'auto';  // 取消right定位
+            });
+            
+            document.addEventListener('mouseup', () => {
+                if (isCountdownDragging) {
+                    isCountdownDragging = false;
+                    const panel = document.getElementById('countdown-panel');
+                    panel.style.cursor = 'move';
+                }
+            });
+        }
+        
+        // 设置预设值
+        function setCountdownPreset(start, end) {
+            document.getElementById('countdown-start').value = start;
+            document.getElementById('countdown-end').value = end;
+            countdownStart = start;
+            countdownEnd = end;
+            countdownCurrent = start;
+            updateCountdownDisplay();
+        }
+        
+        // 更新显示
+        function updateCountdownDisplay() {
+            document.getElementById('countdown-number').textContent = countdownCurrent;
+            
+            const statusEl = document.getElementById('countdown-status');
+            if (countdownRunning && !countdownPaused) {
+                statusEl.textContent = '正在倒计时...';
+                statusEl.className = 'countdown-status running';
+            } else if (countdownPaused) {
+                statusEl.textContent = '已暂停';
+                statusEl.className = 'countdown-status paused';
+            } else if (countdownCurrent <= countdownEnd) {
+                statusEl.textContent = '倒计时结束！';
+                statusEl.className = 'countdown-status finished';
+            } else {
+                statusEl.textContent = '准备就绪';
+                statusEl.className = 'countdown-status';
+            }
+        }
+        
+        // 语音播报
+        function speak(text, callback) {
+            if (!speechSynth) {
+                if (callback) setTimeout(callback, 500);
+                return;
+            }
+            
+            // 取消之前的语音
+            speechSynth.cancel();
+            
+            const utterance = new SpeechSynthesisUtterance(text);
+            utterance.lang = 'zh-CN';
+            utterance.rate = 1.2;  // 稍快的语速
+            utterance.pitch = 1;
+            utterance.volume = 1;
+            
+            if (countdownVoice) {
+                utterance.voice = countdownVoice;
+            }
+            
+            utterance.onend = () => {
+                if (callback) callback();
+            };
+            
+            utterance.onerror = () => {
+                if (callback) callback();
+            };
+            
+            speechSynth.speak(utterance);
+        }
+        
+        // 开始倒计时
+        function startCountdown() {
+            // 读取设置
+            countdownStart = parseInt(document.getElementById('countdown-start').value) || 45;
+            countdownEnd = parseInt(document.getElementById('countdown-end').value) || 0;
+            
+            // 验证
+            if (countdownStart <= countdownEnd) {
+                showToast('开始秒数必须大于结束秒数', 'warning');
+                return;
+            }
+            
+            // 如果是暂停后继续
+            if (countdownPaused) {
+                countdownPaused = false;
+                countdownRunning = true;
+                updateCountdownButtons();
+                updateCountdownDisplay();
+                runCountdownTick();
+                return;
+            }
+            
+            // 全新开始
+            countdownCurrent = countdownStart;
+            countdownRunning = true;
+            countdownPaused = false;
+            updateCountdownButtons();
+            updateCountdownDisplay();
+            
+            // 播放开场语音
+            speak(`各团队准备，倒计时开始！`, () => {
+                // 开场语音结束后开始倒数
+                runCountdownTick();
+            });
+        }
+        
+        // 执行一次倒计时tick - 使用setInterval确保精确1秒
+        function runCountdownTick() {
+            // 清除之前的计时器
+            if (countdownTimer) {
+                clearInterval(countdownTimer);
+                countdownTimer = null;
+            }
+            
+            // 播报当前数字
+            speakNumberNow(countdownCurrent);
+            updateCountdownDisplay();
+            
+            // 如果已到结束数字
+            if (countdownCurrent === countdownEnd) {
+                setTimeout(() => {
+                    if (!countdownRunning || countdownPaused) return;
+                    speakText('倒计时结束！');
+                    countdownRunning = false;
+                    updateCountdownButtons();
+                    updateCountdownDisplay();
+                    showToast('🎉 倒计时结束！', 'success');
+                }, 600);
+                return;
+            }
+            
+            // 使用setInterval确保每秒执行
+            countdownTimer = setInterval(() => {
+                if (!countdownRunning || countdownPaused) {
+                    clearInterval(countdownTimer);
+                    countdownTimer = null;
+                    return;
+                }
+                
+                countdownCurrent--;
+                updateCountdownDisplay();
+                
+                // 播报当前数字
+                speakNumberNow(countdownCurrent);
+                
+                // 检查是否到达结束
+                if (countdownCurrent === countdownEnd) {
+                    clearInterval(countdownTimer);
+                    countdownTimer = null;
+                    setTimeout(() => {
+                        if (!countdownRunning || countdownPaused) return;
+                        speakText('倒计时结束！');
+                        countdownRunning = false;
+                        updateCountdownButtons();
+                        updateCountdownDisplay();
+                        showToast('🎉 倒计时结束！', 'success');
+                    }, 600);
+                }
+            }, 1000);
+        }
+        
+        // 数字的中文读音
+        const DIGIT_NAMES = ['零', '一', '二', '三', '四', '五', '六', '七', '八', '九'];
+        
+        // 将数字转为简短读法：45->"四五", 40->"四零", 9->"九"
+        function numberToShortChinese(num) {
+            if (num < 10) {
+                return DIGIT_NAMES[num];
+            }
+            const tens = Math.floor(num / 10);
+            const ones = num % 10;
+            return DIGIT_NAMES[tens] + DIGIT_NAMES[ones];
+        }
+        
+        // 预热语音引擎
+        function precacheUtterances() {
+            if (!speechSynth) return;
+            // 静默预热
+            const warmup = new SpeechSynthesisUtterance(' ');
+            warmup.volume = 0;
+            warmup.rate = 2;
+            if (countdownVoice) warmup.voice = countdownVoice;
+            speechSynth.speak(warmup);
+        }
+        
+        // 立即播报数字（读"四五"而不是"四十五"，保证短促清晰）
+        function speakNumberNow(num) {
+            if (!speechSynth) return;
+            
+            // 转换为简短读法
+            const text = numberToShortChinese(num);
+            
+            // 先清空队列
+            speechSynth.cancel();
+            
+            // 短暂延迟后播放（给cancel时间生效）
+            setTimeout(() => {
+                const utterance = new SpeechSynthesisUtterance(text);
+                utterance.lang = 'zh-CN';
+                utterance.rate = 8;  // 最快语速确保在1秒内读完
+                utterance.pitch = 1.1;
+                utterance.volume = 1;
+                if (countdownVoice) utterance.voice = countdownVoice;
+                speechSynth.speak(utterance);
+            }, 30);
+        }
+        
+        // 播放文本
+        function speakText(text) {
+            if (!speechSynth) return;
+            speechSynth.cancel();
+            
+            const utterance = new SpeechSynthesisUtterance(text);
+            utterance.lang = 'zh-CN';
+            utterance.rate = 1.2;
+            utterance.pitch = 1;
+            utterance.volume = 1;
+            
+            if (countdownVoice) {
+                utterance.voice = countdownVoice;
+            }
+            
+            speechSynth.speak(utterance);
+        }
+        
+        // 暂停倒计时
+        function pauseCountdown() {
+            countdownPaused = true;
+            countdownRunning = true;  // 仍然标记为运行中（只是暂停）
+            
+            // 取消当前语音
+            if (speechSynth) speechSynth.cancel();
+            
+            // 清除定时器
+            if (countdownTimer) {
+                clearInterval(countdownTimer);
+                countdownTimer = null;
+            }
+            
+            updateCountdownButtons();
+            updateCountdownDisplay();
+            showToast('⏸ 已暂停', 'info');
+        }
+        
+        // 停止倒计时
+        function stopCountdown() {
+            countdownRunning = false;
+            countdownPaused = false;
+            
+            // 取消语音
+            if (speechSynth) speechSynth.cancel();
+            
+            // 清除定时器
+            if (countdownTimer) {
+                clearInterval(countdownTimer);
+                countdownTimer = null;
+            }
+            
+            updateCountdownButtons();
+        }
+        
+        // 重置倒计时
+        function resetCountdown() {
+            stopCountdown();
+            countdownStart = parseInt(document.getElementById('countdown-start').value) || 45;
+            countdownEnd = parseInt(document.getElementById('countdown-end').value) || 0;
+            countdownCurrent = countdownStart;
+            updateCountdownDisplay();
+            showToast('🔄 已重置', 'info');
+        }
+        
+        // 更新按钮状态
+        function updateCountdownButtons() {
+            const startBtn = document.getElementById('countdown-start-btn');
+            const pauseBtn = document.getElementById('countdown-pause-btn');
+            
+            if (countdownRunning && !countdownPaused) {
+                // 运行中
+                startBtn.style.display = 'none';
+                pauseBtn.style.display = 'inline-block';
+            } else if (countdownPaused) {
+                // 暂停中
+                startBtn.style.display = 'inline-block';
+                startBtn.textContent = '▶ 继续';
+                pauseBtn.style.display = 'none';
+            } else {
+                // 停止状态
+                startBtn.style.display = 'inline-block';
+                startBtn.textContent = '▶ 开始';
+                pauseBtn.style.display = 'none';
+            }
+        }
+        
+        // 保存设置
+        function saveCountdownSettings() {
+            const settings = {
+                start: parseInt(document.getElementById('countdown-start').value) || 45,
+                end: parseInt(document.getElementById('countdown-end').value) || 0
+            };
+            localStorage.setItem('countdownSettings', JSON.stringify(settings));
+            showToast('💾 设置已保存', 'success');
+        }
+        
+        // 加载设置
+        function loadCountdownSettings() {
+            try {
+                const saved = localStorage.getItem('countdownSettings');
+                if (saved) {
+                    const settings = JSON.parse(saved);
+                    document.getElementById('countdown-start').value = settings.start || 45;
+                    document.getElementById('countdown-end').value = settings.end || 0;
+                    countdownStart = settings.start || 45;
+                    countdownEnd = settings.end || 0;
+                    countdownCurrent = countdownStart;
+                }
+            } catch (e) {
+                console.warn('加载倒计时设置失败:', e);
+            }
+        }
+        
+        // ========== 时间轴功能 ==========
+        
+        function toggleTimeline() {
+            timelineConfig.enabled = !timelineConfig.enabled;
+            const container = document.getElementById('timeline-container');
+            const btn = document.getElementById('btn-timeline');
+            
+            container.classList.toggle('active', timelineConfig.enabled);
+            btn.style.background = timelineConfig.enabled ? '#27ae60' : '#9b59b6';
+            
+            if (timelineConfig.enabled) {
+                renderTimelineTrack();
+            }
+        }
+        
+        function updateTimelineConfig() {
+            timelineConfig.startTime = document.getElementById('timeline-start').value;
+            timelineConfig.endTime = document.getElementById('timeline-end').value;
+            renderTimelineTrack();
+        }
+        
+        function renderTimelineTrack() {
+            const track = document.getElementById('timeline-track');
+            const ruler = document.getElementById('timeline-ruler');
+            const startMinutes = timeToMinutes(timelineConfig.startTime);
+            const endMinutes = timeToMinutes(timelineConfig.endTime);
+            const totalMinutes = endMinutes - startMinutes;
+            
+            if (totalMinutes <= 0) {
+                track.innerHTML = '<div style="color:#e74c3c;font-size:10px;text-align:center;">时间范围无效</div>';
+                return;
+            }
+            
+            // 生成刻度尺
+            const rulerMarks = [];
+            const majorInterval = 60; // 每小时一个主刻度
+            for (let m = startMinutes; m <= endMinutes; m += majorInterval) {
+                rulerMarks.push(minutesToTime(m));
+            }
+            if (ruler) ruler.innerHTML = rulerMarks.map(t => `<span>${t}</span>`).join('');
+            
+            // 生成时间点（每15分钟一个点）
+            const points = [];
+            for (let m = startMinutes; m <= endMinutes; m += timelineConfig.interval) {
+                const time = minutesToTime(m);
+                const percent = ((m - startMinutes) / totalMinutes) * 100;
+                const mapKey = currentMapId;
+                const hasSnapshot = timelineSnapshots[mapKey] && timelineSnapshots[mapKey][time];
+                const isActive = time === timelineConfig.currentTime;
+                
+                points.push(`
+                    <div class="timeline-point ${hasSnapshot ? 'has-snapshot' : ''} ${isActive ? 'active' : ''}"
+                         style="left: calc(${percent}% - 4px);"
+                         onclick="event.stopPropagation();selectTimelinePoint('${time}')"
+                         title="${time}${hasSnapshot ? ' (有快照)' : ''}">
+                    </div>
+                `);
+            }
+            
+            // 保留进度条和当前标记，只更新时间点
+            const progressEl = document.getElementById('timeline-progress');
+            const markerEl = document.getElementById('timeline-current-marker');
+            track.innerHTML = '';
+            if (progressEl) track.appendChild(progressEl.cloneNode(true));
+            if (markerEl) track.appendChild(markerEl.cloneNode(true));
+            track.innerHTML += points.join('');
+            
+            updateTimelineProgress();
+        }
+        
+        function updateTimelineProgress() {
+            const startMinutes = timeToMinutes(timelineConfig.startTime);
+            const endMinutes = timeToMinutes(timelineConfig.endTime);
+            const currentMinutes = timeToMinutes(timelineConfig.currentTime);
+            const totalMinutes = endMinutes - startMinutes;
+            
+            if (totalMinutes <= 0) return;
+            
+            const percent = Math.min(100, Math.max(0, ((currentMinutes - startMinutes) / totalMinutes) * 100));
+            
+            const progress = document.getElementById('timeline-progress');
+            const marker = document.getElementById('timeline-current-marker');
+            
+            if (progress) progress.style.width = percent + '%';
+            if (marker) marker.style.left = percent + '%';
+        }
+        
+        function onTimelineClick(event) {
+            const track = document.getElementById('timeline-track');
+            const rect = track.getBoundingClientRect();
+            const x = event.clientX - rect.left;
+            const percent = (x / rect.width) * 100;
+            
+            const startMinutes = timeToMinutes(timelineConfig.startTime);
+            const endMinutes = timeToMinutes(timelineConfig.endTime);
+            const totalMinutes = endMinutes - startMinutes;
+            
+            // 计算点击位置对应的时间（对齐到interval）
+            let targetMinutes = startMinutes + (percent / 100) * totalMinutes;
+            targetMinutes = Math.round(targetMinutes / timelineConfig.interval) * timelineConfig.interval;
+            targetMinutes = Math.max(startMinutes, Math.min(endMinutes, targetMinutes));
+            
+            const time = minutesToTime(targetMinutes);
+            selectTimelinePoint(time);
+        }
+        
+        function selectTimelinePoint(time) {
+            timelineConfig.currentTime = time;
+            document.getElementById('timeline-current').textContent = time;
+            
+            // 更新进度条
+            updateTimelineProgress();
+            
+            // 更新时间点激活状态
+            document.querySelectorAll('.timeline-point').forEach(el => {
+                el.classList.toggle('active', el.title.startsWith(time));
+            });
+            
+            // 检查是否有快照
+            const mapKey = currentMapId;
+            if (timelineSnapshots[mapKey] && timelineSnapshots[mapKey][time]) {
+                // 加载快照
+                buildings = JSON.parse(JSON.stringify(timelineSnapshots[mapKey][time].buildings));
+                updateCaches();
+                render();
+                showValidationMessage(`⏱️ ${time} 已加载`);
+            }
+        }
+        
+        function saveTimelineSnapshot() {
+            const mapKey = currentMapId;
+            const time = timelineConfig.currentTime;
+            
+            if (!timelineSnapshots[mapKey]) {
+                timelineSnapshots[mapKey] = {};
+            }
+            
+            timelineSnapshots[mapKey][time] = {
+                buildings: JSON.parse(JSON.stringify(buildings)),
+                savedAt: new Date().toISOString()
+            };
+            
+            // 保存到localStorage
+            try {
+                localStorage.setItem('timelineSnapshots', JSON.stringify(timelineSnapshots));
+            } catch (e) {
+                console.warn('保存时间轴快照失败:', e);
+            }
+            
+            renderTimelineTrack();
+            showValidationMessage(`已保存 ${time} 的快照`);
+        }
+        
+        function clearTimelineSnapshot() {
+            const mapKey = currentMapId;
+            const time = timelineConfig.currentTime;
+            
+            if (timelineSnapshots[mapKey] && timelineSnapshots[mapKey][time]) {
+                delete timelineSnapshots[mapKey][time];
+                
+                try {
+                    localStorage.setItem('timelineSnapshots', JSON.stringify(timelineSnapshots));
+                } catch (e) {
+                    console.warn('清除时间轴快照失败:', e);
+                }
+                
+                renderTimelineTrack();
+                showValidationMessage(`已清除 ${time} 的快照`);
+            } else {
+                showValidationMessage(`${time} 没有快照`);
+            }
+        }
+        
+        function timeToMinutes(time) {
+            const [h, m] = time.split(':').map(Number);
+            return h * 60 + m;
+        }
+        
+        function minutesToTime(minutes) {
+            const h = Math.floor(minutes / 60);
+            const m = minutes % 60;
+            return `${h.toString().padStart(2, '0')}:${m.toString().padStart(2, '0')}`;
         }
         
         function initAllianceUI() {
@@ -999,14 +3524,816 @@
             `).join('');
         }
         
+        // ========== 联盟成员管理 ==========
+        
+        // 打开成员管理弹窗
+        function openMemberModal() {
+            memberModalOpen = true;
+            document.getElementById('member-modal-overlay').classList.add('active');
+            renderAllianceTree();
+            renderMemberModalList();
+            updateMemberStats();
+        }
+        
+        // 关闭成员管理弹窗
+        function closeMemberModal(event) {
+            if (event && event.target !== event.currentTarget) return;
+            memberModalOpen = false;
+            document.getElementById('member-modal-overlay').classList.remove('active');
+            document.getElementById('batch-import-panel').classList.remove('active');
+        }
+        
+        // 渲染联盟树
+        function renderAllianceTree() {
+            const tree = document.getElementById('alliance-tree');
+            const countAll = document.getElementById('count-all');
+            countAll.textContent = allianceMembers.length;
+            
+            tree.innerHTML = ALLIANCES.map(a => {
+                const members = allianceMembers.filter(m => m.allianceId === a.id);
+                const allianceTeams = teams.filter(t => t.allianceId === a.id);
+                return `
+                    <div class="alliance-tree-item" onclick="filterByAlliance(${a.id})" data-alliance="${a.id}">
+                        <span class="alliance-dot" style="background: ${a.color};"></span>
+                        <span>${a.name}</span>
+                        <span class="count">${members.length}</span>
+                    </div>
+                    ${allianceTeams.map(t => {
+                        const teamMembers = members.filter(m => m.teamId === t.id);
+                        const leader = teamMembers.find(m => m.role === 'leader');
+                        return `
+                            <div class="team-tree-item" onclick="event.stopPropagation();filterByTeam(${t.id})" data-team="${t.id}" style="display:flex;justify-content:space-between;align-items:center;">
+                                <span>└ ${t.name} ${leader ? '👑' : ''} (${teamMembers.length})</span>
+                                <span style="display:flex;gap:2px;">
+                                    <button onclick="event.stopPropagation();editTeam(${t.id})" style="background:none;border:none;cursor:pointer;font-size:10px;" title="编辑">✎</button>
+                                    <button onclick="event.stopPropagation();deleteTeam(${t.id})" style="background:none;border:none;cursor:pointer;font-size:10px;color:#e74c3c;" title="删除">✕</button>
+                                </span>
+                            </div>`;
+                    }).join('')}
+                    <button class="add-team-btn" onclick="event.stopPropagation();addTeam(${a.id})">+ 添加小队</button>
+                `;
+            }).join('');
+        }
+        
+        // 筛选函数
+        function filterByAlliance(allianceId) {
+            memberFilter.alliance = allianceId;
+            memberFilter.team = 'all';
+            document.querySelectorAll('.alliance-tree-item').forEach(el => {
+                el.classList.toggle('active', el.dataset.alliance == allianceId);
+            });
+            document.querySelectorAll('.team-tree-item').forEach(el => el.classList.remove('active'));
+            renderMemberModalList();
+        }
+        
+        function filterByTeam(teamId) {
+            memberFilter.team = teamId;
+            document.querySelectorAll('.team-tree-item').forEach(el => {
+                el.classList.toggle('active', el.dataset.team == teamId);
+            });
+            document.querySelectorAll('.alliance-tree-item').forEach(el => el.classList.remove('active'));
+            renderMemberModalList();
+        }
+        
+        function filterMembers() {
+            memberFilter.search = document.getElementById('member-search').value.toLowerCase();
+            renderMemberModalList();
+        }
+        
+        // 渲染成员列表（弹窗中）
+        function renderMemberModalList() {
+            const container = document.getElementById('member-list-container');
+            
+            let filteredMembers = [...allianceMembers];
+            
+            // 联盟筛选
+            if (memberFilter.alliance !== 'all') {
+                filteredMembers = filteredMembers.filter(m => m.allianceId === memberFilter.alliance);
+            }
+            
+            // 小队筛选
+            if (memberFilter.team !== 'all') {
+                filteredMembers = filteredMembers.filter(m => m.teamId === memberFilter.team);
+            }
+            
+            // 搜索筛选
+            if (memberFilter.search) {
+                filteredMembers = filteredMembers.filter(m => 
+                    m.name.toLowerCase().includes(memberFilter.search)
+                );
+            }
+            
+            // 按联盟分组，再按战力排序
+            filteredMembers.sort((a, b) => {
+                if (a.allianceId !== b.allianceId) return (a.allianceId || 99) - (b.allianceId || 99);
+                return a.power - b.power;
+            });
+            
+            if (filteredMembers.length === 0) {
+                container.innerHTML = `
+                    <div class="member-empty">
+                        <div class="member-empty-icon">👤</div>
+                        <div>${memberFilter.search ? '没有找到匹配的成员' : '暂无成员，点击"批量导入"添加'}</div>
+                    </div>
+                `;
+                return;
+            }
+            
+            container.innerHTML = filteredMembers.map(m => {
+                const alliance = ALLIANCES.find(a => a.id === m.allianceId);
+                const team = teams.find(t => t.id === m.teamId);
+                return `
+                    <div class="member-list-row" draggable="true" data-member-id="${m.id}"
+                         ondragstart="onMemberDragStart(event, ${m.id})"
+                         ondragend="onMemberDragEnd(event)">
+                        <input type="checkbox" class="member-checkbox" data-id="${m.id}">
+                        <span style="font-weight:bold;color:#2c3e50;">${m.name}</span>
+                        <span style="color:#e74c3c;font-weight:bold;">⚔ ${m.power}</span>
+                        <span>
+                            ${alliance ? `<span class="member-alliance-badge" style="background:${alliance.color};">${alliance.name}</span>` : '<span style="color:#999;">未分配</span>'}
+                        </span>
+                        <span>
+                            ${team ? `<span class="member-team-badge">${team.name}</span>` : ''}
+                            ${m.role === 'leader' ? '<span class="member-role-badge leader">队长</span>' : ''}
+                        </span>
+                        <span class="member-actions">
+                            ${m.teamId && m.role !== 'leader' ? `<button class="member-action-btn" style="background:#f39c12;color:#fff;" onclick="setAsLeader(${m.id})" title="设为队长">👑</button>` : ''}
+                            <button class="member-action-btn edit" onclick="editMember(${m.id})" title="编辑">✎</button>
+                            <button class="member-action-btn delete" onclick="deleteMember(${m.id})" title="删除">✕</button>
+                        </span>
+                    </div>
+                `;
+            }).join('');
+        }
+        
+        // 更新统计信息
+        function updateMemberStats() {
+            const total = allianceMembers.length;
+            const placed = allianceMembers.filter(m => m.placedAt).length;
+            document.getElementById('stat-total').textContent = total;
+            document.getElementById('stat-placed').textContent = placed;
+            document.getElementById('stat-unplaced').textContent = total - placed;
+        }
+        
+        // 批量导入面板
+        let batchImportAllianceId = 0;
+        
+        function toggleBatchImport() {
+            const panel = document.getElementById('batch-import-panel');
+            panel.classList.toggle('active');
+            
+            if (panel.classList.contains('active')) {
+                renderBatchAllianceSelect();
+            }
+        }
+        
+        function renderBatchAllianceSelect() {
+            const container = document.getElementById('batch-alliance-select');
+            container.innerHTML = ALLIANCES.map(a => `
+                <button class="batch-alliance-btn ${a.id === batchImportAllianceId ? 'selected' : ''}" 
+                        onclick="selectBatchAlliance(${a.id})">
+                    <span style="width:12px;height:12px;border-radius:50%;background:${a.color};"></span>
+                    ${a.name}
+                </button>
+            `).join('');
+        }
+        
+        function selectBatchAlliance(id) {
+            batchImportAllianceId = id;
+            renderBatchAllianceSelect();
+        }
+        
+        function doBatchImport() {
+            const text = document.getElementById('batch-import-text').value.trim();
+            if (!text) {
+                alert('请输入成员信息');
+                return;
+            }
+            
+            const lines = text.split('\n').filter(l => l.trim());
+            let addedCount = 0;
+            
+            for (const line of lines) {
+                const trimmed = line.trim();
+                if (!trimmed) continue;
+                
+                // 解析格式：姓名+战力 或 姓名
+                const parts = trimmed.split(/[+＋]/);
+                const name = parts[0].trim();
+                const power = parts.length > 1 ? parseInt(parts[1]) || 0 : 0;
+                
+                if (!name) continue;
+                
+                // 检查是否已存在
+                if (allianceMembers.some(m => m.name === name && m.allianceId === batchImportAllianceId)) {
+                    continue;
+                }
+                
+                allianceMembers.push({
+                    id: ++memberIdCounter,
+                    name: name,
+                    power: power,
+                    allianceId: batchImportAllianceId,
+                    teamId: null,
+                    role: 'member',
+                    placedAt: null
+                });
+                addedCount++;
+            }
+            
+            // 按联盟和战力排序
+            sortMembers();
+            
+            document.getElementById('batch-import-text').value = '';
+            toggleBatchImport();
+            
+            renderAllianceTree();
+            renderMemberModalList();
+            renderMembersList();
+            updateMemberStats();
+            updateAllianceStats();
+            saveMembersToStorage();
+            
+            showValidationMessage(`已导入 ${addedCount} 名成员到 ${ALLIANCES[batchImportAllianceId].name}`);
+            showToast(`🎉 成功导入 ${addedCount} 名成员`, 'success', 3000);
+        }
+        
+        function sortMembers() {
+            allianceMembers.sort((a, b) => {
+                if (a.allianceId !== b.allianceId) return (a.allianceId || 99) - (b.allianceId || 99);
+                return a.power - b.power;
+            });
+        }
+        
+        // 添加单个成员
+        function openAddMemberForm() {
+            const name = prompt('请输入成员姓名+战力（如：M神+1111）：');
+            if (!name) return;
+            
+            const parts = name.split(/[+＋]/);
+            const memberName = parts[0].trim();
+            const power = parts.length > 1 ? parseInt(parts[1]) || 0 : 0;
+            
+            if (!memberName) return;
+            
+            allianceMembers.push({
+                id: ++memberIdCounter,
+                name: memberName,
+                power: power,
+                allianceId: memberFilter.alliance !== 'all' ? memberFilter.alliance : 0,
+                teamId: memberFilter.team !== 'all' ? memberFilter.team : null,
+                role: 'member',
+                placedAt: null
+            });
+            
+            sortMembers();
+            renderAllianceTree();
+            renderMemberModalList();
+            renderMembersList();
+            updateMemberStats();
+            saveMembersToStorage();
+        }
+        
+        // 编辑成员 - 使用更完整的编辑功能
+        function editMember(id) {
+            const member = allianceMembers.find(m => m.id === id);
+            if (!member) return;
+            
+            // 创建编辑弹窗
+            const alliance = ALLIANCES.find(a => a.id === member.allianceId);
+            const memberTeams = teams.filter(t => t.allianceId === member.allianceId);
+            
+            const overlay = document.createElement('div');
+            overlay.className = 'member-modal-overlay active';
+            overlay.style.zIndex = '10001';
+            overlay.innerHTML = `
+                <div class="member-modal" style="max-width:400px;" onclick="event.stopPropagation()">
+                    <div class="member-modal-header">
+                        <h3>编辑成员</h3>
+                        <button class="member-modal-close" onclick="this.closest('.member-modal-overlay').remove()">×</button>
+                    </div>
+                    <div style="padding:20px;">
+                        <div style="margin-bottom:15px;">
+                            <label style="display:block;margin-bottom:5px;font-size:12px;color:#666;">姓名</label>
+                            <input type="text" id="edit-member-name" value="${member.name}" style="width:100%;padding:8px;border:1px solid #ddd;border-radius:6px;">
+                        </div>
+                        <div style="margin-bottom:15px;">
+                            <label style="display:block;margin-bottom:5px;font-size:12px;color:#666;">战力</label>
+                            <input type="number" id="edit-member-power" value="${member.power}" style="width:100%;padding:8px;border:1px solid #ddd;border-radius:6px;">
+                        </div>
+                        <div style="margin-bottom:15px;">
+                            <label style="display:block;margin-bottom:5px;font-size:12px;color:#666;">联盟</label>
+                            <select id="edit-member-alliance" onchange="updateEditTeamOptions(${id})" style="width:100%;padding:8px;border:1px solid #ddd;border-radius:6px;">
+                                ${ALLIANCES.map(a => `<option value="${a.id}" ${a.id === member.allianceId ? 'selected' : ''}>${a.name}</option>`).join('')}
+                            </select>
+                        </div>
+                        <div style="margin-bottom:15px;">
+                            <label style="display:block;margin-bottom:5px;font-size:12px;color:#666;">小队</label>
+                            <select id="edit-member-team" style="width:100%;padding:8px;border:1px solid #ddd;border-radius:6px;">
+                                <option value="">-- 未分配 --</option>
+                                ${memberTeams.map(t => `<option value="${t.id}" ${t.id === member.teamId ? 'selected' : ''}>${t.name}</option>`).join('')}
+                            </select>
+                        </div>
+                        <div style="margin-bottom:15px;">
+                            <label style="display:block;margin-bottom:5px;font-size:12px;color:#666;">角色</label>
+                            <select id="edit-member-role" style="width:100%;padding:8px;border:1px solid #ddd;border-radius:6px;">
+                                <option value="member" ${member.role !== 'leader' ? 'selected' : ''}>队员</option>
+                                <option value="leader" ${member.role === 'leader' ? 'selected' : ''}>队长</option>
+                            </select>
+                        </div>
+                        <div style="display:flex;gap:10px;justify-content:flex-end;">
+                            <button onclick="this.closest('.member-modal-overlay').remove()" style="padding:8px 16px;border:1px solid #ddd;border-radius:6px;cursor:pointer;background:#f8f9fa;">取消</button>
+                            <button onclick="saveMemberEdit(${id})" style="padding:8px 16px;border:none;border-radius:6px;cursor:pointer;background:#3498db;color:#fff;">保存</button>
+                        </div>
+                    </div>
+                </div>
+            `;
+            overlay.onclick = function(e) { if (e.target === overlay) overlay.remove(); };
+            document.body.appendChild(overlay);
+        }
+        
+        function updateEditTeamOptions(memberId) {
+            const allianceId = parseInt(document.getElementById('edit-member-alliance').value);
+            const teamSelect = document.getElementById('edit-member-team');
+            const memberTeams = teams.filter(t => t.allianceId === allianceId);
+            
+            teamSelect.innerHTML = `
+                <option value="">-- 未分配 --</option>
+                ${memberTeams.map(t => `<option value="${t.id}">${t.name}</option>`).join('')}
+            `;
+        }
+        
+        function saveMemberEdit(id) {
+            const member = allianceMembers.find(m => m.id === id);
+            if (!member) return;
+            
+            member.name = document.getElementById('edit-member-name').value.trim() || member.name;
+            member.power = parseInt(document.getElementById('edit-member-power').value) || 0;
+            member.allianceId = parseInt(document.getElementById('edit-member-alliance').value);
+            
+            const teamValue = document.getElementById('edit-member-team').value;
+            member.teamId = teamValue ? parseInt(teamValue) : null;
+            member.role = document.getElementById('edit-member-role').value;
+            
+            // 更新对应的堡垒信息
+            if (member.placedAt) {
+                const bao = buildings.bao.find(b => b.memberId === id);
+                if (bao) {
+                    bao.name = member.name;
+                    bao.memberName = member.name;
+                    bao.alliance = member.allianceId;
+                }
+            }
+            
+            document.querySelector('.member-modal-overlay[style*="10001"]').remove();
+            
+            sortMembers();
+            renderAllianceTree();
+            renderMemberModalList();
+            renderMembersList();
+            saveMembersToStorage();
+            updateCaches();
+            render();
+        }
+        
+        // 删除成员
+        function deleteMember(id) {
+            const member = allianceMembers.find(m => m.id === id);
+            if (!member) return;
+            
+            if (member.placedAt) {
+                const baoIndex = buildings.bao.findIndex(b => 
+                    b.x === member.placedAt.x && b.y === member.placedAt.y && b.memberName === member.name
+                );
+                if (baoIndex !== -1) {
+                    buildings.bao.splice(baoIndex, 1);
+                }
+            }
+            
+            allianceMembers = allianceMembers.filter(m => m.id !== id);
+            
+            renderAllianceTree();
+            renderMemberModalList();
+            renderMembersList();
+            updateMemberStats();
+            saveMembersToStorage();
+            updateCaches();
+            render();
+        }
+        
+        // 删除选中的成员
+        function deleteSelectedMembers() {
+            const checkboxes = document.querySelectorAll('.member-list-row .member-checkbox:checked');
+            if (checkboxes.length === 0) {
+                alert('请先选择要删除的成员');
+                return;
+            }
+            
+            if (!confirm(`确定删除选中的 ${checkboxes.length} 名成员？`)) return;
+            
+            checkboxes.forEach(cb => {
+                const id = parseInt(cb.dataset.id);
+                const member = allianceMembers.find(m => m.id === id);
+                if (member && member.placedAt) {
+                    const baoIndex = buildings.bao.findIndex(b => 
+                        b.x === member.placedAt.x && b.y === member.placedAt.y
+                    );
+                    if (baoIndex !== -1) buildings.bao.splice(baoIndex, 1);
+                }
+                allianceMembers = allianceMembers.filter(m => m.id !== id);
+            });
+            
+            renderAllianceTree();
+            renderMemberModalList();
+            renderMembersList();
+            updateMemberStats();
+            saveMembersToStorage();
+            updateCaches();
+            render();
+        }
+        
+        // 全选/取消全选
+        function toggleSelectAll() {
+            const selectAll = document.getElementById('select-all-members').checked;
+            document.querySelectorAll('.member-list-row .member-checkbox').forEach(cb => {
+                cb.checked = selectAll;
+            });
+        }
+        
+        // 导出成员CSV
+        function exportMembersCSV() {
+            const csv = allianceMembers.map(m => {
+                const alliance = ALLIANCES.find(a => a.id === m.allianceId);
+                const team = teams.find(t => t.id === m.teamId);
+                return `${m.name},${m.power},${alliance ? alliance.name : ''},${team ? team.name : ''},${m.role}`;
+            }).join('\n');
+            
+            const header = '姓名,战力,联盟,小队,角色\n';
+            const blob = new Blob([header + csv], { type: 'text/csv;charset=utf-8;' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = '联盟成员.csv';
+            a.click();
+        }
+        
+        // 小队管理
+        function addTeam(allianceId) {
+            const name = prompt('请输入小队名称：');
+            if (!name) return;
+            
+            teams.push({
+                id: ++teamIdCounter,
+                name: name.trim(),
+                allianceId: allianceId
+            });
+            
+            renderAllianceTree();
+            saveTeamsToStorage();
+        }
+        
+        function editTeam(teamId) {
+            const team = teams.find(t => t.id === teamId);
+            if (!team) return;
+            
+            const newName = prompt('修改小队名称：', team.name);
+            if (!newName) return;
+            
+            team.name = newName.trim();
+            renderAllianceTree();
+            renderMemberModalList();
+            saveTeamsToStorage();
+        }
+        
+        function deleteTeam(teamId) {
+            const team = teams.find(t => t.id === teamId);
+            if (!team) return;
+            
+            const membersInTeam = allianceMembers.filter(m => m.teamId === teamId);
+            if (membersInTeam.length > 0) {
+                if (!confirm(`小队"${team.name}"中有${membersInTeam.length}名成员，删除后成员将变为未分配小队，确定删除？`)) return;
+                membersInTeam.forEach(m => {
+                    m.teamId = null;
+                    m.role = 'member';
+                });
+            }
+            
+            teams = teams.filter(t => t.id !== teamId);
+            renderAllianceTree();
+            renderMemberModalList();
+            saveMembersToStorage();
+            saveTeamsToStorage();
+        }
+        
+        // 批量分配成员到小队
+        function assignSelectedToTeam() {
+            const checkboxes = document.querySelectorAll('.member-list-row .member-checkbox:checked');
+            if (checkboxes.length === 0) {
+                alert('请先选择要分配的成员');
+                return;
+            }
+            
+            // 获取选中成员的联盟（必须是同一联盟）
+            const selectedIds = Array.from(checkboxes).map(cb => parseInt(cb.dataset.id));
+            const selectedMembers = allianceMembers.filter(m => selectedIds.includes(m.id));
+            const allianceIds = [...new Set(selectedMembers.map(m => m.allianceId))];
+            
+            if (allianceIds.length > 1) {
+                alert('只能同时分配同一联盟的成员');
+                return;
+            }
+            
+            const allianceId = allianceIds[0];
+            const allianceTeams = teams.filter(t => t.allianceId === allianceId);
+            
+            if (allianceTeams.length === 0) {
+                alert('该联盟还没有小队，请先创建小队');
+                return;
+            }
+            
+            // 选择小队
+            const teamOptions = allianceTeams.map(t => `${t.id}: ${t.name}`).join('\n');
+            const input = prompt(`选择小队（输入编号）：\n${teamOptions}`);
+            if (!input) return;
+            
+            const teamId = parseInt(input);
+            const targetTeam = teams.find(t => t.id === teamId);
+            if (!targetTeam) {
+                alert('无效的小队编号');
+                return;
+            }
+            
+            selectedMembers.forEach(m => {
+                m.teamId = teamId;
+            });
+            
+            renderAllianceTree();
+            renderMemberModalList();
+            saveMembersToStorage();
+            showValidationMessage(`已将 ${selectedMembers.length} 名成员分配到 ${targetTeam.name}`);
+        }
+        
+        // 设为队长
+        function setAsLeader(memberId) {
+            const member = allianceMembers.find(m => m.id === memberId);
+            if (!member || !member.teamId) {
+                alert('该成员未分配小队');
+                return;
+            }
+            
+            // 将原队长设为队员
+            allianceMembers.filter(m => m.teamId === member.teamId && m.role === 'leader').forEach(m => {
+                m.role = 'member';
+            });
+            
+            member.role = 'leader';
+            renderMemberModalList();
+            saveMembersToStorage();
+        }
+        
+        function saveTeamsToStorage() {
+            try {
+                localStorage.setItem('teams', JSON.stringify(teams));
+            } catch (e) {
+                console.warn('保存小队数据失败:', e);
+            }
+        }
+        
+        function loadTeamsFromStorage() {
+            try {
+                const data = localStorage.getItem('teams');
+                if (data) {
+                    teams = JSON.parse(data);
+                    teamIdCounter = Math.max(0, ...teams.map(t => t.id), 0);
+                }
+            } catch (e) {
+                console.warn('加载小队数据失败:', e);
+            }
+        }
+        
+        // 左侧简化列表渲染
+        function renderMembersList() {
+            const container = document.getElementById('members-list');
+            const count = document.getElementById('member-count');
+            const placedCount = allianceMembers.filter(m => m.placedAt).length;
+            count.textContent = `(${allianceMembers.length}人/${placedCount}已放)`;
+            
+            // 只显示当前联盟的成员，最多显示20个
+            const currentMembers = allianceMembers
+                .filter(m => m.allianceId === currentAlliance)
+                .slice(0, 20);
+            
+            if (currentMembers.length === 0) {
+                container.innerHTML = `<div style="text-align:center;padding:15px 8px;">
+                    <div style="font-size:24px;margin-bottom:8px;">👤</div>
+                    <div style="color:#7f8c8d;font-size:11px;margin-bottom:8px;">
+                        ${ALLIANCES[currentAlliance].name}还没有成员
+                    </div>
+                    <button onclick="openMemberModal()" style="padding:6px 12px;background:#3498db;color:#fff;border:none;border-radius:4px;cursor:pointer;font-size:10px;">
+                        📥 批量导入成员
+                    </button>
+                </div>`;
+                return;
+            }
+            
+            const allianceColor = ALLIANCES[currentAlliance].color;
+            container.innerHTML = currentMembers.map(m => `
+                <div class="member-item ${m.placedAt ? 'placed' : ''}" 
+                     style="border-left-color:${allianceColor};"
+                     draggable="true" 
+                     data-member-id="${m.id}"
+                     ondragstart="onMemberDragStart(event, ${m.id})"
+                     ondragend="onMemberDragEnd(event)">
+                    <span class="member-name">${m.name}</span>
+                    <span class="member-power">⚔${m.power}</span>
+                    ${m.placedAt ? `<span class="member-coord">(${m.placedAt.displayX},${m.placedAt.displayY})</span>` : ''}
+                </div>
+            `).join('') + (allianceMembers.filter(m => m.allianceId === currentAlliance).length > 20 ? 
+                `<div style="color:#999;font-size:9px;text-align:center;padding:4px;">还有更多，请点击管理查看</div>` : '');
+        }
+        
+        // 拖拽相关
+        function onMemberDragStart(event, memberId) {
+            const member = allianceMembers.find(m => m.id === memberId);
+            if (!member) return;
+            
+            dragMember = member;
+            event.target.classList.add('dragging');
+            document.body.classList.add('dragging-member');
+            
+            const alliance = ALLIANCES.find(a => a.id === member.allianceId);
+            const color = alliance ? alliance.color : '#3498db';
+            
+            dragPreviewEl = document.createElement('div');
+            dragPreviewEl.className = 'drag-preview';
+            dragPreviewEl.style.background = color;
+            dragPreviewEl.innerHTML = `🏰 ${member.name}<br><span style="font-size:10px;opacity:0.8;">拖到地图放置</span>`;
+            document.body.appendChild(dragPreviewEl);
+            
+            // 初始位置
+            dragPreviewEl.style.left = event.clientX + 'px';
+            dragPreviewEl.style.top = event.clientY + 'px';
+            
+            event.dataTransfer.setData('text/plain', memberId.toString());
+            event.dataTransfer.effectAllowed = 'copy';
+            
+            const emptyImg = new Image();
+            emptyImg.src = 'data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7';
+            event.dataTransfer.setDragImage(emptyImg, 0, 0);
+        }
+        
+        function onMemberDragEnd(event) {
+            event.target.classList.remove('dragging');
+            document.body.classList.remove('dragging-member');
+            dragMember = null;
+            if (dragPreviewEl) {
+                dragPreviewEl.remove();
+                dragPreviewEl = null;
+            }
+        }
+        
+        function setupCanvasDragDrop() {
+            const canvasWrapper = document.getElementById('canvas-wrapper');
+            
+            // 全局拖动时更新预览位置
+            document.addEventListener('dragover', (e) => {
+                if (!dragMember || !dragPreviewEl) return;
+                dragPreviewEl.style.left = e.clientX + 'px';
+                dragPreviewEl.style.top = (e.clientY - 40) + 'px';
+            });
+            
+            canvasWrapper.addEventListener('dragover', (e) => {
+                if (!dragMember) return;
+                e.preventDefault();
+                e.dataTransfer.dropEffect = 'copy';
+                
+                if (dragPreviewEl) {
+                    dragPreviewEl.style.left = e.clientX + 'px';
+                    dragPreviewEl.style.top = (e.clientY - 40) + 'px';
+                }
+                
+                const gamePos = screenToGame(e.clientX, e.clientY);
+                previewPos = { x: gamePos.x, y: gamePos.y };
+                
+                // 使用requestAnimationFrame节流渲染，避免卡顿
+                if (!dragRenderPending) {
+                    dragRenderPending = true;
+                    requestAnimationFrame(() => {
+                        render();
+                        dragRenderPending = false;
+                    });
+                }
+            });
+            
+            canvasWrapper.addEventListener('drop', (e) => {
+                if (!dragMember) return;
+                e.preventDefault();
+                
+                const gamePos = screenToGame(e.clientX, e.clientY);
+                placeMemberBao(dragMember, gamePos.x, gamePos.y);
+            });
+            
+            canvasWrapper.addEventListener('dragleave', (e) => {
+                if (!dragMember) return;
+                previewPos = null;
+                render();
+            });
+        }
+        
+        function placeMemberBao(member, x, y) {
+            const validation = validatePlacement('bao', x, y);
+            if (!validation.valid) {
+                showValidationMessage(validation.message);
+                return;
+            }
+            
+            // 删除旧的堡
+            if (member.placedAt) {
+                const oldIndex = buildings.bao.findIndex(b => 
+                    b.x === member.placedAt.x && b.y === member.placedAt.y && b.memberId === member.id
+                );
+                if (oldIndex !== -1) {
+                    buildings.bao.splice(oldIndex, 1);
+                }
+            }
+            
+            // 使用成员的联盟ID
+            const memberAlliance = member.allianceId !== undefined ? member.allianceId : currentAlliance;
+            
+            const coord = getBuildingDisplayCoord('bao', x, y);
+            const newBao = {
+                x: x,
+                y: y,
+                alliance: memberAlliance,
+                index: getNextBaoIndex(memberAlliance),
+                name: member.name,
+                memberName: member.name,
+                memberId: member.id
+            };
+            buildings.bao.push(newBao);
+            
+            member.placedAt = { 
+                x: x, 
+                y: y,
+                displayX: coord.y,
+                displayY: coord.x
+            };
+            
+            updateCaches();
+            renderMembersList();
+            if (memberModalOpen) {
+                renderMemberModalList();
+                updateMemberStats();
+            }
+            updateStats();
+            updateAllianceStats();
+            saveMembersToStorage();
+            render();
+            
+            showValidationMessage(`🏰 ${member.name} → (${coord.y}, ${coord.x})`);
+            showToast(`${member.name} 已部署到 (${coord.y}, ${coord.x})`, 'success', 2000);
+            triggerAutoSave();
+        }
+        
+        function saveMembersToStorage() {
+            try {
+                localStorage.setItem('allianceMembers', JSON.stringify(allianceMembers));
+            } catch (e) {
+                console.warn('保存成员数据失败:', e);
+            }
+        }
+        
+        function loadMembersFromStorage() {
+            try {
+                const data = localStorage.getItem('allianceMembers');
+                if (data) {
+                    allianceMembers = JSON.parse(data);
+                    memberIdCounter = Math.max(0, ...allianceMembers.map(m => m.id));
+                }
+                loadTeamsFromStorage();
+                renderMembersList();
+            } catch (e) {
+                console.warn('加载成员数据失败:', e);
+            }
+        }
+        
         function selectAlliance(id) {
             currentAlliance = id;
             document.querySelectorAll('.alliance-btn').forEach((btn, i) => {
                 btn.classList.toggle('active', i === id);
+                if (i === id) btn.classList.add('pulse-success');
+                setTimeout(() => btn.classList.remove('pulse-success'), 500);
             });
             // 更新旗按钮的颜色提示
             const qiBtn = document.getElementById('tool-qi');
             qiBtn.style.background = `linear-gradient(135deg, ${ALLIANCES[id].color}, ${ALLIANCES[id].borderInactive})`;
+            // 更新联盟名称显示
+            const nameEl = document.getElementById('current-alliance-name');
+            if (nameEl) nameEl.textContent = ALLIANCES[id].name;
+            // 更新成员列表显示当前联盟的成员
+            renderMembersList();
+            // 更新联盟统计
+            updateAllianceStats();
             render();
         }
         
@@ -1039,6 +4366,7 @@
         
         function screenToGame(screenX, screenY) {
             const rect = canvas.getBoundingClientRect();
+            const mapCenter = GAME_SIZE / 2;  // 地图中心点
             
             // 相对于画布中心
             let relX = screenX - rect.left - canvas.width / 2;
@@ -1062,20 +4390,21 @@
             relY -= panOffset.y;
             
             // 转换为游戏坐标
-            // 游戏坐标系：右下(0,0)、右上(1199,0)、左下(0,1199)、左上(1199,1199)
+            // 游戏坐标系：右下(0,0)、右上(MAX_COORD,0)、左下(0,MAX_COORD)、左上(MAX_COORD,MAX_COORD)
             // X轴向上增大，Y轴向左增大
             // 注：内部变量gameX实际对应Y轴(向左)，gameY对应X轴(向上)
-            // 画布中心 = 游戏(600, 600)
-            const gameX = 600 - Math.floor(relX / CELL_SIZE);
-            const gameY = 600 - Math.floor(relY / CELL_SIZE);
+            // 画布中心 = 游戏(mapCenter, mapCenter)
+            const gameX = mapCenter - Math.floor(relX / CELL_SIZE);
+            const gameY = mapCenter - Math.floor(relY / CELL_SIZE);
             
             return { x: gameX, y: gameY };
         }
         
         function gameToCanvas(gameX, gameY) {
-            // 游戏(600,600) = 画布中心
-            const canvasX = canvas.width / 2 + (600 - gameX) * CELL_SIZE + panOffset.x;
-            const canvasY = canvas.height / 2 + (600 - gameY) * CELL_SIZE + panOffset.y;
+            const mapCenter = GAME_SIZE / 2;  // 地图中心点
+            // 游戏(mapCenter,mapCenter) = 画布中心
+            const canvasX = canvas.width / 2 + (mapCenter - gameX) * CELL_SIZE + panOffset.x;
+            const canvasY = canvas.height / 2 + (mapCenter - gameY) * CELL_SIZE + panOffset.y;
             return { x: canvasX, y: canvasY };
         }
         
@@ -1183,6 +4512,13 @@
                     hideBuildingInfo();
                 }
                 render();
+                return;
+            }
+            
+            // 箭头绘制工具：拖动时更新终点
+            if (currentTool === 'arrow' && isDrawingArrow && arrowStartPoint) {
+                updateArrowEnd(gamePos.x, gamePos.y);
+                showTooltip(e.clientX, e.clientY, `起点→终点\n松手完成绘制`, true);
                 return;
             }
             
@@ -1378,11 +4714,24 @@
                     placeBuilding(currentTool, previewPos.x, previewPos.y);
                 }
             }
+            
+            // 箭头工具：按下开始绘制
+            if (currentTool === 'arrow' && isDrawingArrow) {
+                const gamePos = screenToGame(e.clientX, e.clientY);
+                startArrowDraw(gamePos.x, gamePos.y);
+            }
         }
         
         function onMouseUp(e) {
             isDragging = false;
             if (currentTool === 'move') canvas.style.cursor = 'grab';
+            
+            // 箭头工具：松手完成绘制
+            if (currentTool === 'arrow' && isDrawingArrow && arrowStartPoint) {
+                const gamePos = screenToGame(e.clientX, e.clientY);
+                finishArrowDraw(gamePos.x, gamePos.y);
+                return;
+            }
             
             // 处理拖动工具
             if (currentTool === 'drag') {
@@ -1429,11 +4778,18 @@
             }
         }
         
-        // 双击改名堡垒
+        // 双击事件处理
         function onDblClick(e) {
             const gamePos = screenToGame(e.clientX, e.clientY);
             const gameX = Math.floor(gamePos.x);
             const gameY = Math.floor(gamePos.y);
+            
+            // 检查是否双击了箭头（优先）
+            const clickedArrow = findArrowAtPosition(gameX, gameY);
+            if (clickedArrow) {
+                renameArrow(clickedArrow.id);
+                return;
+            }
             
             // 查找点击位置是否有堡垒
             for (let i = 0; i < buildings.bao.length; i++) {
@@ -1477,22 +4833,70 @@
         
         let lastTouchDistance = 0;
         let touchStartTime = 0;
+        let isPinchZooming = false;  // 是否正在双指缩放
+        let pinchStartZoom = 1;      // 双指缩放开始时的缩放值
+        let longPressTimer = null;   // 长按计时器
+        let isLongPress = false;     // 是否触发了长按
         
         function getTouchPos(e) {
             const touch = e.touches[0] || e.changedTouches[0];
             return { clientX: touch.clientX, clientY: touch.clientY };
         }
         
+        // 计算两指间距离
+        function getTouchDistance(touches) {
+            const dx = touches[0].clientX - touches[1].clientX;
+            const dy = touches[0].clientY - touches[1].clientY;
+            return Math.sqrt(dx * dx + dy * dy);
+        }
+        
+        // 计算两指中心点
+        function getTouchCenter(touches) {
+            return {
+                x: (touches[0].clientX + touches[1].clientX) / 2,
+                y: (touches[0].clientY + touches[1].clientY) / 2
+            };
+        }
+        
+        // 记录触摸开始位置，用于防止漂移
+        let touchStartPos = null;
+        
         function onTouchStart(e) {
             e.preventDefault();
             touchStartTime = Date.now();
+            isLongPress = false;
             
+            // 双指缩放开始
             if (e.touches.length === 2) {
-                // 禁用双指缩放（改用按钮控制）
+                isPinchZooming = true;
+                lastTouchDistance = getTouchDistance(e.touches);
+                pinchStartZoom = zoom;
+                // 取消长按计时器
+                if (longPressTimer) {
+                    clearTimeout(longPressTimer);
+                    longPressTimer = null;
+                }
                 return;
             }
             
             const pos = getTouchPos(e);
+            touchStartPos = { x: pos.clientX, y: pos.clientY };
+            
+            // 启动长按计时器（500ms触发长按删除）
+            if (currentTool !== 'move') {
+                longPressTimer = setTimeout(() => {
+                    isLongPress = true;
+                    // 长按时检测并删除建筑
+                    const gamePos = screenToGame(pos.clientX, pos.clientY);
+                    const building = findBuildingAt(gamePos.x, gamePos.y);
+                    if (building) {
+                        // 震动反馈（如果支持）
+                        if (navigator.vibrate) navigator.vibrate(50);
+                        deleteAtPosition(gamePos.x, gamePos.y);
+                        showValidationMessage('🗑️ 长按删除成功');
+                    }
+                }, 500);
+            }
             
             if (currentTool === 'move') {
                 isDragging = true;
@@ -1507,8 +4911,23 @@
         function onTouchMove(e) {
             e.preventDefault();
             
-            if (e.touches.length === 2) {
-                // 禁用双指缩放（改用按钮控制）
+            // 取消长按计时器（移动时不触发长按）
+            if (longPressTimer) {
+                clearTimeout(longPressTimer);
+                longPressTimer = null;
+            }
+            
+            // 双指缩放处理
+            if (e.touches.length === 2 && isPinchZooming) {
+                const currentDistance = getTouchDistance(e.touches);
+                if (lastTouchDistance > 0) {
+                    const scale = currentDistance / lastTouchDistance;
+                    const newZoom = pinchStartZoom * scale;
+                    zoom = Math.max(0.1, Math.min(3, newZoom));
+                    document.getElementById('zoom-level').textContent = Math.round(zoom * 100) + '%';
+                    render();
+                }
+                lastTouchDistance = currentDistance;
                 return;
             }
             
@@ -1538,27 +4957,52 @@
         
         function onTouchEnd(e) {
             e.preventDefault();
+            
+            // 取消长按计时器
+            if (longPressTimer) {
+                clearTimeout(longPressTimer);
+                longPressTimer = null;
+            }
+            
+            // 双指缩放结束
+            if (isPinchZooming && e.touches.length < 2) {
+                isPinchZooming = false;
+                lastTouchDistance = 0;
+                return;
+            }
+            
             lastTouchDistance = 0;
             
             const touchDuration = Date.now() - touchStartTime;
-            const pos = getTouchPos(e);
+            const endPos = getTouchPos(e);
             
             if (currentTool === 'move') {
                 isDragging = false;
-            } else if (touchDuration < 300) {
-                // 短按视为点击，放置建筑
-                onMouseMove({ clientX: pos.clientX, clientY: pos.clientY });
+            } else if (!isLongPress && touchDuration < 300 && touchStartPos) {
+                // 短按视为点击，放置建筑（排除长按情况）
+                // 计算触摸移动距离，防止漂移
+                const moveDistance = Math.sqrt(
+                    Math.pow(endPos.clientX - touchStartPos.x, 2) + 
+                    Math.pow(endPos.clientY - touchStartPos.y, 2)
+                );
+                
+                // 如果移动距离小于15像素，使用开始位置（更精准）
+                const usePos = moveDistance < 15 ? touchStartPos : endPos;
+                
+                onMouseMove({ clientX: usePos.x, clientY: usePos.y });
                 if (['qi', 'bao', 'keng', 'kuang'].includes(currentTool) && previewPos) {
                     const validation = validatePlacement(currentTool, previewPos.x, previewPos.y);
                     if (validation.valid) {
                         placeBuilding(currentTool, previewPos.x, previewPos.y);
                     }
                 } else if (currentTool === 'delete') {
-                    const gamePos = screenToGame(pos.clientX, pos.clientY);
+                    const gamePos = screenToGame(usePos.x, usePos.y);
                     deleteAtPosition(gamePos.x, gamePos.y);
                 }
             }
             
+            touchStartPos = null;
+            isLongPress = false;
             hideTooltip();
             render();
         }
@@ -1617,12 +5061,45 @@
         }
         
         function onKeyDown(e) {
+            // Ctrl+Z 撤销, Ctrl+Y 或 Ctrl+Shift+Z 重做
+            if (e.ctrlKey || e.metaKey) {
+                if (e.key === 'z' || e.key === 'Z') {
+                    e.preventDefault();
+                    if (e.shiftKey) {
+                        redo();
+                    } else {
+                        undo();
+                    }
+                    return;
+                }
+                if (e.key === 'y' || e.key === 'Y') {
+                    e.preventDefault();
+                    redo();
+                    return;
+                }
+            }
+            
+            // 箭头绘制模式的特殊按键处理
+            if (isDrawingArrow) {
+                if (e.key === 'Enter') {
+                    e.preventDefault();
+                    finishArrow();
+                    return;
+                }
+                if (e.key === 'Escape') {
+                    e.preventDefault();
+                    cancelArrowDrawing();
+                    return;
+                }
+            }
+            
             switch(e.key.toLowerCase()) {
                 case '1': selectTool('qi'); break;
                 case '2': selectTool('bao'); break;
                 case '3': selectTool('keng'); break;
                 case '4': selectTool('kuang'); break;
                 case '5': selectTool('drag'); break;
+                case '6': toggleArrowDrawing(); break;  // 快捷键6：切换箭头绘制
                 case 'p': selectTool('pointer'); break;
                 case 'd': selectTool('delete'); break;
                 case 'c': centerView(); break;
@@ -1645,15 +5122,26 @@
         function centerView() {
             panOffset = { x: 0, y: 0 };
             render();
-            showValidationMessage('已回到中心 (600, 600)');
+            const mapCenter = GAME_SIZE / 2;
+            showValidationMessage(`已回到中心 (${mapCenter}, ${mapCenter})`);
         }
         
         function setRotation(deg) {
             rotation = parseInt(deg);
-            document.getElementById('rotation-slider').value = rotation;
-            document.getElementById('rotation-display').textContent = rotation;
-            document.querySelectorAll('.rotation-preset').forEach(btn => {
-                btn.classList.toggle('active', parseInt(btn.textContent) === rotation);
+            const slider = document.getElementById('rotation-slider');
+            const display = document.getElementById('rotation-display');
+            if (slider) slider.value = rotation;
+            if (display) display.textContent = rotation;
+            // 更新header中的旋转预设按钮
+            document.querySelectorAll('.rotation-preset-btn').forEach(btn => {
+                const btnDeg = parseInt(btn.textContent);
+                if (btnDeg === rotation) {
+                    btn.style.background = '#00d4ff';
+                    btn.style.color = '#000';
+                } else {
+                    btn.style.background = 'rgba(255,255,255,0.15)';
+                    btn.style.color = '#fff';
+                }
             });
             render();
         }
@@ -1825,15 +5313,91 @@
             render();
         }
         
+        // 网格吸附开关和吸附距离
+        let gridSnapEnabled = true;
+        const SNAP_DISTANCE = 3;  // 吸附距离（格子数）
+        
         function alignToGrid(pos, type) {
             const size = BUILDING_CONFIG[type].size;
+            let alignedPos;
+            
             if (type === 'bao' || type === 'kuang') {
-                // 堡和矿：直接使用当前坐标，不再强制偶数对齐
-                // 这样可以贴着坑的任意边放置
-                return { x: pos.x, y: pos.y };
+                // 堡和矿：直接使用当前坐标
+                alignedPos = { x: pos.x, y: pos.y };
+            } else {
+                // 旗和坑：以点击位置为中心放置
+                alignedPos = { x: pos.x - Math.floor(size / 2), y: pos.y - Math.floor(size / 2) };
             }
-            // 旗和坑：以点击位置为中心放置
-            return { x: pos.x - Math.floor(size / 2), y: pos.y - Math.floor(size / 2) };
+            
+            // 如果启用了网格吸附，尝试吸附到附近建筑边缘
+            if (gridSnapEnabled) {
+                alignedPos = snapToNearbyBuildings(alignedPos, type, size);
+            }
+            
+            return alignedPos;
+        }
+        
+        // 吸附到附近建筑边缘
+        function snapToNearbyBuildings(pos, type, size) {
+            let bestSnap = { ...pos };
+            let minDistance = SNAP_DISTANCE + 1;
+            
+            // 检查所有建筑类型
+            for (const buildType of ['qi', 'bao', 'keng', 'kuang']) {
+                for (const b of buildings[buildType]) {
+                    const bSize = BUILDING_CONFIG[buildType].size;
+                    
+                    // 计算四个可能的吸附位置（贴着建筑的四边）
+                    const snapPositions = [
+                        { x: b.x - size, y: b.y },           // 左侧
+                        { x: b.x + bSize, y: b.y },          // 右侧
+                        { x: b.x, y: b.y - size },           // 上方
+                        { x: b.x, y: b.y + bSize },          // 下方
+                        { x: b.x - size, y: b.y - size },    // 左上角
+                        { x: b.x + bSize, y: b.y - size },   // 右上角
+                        { x: b.x - size, y: b.y + bSize },   // 左下角
+                        { x: b.x + bSize, y: b.y + bSize },  // 右下角
+                    ];
+                    
+                    for (const snap of snapPositions) {
+                        const dx = Math.abs(snap.x - pos.x);
+                        const dy = Math.abs(snap.y - pos.y);
+                        const distance = Math.max(dx, dy);
+                        
+                        if (distance < minDistance && distance <= SNAP_DISTANCE) {
+                            minDistance = distance;
+                            bestSnap = { ...snap };
+                        }
+                    }
+                    
+                    // 对齐边缘（只对齐x或y，另一个保持原位置）
+                    if (Math.abs(b.x - pos.x) <= SNAP_DISTANCE && Math.abs(b.x - pos.x) < Math.abs(bestSnap.x - pos.x)) {
+                        bestSnap.x = b.x;
+                    }
+                    if (Math.abs(b.x + bSize - pos.x) <= SNAP_DISTANCE && Math.abs(b.x + bSize - pos.x) < Math.abs(bestSnap.x - pos.x)) {
+                        bestSnap.x = b.x + bSize;
+                    }
+                    if (Math.abs(b.y - pos.y) <= SNAP_DISTANCE && Math.abs(b.y - pos.y) < Math.abs(bestSnap.y - pos.y)) {
+                        bestSnap.y = b.y;
+                    }
+                    if (Math.abs(b.y + bSize - pos.y) <= SNAP_DISTANCE && Math.abs(b.y + bSize - pos.y) < Math.abs(bestSnap.y - pos.y)) {
+                        bestSnap.y = b.y + bSize;
+                    }
+                }
+            }
+            
+            return bestSnap;
+        }
+        
+        // 切换网格吸附
+        function toggleGridSnap() {
+            gridSnapEnabled = !gridSnapEnabled;
+            const btn = document.getElementById('btn-grid-snap');
+            if (btn) {
+                btn.textContent = gridSnapEnabled ? '🧲 吸附:开' : '🧲 吸附:关';
+                btn.style.background = gridSnapEnabled ? '#27ae60' : '#7f8c8d';
+            }
+            showValidationMessage(gridSnapEnabled ? '🧲 网格吸附已开启' : '🧲 网格吸附已关闭');
         }
         
         // ========== 验证 ==========
@@ -2023,6 +5587,7 @@
         }
         
         function placeBuilding(type, x, y) {
+            saveToHistory();  // 保存到历史记录
             if (type === 'qi') {
                 buildings[type].push({ x, y, alliance: currentAlliance });
             } else if (type === 'bao') {
@@ -2035,12 +5600,15 @@
             }
             updateCoverage();
             updateStats();
+            updateAllianceStats();
             render();
             const coord = getBuildingDisplayCoord(type, x, y);
             showValidationMessage(`${BUILDING_CONFIG[type].icon} → (${coord.y}, ${coord.x})`);
+            triggerAutoSave();
         }
         
         function deleteAtPosition(gameX, gameY) {
+            saveToHistory();  // 保存到历史记录
             // 检查是否点击了NPC建筑
             for (const [direction, npc] of Object.entries(NPC_BUILDINGS)) {
                 if (gameX >= npc.x && gameX < npc.x + npc.size && gameY >= npc.y && gameY < npc.y + npc.size) {
@@ -2062,6 +5630,17 @@
                     const b = buildings[type][i];
                     if (gameX >= b.x && gameX < b.x + size && gameY >= b.y && gameY < b.y + size) {
                         const coord = getBuildingDisplayCoord(type, b.x, b.y);
+                        
+                        // 如果删除的是堡，更新成员状态
+                        if (type === 'bao' && b.memberId) {
+                            const member = allianceMembers.find(m => m.id === b.memberId);
+                            if (member) {
+                                member.placedAt = null;
+                                renderMembersList();
+                                saveMembersToStorage();
+                            }
+                        }
+                        
                         buildings[type].splice(i, 1);
                         updateCoverage(); updateStats(); render();
                         showValidationMessage(`删除 ${BUILDING_CONFIG[type].icon} (${coord.y}, ${coord.x})`);
@@ -2069,6 +5648,13 @@
                     }
                 }
             }
+        }
+        
+        // 更新所有缓存（统一入口）
+        function updateCaches() {
+            updateCoverage();
+            updateStats();
+            updateAllianceStats();
         }
         
         function updateCoverage() {
@@ -2173,6 +5759,15 @@
                 const validation = validatePlacement(currentTool, previewPos.x, previewPos.y);
                 drawPreview(currentTool, previewPos.x, previewPos.y, validation.valid);
             }
+            
+            // 成员拖拽预览
+            if (dragMember && previewPos) {
+                const validation = validatePlacement('bao', previewPos.x, previewPos.y);
+                drawPreview('bao', previewPos.x, previewPos.y, validation.valid);
+            }
+            
+            // 绘制行军箭头
+            drawArrows();
             
             if (hoveredBuilding) drawBuildingHighlight(hoveredBuilding.type, hoveredBuilding.building.x, hoveredBuilding.building.y, hoveredBuilding.building);
             
@@ -2328,6 +5923,9 @@
         
         // 绘制特殊区域背景（沃土→黑土→红土，从外到内）
         function drawSpecialZones() {
+            // 只在王城地图显示特殊区域
+            if (currentMapId !== 'wangcheng') return;
+            
             for (const zone of SPECIAL_ZONES) {
                 const pos = gameToCanvas(zone.x, zone.y);
                 const zoneSize = zone.size * CELL_SIZE;
@@ -2355,8 +5953,8 @@
         }
         
         function drawBoundary() {
-            // 绘制地图边界 (0-1199)
-            const topLeft = gameToCanvas(1199, 1199);
+            // 绘制地图边界 (0 到 MAX_COORD)
+            const topLeft = gameToCanvas(MAX_COORD, MAX_COORD);
             const bottomRight = gameToCanvas(0, 0);
             
             // 因为游戏坐标Y向上增大，画布Y向下增大
@@ -2377,24 +5975,27 @@
             ctx.font = '11px Arial';
             ctx.fillStyle = 'rgba(255, 255, 255, 0.6)';
             
-            // 左上角 (1199, 1199) - X大=上，Y大=左
+            // 左上角 (MAX_COORD, MAX_COORD) - X大=上，Y大=左
             ctx.textAlign = 'left';
-            ctx.fillText('(1199, 1199)', x + 5, y + 15);
+            ctx.fillText(`(${MAX_COORD}, ${MAX_COORD})`, x + 5, y + 15);
             
             // 右下角 (0, 0) - X小=下，Y小=右
             ctx.textAlign = 'right';
             ctx.fillText('(0, 0)', x + w - 5, y + h - 5);
             
-            // 右上角 (1199, 0) - X大=上，Y小=右
+            // 右上角 (MAX_COORD, 0) - X大=上，Y小=右
             ctx.textAlign = 'right';
-            ctx.fillText('(1199, 0)', x + w - 5, y + 15);
+            ctx.fillText(`(${MAX_COORD}, 0)`, x + w - 5, y + 15);
             
-            // 左下角 (0, 1199) - X小=下，Y大=左
+            // 左下角 (0, MAX_COORD) - X小=下，Y大=左
             ctx.textAlign = 'left';
-            ctx.fillText('(0, 1199)', x + 5, y + h - 5);
+            ctx.fillText(`(0, ${MAX_COORD})`, x + 5, y + h - 5);
         }
         
         function drawNPCBuildings() {
+            // 只在王城地图显示NPC建筑
+            if (currentMapId !== 'wangcheng') return;
+            
             // 先绘制王城（底层）
             const wcPos = gameToCanvas(WANG_CHENG.x, WANG_CHENG.y);
             const wcSize = WANG_CHENG.size * CELL_SIZE;
@@ -2464,8 +6065,17 @@
                 fillColor = isActive ? allianceConfig.colorActive : allianceConfig.colorInactive;
                 borderColor = isActive ? allianceConfig.borderActive : allianceConfig.borderInactive;
             } else if (type === 'bao') {
-                fillColor = isBaoInQi(gameX, gameY) ? config.colorActive : config.colorInactive;
-                borderColor = config.border;
+                // 使用堡所属联盟的颜色
+                const baoAlliance = building.alliance;
+                if (baoAlliance !== null && baoAlliance !== undefined && ALLIANCES[baoAlliance]) {
+                    const allianceConfig = ALLIANCES[baoAlliance];
+                    const inQi = isBaoInQi(gameX, gameY);
+                    fillColor = inQi ? allianceConfig.colorActive : allianceConfig.colorInactive;
+                    borderColor = inQi ? allianceConfig.borderActive : allianceConfig.borderInactive;
+                } else {
+                    fillColor = isBaoInQi(gameX, gameY) ? config.colorActive : config.colorInactive;
+                    borderColor = config.border;
+                }
             } else {
                 fillColor = config.color;
                 borderColor = config.border;
@@ -2506,46 +6116,80 @@
             if (type === 'bao') {
                 // 获取坐标
                 const coord = getBuildingDisplayCoord('bao', building.x, building.y);
-                const hasIndex = building.index !== null && building.index !== undefined;
                 const hasName = building.name && building.name.trim();
+                const hasMember = building.memberId && building.memberName;
                 
-                // 根据联盟获取颜色
-                const allianceColor = building.alliance !== null && building.alliance !== undefined 
-                    ? ALLIANCES[building.alliance].borderActive 
-                    : '#888';
+                // 查找成员信息
+                let memberPower = null;
+                let memberTeam = null;
+                let memberRole = null;
+                if (hasMember) {
+                    const member = allianceMembers.find(m => m.id === building.memberId);
+                    if (member) {
+                        memberPower = member.power;
+                        memberTeam = teams.find(t => t.id === member.teamId);
+                        memberRole = member.role;
+                    }
+                }
                 
-                // 多行显示：序号、名称、坐标
+                // 根据联盟获取颜色和名称
+                const allianceId = building.alliance;
+                const allianceConfig = allianceId !== null && allianceId !== undefined ? ALLIANCES[allianceId] : null;
+                const allianceColor = allianceConfig ? allianceConfig.borderActive : '#888';
+                const allianceName = allianceConfig ? allianceConfig.name : '';
+                
+                // 多行显示
                 const centerX = drawX + pSize / 2;
-                const lineHeight = pSize / 4; // 每行高度
+                const lineHeight = pSize / 4;
                 
-                if (hasIndex || hasName) {
-                    // 第一行：序号
-                    if (hasIndex) {
-                        ctx.font = 'bold 8px Arial';
-                        ctx.fillStyle = allianceColor;
-                        ctx.fillText(building.index.toString(), centerX, drawY + lineHeight * 0.9);
+                // 左上角联盟标记（小圆点+缩写）
+                if (allianceConfig) {
+                    ctx.fillStyle = allianceConfig.color;
+                    ctx.beginPath();
+                    ctx.arc(drawX + 4, drawY + 4, 3, 0, Math.PI * 2);
+                    ctx.fill();
+                    
+                    // 队长标记
+                    if (memberRole === 'leader') {
+                        ctx.font = 'bold 6px Arial';
+                        ctx.fillStyle = '#f39c12';
+                        ctx.fillText('👑', drawX + pSize - 8, drawY + 8);
+                    }
+                }
+                
+                if (hasName || hasMember) {
+                    // 显示名称（截断显示，最多4字符）
+                    let displayName = building.name || building.memberName;
+                    if (displayName.length > 4) {
+                        displayName = displayName.substring(0, 3) + '…';
+                    }
+                    ctx.font = 'bold 8px Arial';
+                    ctx.fillStyle = '#fff';
+                    ctx.fillText(displayName, centerX, drawY + lineHeight * 1.2);
+                    
+                    // 显示小队名称（不显示战力）
+                    if (memberTeam) {
+                        ctx.font = 'bold 6px Arial';
+                        ctx.fillStyle = '#87ceeb';
+                        let teamName = memberTeam.name;
+                        if (teamName.length > 4) teamName = teamName.substring(0, 3) + '…';
+                        ctx.fillText(teamName, centerX, drawY + lineHeight * 2.3);
                     }
                     
-                    // 第二行：名称（截断显示，最多4字符）
-                    if (hasName) {
-                        let displayName = building.name;
-                        if (displayName.length > 4) {
-                            displayName = displayName.substring(0, 3) + '…';
-                        }
-                        ctx.font = 'bold 7px Arial';
-                        ctx.fillStyle = '#fff';
-                        ctx.fillText(displayName, centerX, drawY + lineHeight * 2);
-                    }
-                    
-                    // 第三行：坐标
+                    // 底部显示坐标
                     ctx.font = '5px Arial';
                     ctx.fillStyle = 'rgba(255,255,255,0.6)';
-                    ctx.fillText(`${coord.y},${coord.x}`, centerX, drawY + lineHeight * 3.1);
+                    ctx.fillText(`${coord.y},${coord.x}`, centerX, drawY + lineHeight * 3.4);
                 } else {
-                    // 无序号时只显示坐标
+                    // 无名称时显示联盟缩写和坐标
+                    if (allianceName) {
+                        ctx.font = 'bold 7px Arial';
+                        ctx.fillStyle = 'rgba(255,255,255,0.8)';
+                        ctx.fillText(allianceName.substring(0, 2), centerX, drawY + pSize / 2 - 3);
+                    }
                     ctx.font = '6px Arial';
                     ctx.fillStyle = 'rgba(255,255,255,0.5)';
-                    ctx.fillText(`${coord.y},${coord.x}`, centerX, drawY + pSize / 2);
+                    ctx.fillText(`${coord.y},${coord.x}`, centerX, drawY + pSize / 2 + 6);
                 }
             }
         }
@@ -2617,6 +6261,128 @@
         function hideTooltip() { tooltip.style.display = 'none'; }
         function showValidationMessage(msg) { document.getElementById('validation-msg').textContent = msg; }
         
+        // ========== 用户体验增强功能 ==========
+        
+        // Loading提示
+        function showLoading(text = '加载中...') {
+            const overlay = document.getElementById('loading-overlay');
+            const textEl = document.getElementById('loading-text');
+            if (textEl) textEl.textContent = text;
+            if (overlay) overlay.classList.add('active');
+        }
+        
+        function hideLoading() {
+            const overlay = document.getElementById('loading-overlay');
+            if (overlay) overlay.classList.remove('active');
+        }
+        
+        // Toast提示
+        function showToast(message, type = 'info', duration = 3000) {
+            const container = document.getElementById('toast-container');
+            const toast = document.createElement('div');
+            toast.className = `toast ${type}`;
+            
+            const icons = { success: '✓', info: 'ℹ', warning: '⚠', error: '✕' };
+            toast.innerHTML = `<span>${icons[type] || 'ℹ'}</span><span>${message}</span>`;
+            
+            container.appendChild(toast);
+            
+            setTimeout(() => {
+                toast.classList.add('toast-exit');
+                setTimeout(() => toast.remove(), 300);
+            }, duration);
+        }
+        
+        // 快捷键提示条
+        function hideShortcutBar() {
+            const bar = document.getElementById('shortcut-bar');
+            bar.classList.add('hidden');
+            localStorage.setItem('shortcutBarHidden', 'true');
+        }
+        
+        function showShortcutBar() {
+            const bar = document.getElementById('shortcut-bar');
+            bar.classList.remove('hidden');
+            localStorage.removeItem('shortcutBarHidden');
+        }
+        
+        // 自动保存提示
+        let lastSaveTime = Date.now();
+        let saveIndicatorTimeout = null;
+        
+        function triggerAutoSave() {
+            const now = Date.now();
+            if (now - lastSaveTime > 5000) { // 至少5秒间隔
+                saveMapDataToStorage();
+                lastSaveTime = now;
+                
+                // 显示保存指示
+                clearTimeout(saveIndicatorTimeout);
+                const indicator = document.getElementById('save-indicator');
+                if (indicator) {
+                    indicator.style.opacity = '1';
+                    saveIndicatorTimeout = setTimeout(() => {
+                        indicator.style.opacity = '0';
+                    }, 2000);
+                }
+            }
+        }
+        
+        // 联盟统计
+        function updateAllianceStats() {
+            const statsEl = document.getElementById('alliance-stats-content');
+            if (!statsEl) return;
+            
+            const currentMembers = allianceMembers.filter(m => m.allianceId === currentAlliance);
+            const placedMembers = currentMembers.filter(m => m.placedAt);
+            const totalPower = currentMembers.reduce((sum, m) => sum + (m.power || 0), 0);
+            const allianceQi = buildings.qi.filter(q => q.alliance === currentAlliance);
+            const allianceBao = buildings.bao.filter(b => b.alliance === currentAlliance);
+            
+            statsEl.innerHTML = `
+                <div class="alliance-stats-row">
+                    <span class="stats-label">成员</span>
+                    <span class="stats-value">${placedMembers.length}/${currentMembers.length} 已部署</span>
+                </div>
+                <div class="alliance-stats-row">
+                    <span class="stats-label">总战力</span>
+                    <span class="stats-value highlight">${totalPower.toLocaleString()}</span>
+                </div>
+                <div class="alliance-stats-row">
+                    <span class="stats-label">旗/堡</span>
+                    <span class="stats-value">${allianceQi.length} / ${allianceBao.length}</span>
+                </div>
+            `;
+        }
+        
+        // 欢迎引导
+        function showWelcomeGuide() {
+            if (localStorage.getItem('welcomeShown')) return;
+            
+            const overlay = document.createElement('div');
+            overlay.className = 'welcome-overlay';
+            overlay.innerHTML = `
+                <div class="welcome-card">
+                    <h2>🏯 欢迎使用沙盘演练系统</h2>
+                    <p>
+                        这是一个战术推演工具，帮助您：<br>
+                        📍 在地图上规划建筑布局<br>
+                        👥 管理联盟成员和小队<br>
+                        ⏱️ 按时间轴记录战场变化
+                    </p>
+                    <button class="welcome-btn" onclick="closeWelcome()">开始使用</button>
+                </div>
+            `;
+            document.body.appendChild(overlay);
+        }
+        
+        function closeWelcome() {
+            const overlay = document.querySelector('.welcome-overlay');
+            if (overlay) overlay.remove();
+            localStorage.setItem('welcomeShown', 'true');
+            showToast('💡 按 1-4 选择建筑，拖动成员到地图放置堡垒', 'info', 5000);
+        }
+        
         function updateStats() {
             // 按联盟统计旗的数量
             for (const alliance of ALLIANCES) {
@@ -2646,7 +6412,12 @@
         
         function clearAll() {
             if (confirm('确定清空？')) {
+                saveToHistory();  // 保存到历史记录
                 buildings = { qi: [], bao: [], keng: [], kuang: [] };
+                // 清除成员的放置状态
+                allianceMembers.forEach(m => m.placedAt = null);
+                renderMembersList();
+                saveMembersToStorage();
                 updateCoverage(); updateStats(); render();
                 showValidationMessage('已清空');
             }
