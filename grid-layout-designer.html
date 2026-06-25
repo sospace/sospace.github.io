@@ -24,116 +24,142 @@
             color: #fff;
         }
         
+        /* 手机端工具栏折叠 */
+        .mobile-toolbar-toggle {
+            display: none;
+        }
+        
         /* 响应式布局 */
         @media (max-width: 768px) {
-            body { flex-direction: column; }
+            body { flex-direction: column; min-height: 0; }
             
-            /* 顶部工具栏 - 紧凑横向布局 */
+            /* 顶部工具栏 - 紧凑单行布局 */
             .toolbar { 
                 width: 100% !important; min-width: 100% !important; 
+                flex: 0 0 auto;
                 flex-direction: row !important; flex-wrap: wrap;
-                padding: 6px 8px !important; gap: 4px !important;
+                padding: 4px 6px !important; gap: 3px !important;
                 max-height: none; overflow-y: visible;
                 border-right: none; border-bottom: 1px solid #C8E0EC;
-                padding-bottom: 8px !important;
+                padding-bottom: 4px !important;
             }
             .toolbar h2 { display: none; }
+            .mobile-toolbar-toggle {
+                display: block;
+                flex: 0 0 100%;
+                order: 0;
+                padding: 3px 8px;
+                border: none;
+                border-radius: 4px;
+                background: rgba(200,224,236,0.5);
+                color: #5a7a8a;
+                font-size: 10px;
+                cursor: pointer;
+                text-align: center;
+            }
+            .toolbar.collapsed .alliance-section,
+            .toolbar.collapsed .mobile-tools-row { display: none !important; }
             
-            /* 联盟选择 - 横向排列 */
+            /* 联盟选择 - 仅颜色按钮 */
             .alliance-section { 
-                flex: 0 0 100%; order: 1; padding: 4px 6px !important;
+                flex: 0 0 100%; order: 1; padding: 2px 4px !important;
                 background: transparent;
             }
             .alliance-section h3 { display: none; }
+            .alliance-stats { display: none !important; }
             .alliance-grid { 
-                grid-template-columns: repeat(6, 1fr) !important; gap: 3px; 
+                grid-template-columns: repeat(6, 1fr) !important; gap: 2px; 
             }
             .alliance-btn { 
-                padding: 6px 2px !important; font-size: 8px !important; 
+                padding: 4px 1px !important; font-size: 8px !important; 
                 border-radius: 4px;
             }
-            .alliance-btn .alliance-name { font-size: 7px !important; }
+            .alliance-btn .alliance-name { display: none !important; }
+            .alliance-color { width: 16px !important; height: 16px !important; }
             
-            /* 建筑选择 - 紧凑图标按钮网格布局 */
+            /* 建筑+工具合并为一行图标按钮 */
+            .mobile-tools-row {
+                flex: 0 0 100%; order: 2;
+                display: grid;
+                grid-template-columns: repeat(9, 1fr);
+                gap: 2px;
+                padding: 2px;
+                background: rgba(200,224,236,0.15);
+                border-radius: 4px;
+            }
+            .mobile-tools-row .tool-section {
+                display: contents;
+            }
             .tool-section { 
-                flex: 1 1 auto; order: 2; padding: 2px 4px !important;
-                background: rgba(200,224,236,0.2); min-width: auto;
+                flex: 0 0 100%; order: 2; padding: 2px !important;
+                background: rgba(200,224,236,0.15); min-width: auto;
                 display: grid !important;
-                grid-template-columns: repeat(4, 1fr);
-                gap: 3px;
-                border-radius: 6px;
+                grid-template-columns: repeat(9, 1fr);
+                gap: 2px;
+                border-radius: 4px;
             }
             .tool-section h3 { display: none; }
-            .tool-section:first-of-type { order: 2; } /* 建筑选择 */
-            .tool-section:last-of-type { order: 3; }  /* 工具 */
             .tool-btn { 
-                padding: 10px 4px !important; font-size: 9px !important; 
+                padding: 6px 2px !important; font-size: 8px !important; 
                 margin-bottom: 0 !important;
                 flex-direction: column !important;
                 justify-content: center;
                 width: auto !important;
+                min-height: 0;
             }
-            .tool-btn span:last-child { 
-                display: block !important; 
-                font-size: 7px !important; 
-                white-space: nowrap;
-            }
-            .tool-icon { width: 20px !important; height: 20px !important; font-size: 16px !important; }
+            .tool-btn span:last-child { display: none !important; }
+            .tool-icon { width: 18px !important; height: 18px !important; font-size: 14px !important; }
             
-            /* 旋转控制 - 简化 */
-            .rotation-control { 
-                flex: 0 0 auto; order: 4; padding: 4px 8px !important;
-                display: flex; flex-direction: row !important; align-items: center; gap: 6px;
-                background: rgba(200,224,236,0.2); min-width: auto;
-                border-radius: 6px;
-            }
-            .rotation-control h3 { display: none; }
-            .rotation-value { font-size: 11px !important; margin: 0 !important; }
-            .rotation-slider { width: 60px !important; margin: 0 !important; }
-            .rotation-presets { display: none !important; }
-            
-            /* 桌面端操作按钮在手机端隐藏，由底部工具栏替代 */
+            .rotation-control { display: none !important; }
             .action-btns { display: none !important; }
-            
-            /* 右侧规则面板隐藏 */
             .rules-panel { display: none !important; }
             
-            /* 主区域 */
-            .main-area { flex: 1; padding-bottom: 56px; } /* 为底部工具栏留空间 */
+            /* 主区域占满剩余空间 */
+            .main-area { flex: 1 1 0; min-height: 0; padding-bottom: 48px; display: flex; flex-direction: column; }
+            .canvas-wrapper { flex: 1 1 0; min-height: 0; }
             
-            /* Header - 简化布局 */
+            /* 地图Tab紧凑 */
+            .map-tabs { margin: 0 4px !important; padding: 2px !important; }
+            .map-tab { padding: 4px 2px !important; font-size: 9px !important; }
+            .map-tab .map-size { display: none; }
+            
+            /* Header - 极简 */
             .header { 
-                padding: 4px 8px !important; 
-                flex-wrap: wrap;
+                padding: 3px 6px !important; 
+                flex-wrap: nowrap;
             }
-            .header h1 { 
-                font-size: 11px !important; 
-                flex: 0 0 auto;
-            }
+            #map-title { display: none !important; }
             .header-info { 
-                flex: 1; justify-content: flex-end; 
-                gap: 6px !important; font-size: 10px !important;
-                flex-wrap: wrap;
+                flex: 1; justify-content: space-between; 
+                gap: 4px !important; font-size: 9px !important;
+                flex-wrap: nowrap;
             }
             .header-info span { padding: 2px 4px !important; }
-            .header-info > span:nth-child(n+3) { display: none; } /* 隐藏缩放后面的元素 */
-            #btn-zoom-out, #btn-zoom-in { width: 22px !important; height: 22px !important; }
-            #btn-zoom-reset { padding: 2px 4px !important; font-size: 9px !important; }
-            #btn-remove-watermark { display: none; } /* 移到底部工具栏 */
+            .header-info .header-rotation { display: none !important; }
+            .header-info .coord-mobile { display: flex !important; }
+            #btn-zoom-out, #btn-zoom-in { width: 20px !important; height: 20px !important; font-size: 11px !important; }
+            #btn-zoom-reset { display: none !important; }
+            #btn-remove-watermark { display: none !important; }
+            #zoom-level { min-width: 32px !important; font-size: 9px !important; }
             
-            /* 版权栏 */
-            .copyright-footer { 
-                display: none; /* 手机端隐藏底部版权栏，避免遮挡 */
+            /* 状态栏移到工具栏上方，仅保留坐标 */
+            .status-bar {
+                position: fixed;
+                bottom: 48px; left: 0; right: 0;
+                height: 24px;
+                padding: 0 8px;
+                font-size: 9px;
+                z-index: 998;
             }
-            .copyright-watermark { 
-                bottom: 60px; font-size: 8px; 
-            }
+            .status-bar-left { display: none !important; }
+            .status-bar-right { gap: 6px; width: 100%; justify-content: center; }
+            .status-bar-item.coord { font-size: 10px; }
             
-            /* 底部固定工具栏 */
-            .mobile-toolbar {
-                display: flex !important;
-            }
+            .copyright-footer { display: none; }
+            .mobile-toolbar { display: flex !important; }
         }
+        
+        .header-info .coord-mobile { display: none; }
         
         /* 底部固定工具栏 - 默认隐藏，仅手机端显示 */
         .mobile-toolbar {
@@ -173,83 +199,29 @@
         
         /* 超小屏幕 (手机竖屏) 优化 */
         @media (max-width: 480px) {
-            .toolbar {
-                padding: 4px 6px !important;
-            }
-            
-            /* 联盟按钮 - 更紧凑 */
-            .alliance-grid { 
-                grid-template-columns: repeat(6, 1fr) !important;
-                gap: 2px !important;
-            }
-            .alliance-btn { 
-                padding: 5px 1px !important; 
-                font-size: 10px !important;
-            }
-            .alliance-btn .alliance-name { display: none !important; }
-            
-            /* 工具按钮 - 更紧凑的网格 */
-            .tool-section {
-                grid-template-columns: repeat(4, 1fr) !important;
-                gap: 2px !important;
-            }
-            .tool-btn {
-                padding: 8px 2px !important;
-            }
-            .tool-btn span:last-child { 
-                font-size: 6px !important;
-            }
-            .tool-icon { font-size: 14px !important; }
-            
-            /* 旋转控制 - 更紧凑 */
-            .rotation-control {
-                padding: 2px 4px !important;
-            }
-            .rotation-value { font-size: 10px !important; }
-            .rotation-slider { width: 50px !important; }
-            
-            /* Header */
-            .header h1 { font-size: 10px !important; }
-            .header-info { gap: 4px !important; font-size: 9px !important; }
-            #btn-zoom-out, #btn-zoom-in { width: 20px !important; height: 20px !important; font-size: 12px !important; }
-            #zoom-level { min-width: 30px !important; font-size: 9px !important; }
-            
-            /* 底部工具栏 - 更紧凑 */
-            .mobile-toolbar {
-                padding: 4px 6px;
-                gap: 4px;
-            }
-            .mobile-toolbar-btn {
-                padding: 6px 2px;
-                font-size: 8px;
-                max-width: 60px;
-            }
-            .mobile-toolbar-btn .mobile-icon { font-size: 14px; }
+            .toolbar { padding: 3px 4px !important; }
+            .alliance-btn { padding: 3px 0 !important; }
+            .alliance-color { width: 14px !important; height: 14px !important; }
+            .tool-section { grid-template-columns: repeat(9, 1fr) !important; }
+            .tool-btn { padding: 5px 1px !important; }
+            .tool-icon { font-size: 12px !important; width: 16px !important; height: 16px !important; }
+            .map-tab { font-size: 8px !important; padding: 3px 1px !important; }
+            .mobile-toolbar { padding: 3px 4px; gap: 3px; }
+            .mobile-toolbar-btn { padding: 5px 1px; font-size: 7px; max-width: 52px; }
+            .mobile-toolbar-btn .mobile-icon { font-size: 13px; }
+            .status-bar { bottom: 42px; height: 22px; }
+            .main-area { padding-bottom: 42px; }
         }
         
         /* 横屏模式优化 */
         @media (max-width: 768px) and (orientation: landscape) {
-            .toolbar {
-                max-height: 100px !important;
-                padding: 4px 8px !important;
-            }
-            .alliance-section {
-                flex: 0 0 auto !important;
-            }
-            .alliance-grid { 
-                grid-template-columns: repeat(6, 1fr) !important;
-            }
-            .tool-section {
-                grid-template-columns: repeat(8, 1fr) !important;
-            }
-            .tool-btn span:last-child { display: none !important; }
-            .rotation-control {
-                flex: 0 0 auto !important;
-            }
-            .main-area { padding-bottom: 44px; }
-            .mobile-toolbar { padding: 4px; }
-            .mobile-toolbar-btn { padding: 4px 2px; font-size: 8px; }
-            .mobile-toolbar-btn .mobile-icon { font-size: 12px; }
+            .toolbar { max-height: 72px !important; overflow: hidden; }
+            .alliance-section { flex: 0 0 auto !important; max-width: 38%; }
+            .tool-section { flex: 1 1 auto !important; grid-template-columns: repeat(9, 1fr) !important; }
+            .main-area { padding-bottom: 38px; }
+            .mobile-toolbar { padding: 3px; }
+            .mobile-toolbar-btn { padding: 3px 1px; font-size: 7px; max-width: 48px; }
+            .status-bar { bottom: 38px; }
         }
         
         .toolbar {
@@ -283,6 +255,7 @@
             margin-right: 5px;
         }
         .tool-section { background: rgba(200,224,236,0.3); padding: 10px; border-radius: 8px; }
+        .mobile-tools-row { display: flex; flex-direction: column; gap: 10px; }
         .tool-section h3 { font-size: 11px; color: #5a7a8a; margin-bottom: 6px; }
         .tool-btn {
             width: 100%; padding: 8px; margin-bottom: 4px;
@@ -1155,6 +1128,12 @@
         }
         .modal-btn-primary { background: #00d4ff; color: #000; }
         .modal-btn-secondary { background: rgba(255,255,255,0.1); color: #fff; }
+        .modal-input {
+            width: 100%; padding: 10px 12px; background: rgba(0,0,0,0.3);
+            border: 1px solid rgba(255,255,255,0.2); border-radius: 6px;
+            color: #fff; font-size: 14px; font-family: inherit;
+        }
+        .modal-input:focus { outline: none; border-color: #00d4ff; }
         
         /* 登录界面样式 - 冬日雪景 */
         .login-overlay {
@@ -1295,7 +1274,8 @@
         </div>
     </div>
     
-    <div class="toolbar">
+    <div class="toolbar" id="toolbar">
+        <button class="mobile-toolbar-toggle" id="toolbar-toggle" onclick="toggleMobileToolbar()">▲ 收起工具栏</button>
         <h2><span class="logo-earth">🌍</span> 管理助手</h2>
         
         <!-- 地图选择移到header上方 -->
@@ -1319,6 +1299,7 @@
             </div>
         </div>
         
+        <div class="mobile-tools-row">
         <div class="tool-section">
             <h3>选择建筑</h3>
             <button class="tool-btn tool-btn-qi" onclick="selectTool('qi')" id="tool-qi">
@@ -1352,6 +1333,7 @@
             <button class="tool-btn" onclick="toggleGridSnap()" id="btn-grid-snap" style="background:#27ae60;">
                 <span class="tool-icon">🧲</span><span>吸附:开</span>
             </button>
+        </div>
         </div>
         
         <!-- 成员列表隐藏在此，实际显示移到右侧面板 -->
@@ -1393,7 +1375,10 @@
                     <button id="btn-zoom-in" style="width:24px;height:24px;border:none;border-radius:4px;background:#2980b9;color:#fff;cursor:pointer;font-weight:bold;">+</button>
                     <button id="btn-zoom-reset" style="padding:2px 6px;border:none;border-radius:4px;background:#5a7a8a;color:#fff;cursor:pointer;font-size:10px;">重置</button>
                 </span>
-                <span style="display:flex;align-items:center;gap:4px;">
+                <span class="coord-mobile" style="display:flex;align-items:center;gap:4px;background:rgba(200,224,236,0.5);padding:2px 6px;border-radius:4px;">
+                    坐标: <span id="mouse-game-header">(600, 600)</span>
+                </span>
+                <span class="header-rotation" style="display:flex;align-items:center;gap:4px;">
                     旋转: 
                     <button onclick="setRotation(0)" class="rotation-preset-btn" style="padding:2px 6px;border:none;border-radius:3px;background:rgba(255,255,255,0.15);color:#fff;font-size:10px;cursor:pointer;">0°</button>
                     <button onclick="setRotation(45)" class="rotation-preset-btn active" style="padding:2px 6px;border:none;border-radius:3px;background:#00d4ff;color:#000;font-size:10px;cursor:pointer;">45°</button>
@@ -1721,6 +1706,19 @@
         </button>
     </div>
     
+    <!-- 堡垒改名弹窗 -->
+    <div class="modal-overlay" id="rename-bao-modal">
+        <div class="modal" style="max-width:360px">
+            <h3>🏰 堡垒改名</h3>
+            <div id="rename-bao-coord" style="color:#888;font-size:12px;margin-bottom:12px"></div>
+            <input type="text" class="modal-input" id="rename-bao-input" placeholder="输入名称（留空则清除）" maxlength="20" onkeydown="if(event.key==='Enter')confirmRenameBao()">
+            <div class="modal-btns">
+                <button class="modal-btn modal-btn-secondary" onclick="closeRenameBaoModal()">取消</button>
+                <button class="modal-btn modal-btn-primary" onclick="confirmRenameBao()">确定</button>
+            </div>
+        </div>
+    </div>
+    
     <!-- 名称分配弹窗 -->
     <div class="modal-overlay" id="name-modal">
         <div class="modal">
@@ -1821,8 +1819,8 @@
         }
         
         const canvasWrapper = document.getElementById('canvas-wrapper');
-        const canvas = document.getElementById('canvas');
-        const ctx = canvas.getContext('2d');
+        let canvas = document.getElementById('canvas');
+        let ctx = canvas.getContext('2d');
         const tooltip = document.getElementById('tooltip');
         const buildingInfo = document.getElementById('building-info');
         const boundaryWarning = document.getElementById('boundary-warning');
@@ -2174,6 +2172,16 @@
                 document.getElementById('shortcut-bar').classList.add('hidden');
             }
             updateAllianceStats();
+            
+            if (window.innerWidth <= 768) {
+                const toolbar = document.getElementById('toolbar');
+                const toggleBtn = document.getElementById('toolbar-toggle');
+                if (toolbar && toggleBtn) {
+                    toolbar.classList.add('collapsed');
+                    toggleBtn.textContent = '▼ 展开工具栏';
+                    setTimeout(resizeCanvas, 50);
+                }
+            }
             
             // 初始化行军箭头工具
             initArrowTools();
@@ -4430,6 +4438,54 @@
             }
         }
         
+        // 导出/导入坐标转换：内部 x=gameY轴, y=gameX轴(用户X)
+        function exportBuildingCoord(b, type) {
+            const coord = getBuildingDisplayCoord(type, b.x, b.y);
+            return { gameX: b.y, gameY: b.x, displayX: coord.y, displayY: coord.x };
+        }
+        
+        function importBuildingCoord(b) {
+            if (b.gameX !== undefined && b.gameY !== undefined) {
+                return { x: b.gameY, y: b.gameX };
+            }
+            if (b.x !== undefined && b.y !== undefined) {
+                return { x: b.x, y: b.y };
+            }
+            return { x: 0, y: 0 };
+        }
+        
+        function updateCoordDisplay(gameY, gameX) {
+            const text = `(${gameY}, ${gameX})`;
+            document.getElementById('mouse-game').textContent = text;
+            const headerEl = document.getElementById('mouse-game-header');
+            if (headerEl) headerEl.textContent = text;
+        }
+        
+        function drawCoordLabel(cx, cy, coord) {
+            const text = `${coord.y}, ${coord.x}`;
+            const fontSize = 10;
+            ctx.font = `bold ${fontSize}px Arial`;
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+            const metrics = ctx.measureText(text);
+            const padX = 4, padY = 2;
+            const tw = metrics.width + padX * 2;
+            const th = fontSize + padY * 2;
+            ctx.fillStyle = 'rgba(0, 0, 0, 0.7)';
+            ctx.fillRect(cx - tw / 2, cy - th / 2, tw, th);
+            ctx.fillStyle = '#fff';
+            ctx.fillText(text, cx, cy);
+        }
+        
+        function toggleMobileToolbar() {
+            const toolbar = document.getElementById('toolbar');
+            const btn = document.getElementById('toolbar-toggle');
+            if (!toolbar || !btn) return;
+            toolbar.classList.toggle('collapsed');
+            btn.textContent = toolbar.classList.contains('collapsed') ? '▼ 展开工具栏' : '▲ 收起工具栏';
+            setTimeout(resizeCanvas, 50);
+        }
+        
         // ========== 限制平移范围 ==========
         
         function clampPanOffset() {
@@ -4453,7 +4509,7 @@
             
             // 显示坐标（始终显示，即使超出范围）
             // 注：gamePos.y对应X轴(向上)，gamePos.x对应Y轴(向左)，所以显示时交换顺序
-            document.getElementById('mouse-game').textContent = `(${gamePos.y}, ${gamePos.x})`;
+            updateCoordDisplay(gamePos.y, gamePos.x);
             
             // 超出边界警告
             boundaryWarning.style.display = inBounds ? 'none' : 'block';
@@ -4792,32 +4848,49 @@
             }
             
             // 查找点击位置是否有堡垒
-            for (let i = 0; i < buildings.bao.length; i++) {
-                const bao = buildings.bao[i];
-                if (gameX >= bao.x && gameX < bao.x + 2 && gameY >= bao.y && gameY < bao.y + 2) {
-                    // 找到堡垒，弹出改名对话框
-                    renameBao(i, bao);
-                    return;
-                }
+            const baoIdx = findBaoIndexAt(gameX, gameY);
+            if (baoIdx >= 0) {
+                renameBao(baoIdx, buildings.bao[baoIdx]);
+                return;
             }
         }
         
-        // 堡垒改名函数
-        function renameBao(index, bao) {
-            const currentName = bao.name || '';
-            // 坐标显示交换：bao.y对应X轴，bao.x对应Y轴
-            const newName = prompt(`🏰 堡垒改名\n坐标: (${bao.y}, ${bao.x})\n请输入新名称（留空则清除名称）:`, currentName);
-            
-            if (newName !== null) {  // 用户没有点取消
-                buildings.bao[index].name = newName.trim();
-                updateStats();
-                render();
-                if (newName.trim()) {
-                    showValidationMessage(`🏰 堡垒已命名为: ${newName.trim()}`);
-                } else {
-                    showValidationMessage(`🏰 堡垒名称已清除`);
+        // 堡垒改名
+        let renameBaoIndex = -1;
+        
+        function findBaoIndexAt(gameX, gameY) {
+            for (let i = 0; i < buildings.bao.length; i++) {
+                const bao = buildings.bao[i];
+                if (gameX >= bao.x && gameX < bao.x + 2 && gameY >= bao.y && gameY < bao.y + 2) {
+                    return i;
                 }
             }
+            return -1;
+        }
+        
+        function renameBao(index, bao) {
+            renameBaoIndex = index;
+            document.getElementById('rename-bao-coord').textContent = `坐标: (${bao.y}, ${bao.x})`;
+            const input = document.getElementById('rename-bao-input');
+            input.value = bao.name || '';
+            document.getElementById('rename-bao-modal').classList.add('show');
+            setTimeout(() => { input.focus(); input.select(); }, 100);
+        }
+        
+        function closeRenameBaoModal() {
+            document.getElementById('rename-bao-modal').classList.remove('show');
+            renameBaoIndex = -1;
+        }
+        
+        function confirmRenameBao() {
+            if (renameBaoIndex < 0) return;
+            const newName = document.getElementById('rename-bao-input').value.trim();
+            buildings.bao[renameBaoIndex].name = newName;
+            closeRenameBaoModal();
+            updateStats();
+            render();
+            saveMapDataToStorage();
+            showValidationMessage(newName ? `🏰 堡垒已命名为: ${newName}` : '🏰 堡垒名称已清除');
         }
         
         function onMouseLeave() {
@@ -4955,6 +5028,33 @@
             }
         }
         
+        let lastTapTime = 0;
+        let lastTapBuildingKey = null;
+        
+        function tryDoubleTapRename(pos) {
+            const gamePos = screenToGame(pos.x, pos.y);
+            const baoIdx = findBaoIndexAt(gamePos.x, gamePos.y);
+            if (baoIdx < 0) {
+                lastTapTime = 0;
+                lastTapBuildingKey = null;
+                return false;
+            }
+            const key = String(baoIdx);
+            const now = Date.now();
+            if (now - lastTapTime < 400 && lastTapBuildingKey === key) {
+                renameBao(baoIdx, buildings.bao[baoIdx]);
+                lastTapTime = 0;
+                lastTapBuildingKey = null;
+                return true;
+            }
+            lastTapTime = now;
+            lastTapBuildingKey = key;
+            if (!['qi', 'bao', 'keng', 'kuang'].includes(currentTool)) {
+                return true;
+            }
+            return false;
+        }
+        
         function onTouchEnd(e) {
             e.preventDefault();
             
@@ -4979,15 +5079,19 @@
             if (currentTool === 'move') {
                 isDragging = false;
             } else if (!isLongPress && touchDuration < 300 && touchStartPos) {
-                // 短按视为点击，放置建筑（排除长按情况）
-                // 计算触摸移动距离，防止漂移
                 const moveDistance = Math.sqrt(
                     Math.pow(endPos.clientX - touchStartPos.x, 2) + 
                     Math.pow(endPos.clientY - touchStartPos.y, 2)
                 );
-                
-                // 如果移动距离小于15像素，使用开始位置（更精准）
                 const usePos = moveDistance < 15 ? touchStartPos : endPos;
+                
+                if (tryDoubleTapRename(usePos)) {
+                    touchStartPos = null;
+                    isLongPress = false;
+                    hideTooltip();
+                    render();
+                    return;
+                }
                 
                 onMouseMove({ clientX: usePos.x, clientY: usePos.y });
                 if (['qi', 'bao', 'keng', 'kuang'].includes(currentTool) && previewPos) {
@@ -6176,20 +6280,19 @@
                         ctx.fillText(teamName, centerX, drawY + lineHeight * 2.3);
                     }
                     
-                    // 底部显示坐标
-                    ctx.font = '5px Arial';
-                    ctx.fillStyle = 'rgba(255,255,255,0.6)';
-                    ctx.fillText(`${coord.y},${coord.x}`, centerX, drawY + lineHeight * 3.4);
+                    if (currentTool === 'pointer' || zoom >= 0.4) {
+                        drawCoordLabel(centerX, drawY + pSize + 8, coord);
+                    }
                 } else {
-                    // 无名称时显示联盟缩写和坐标
+                    // 无名称时显示联盟缩写
                     if (allianceName) {
                         ctx.font = 'bold 7px Arial';
                         ctx.fillStyle = 'rgba(255,255,255,0.8)';
-                        ctx.fillText(allianceName.substring(0, 2), centerX, drawY + pSize / 2 - 3);
+                        ctx.fillText(allianceName.substring(0, 2), centerX, drawY + pSize / 2 - 2);
                     }
-                    ctx.font = '6px Arial';
-                    ctx.fillStyle = 'rgba(255,255,255,0.5)';
-                    ctx.fillText(`${coord.y},${coord.x}`, centerX, drawY + pSize / 2 + 6);
+                    if (currentTool === 'pointer' || zoom >= 0.4) {
+                        drawCoordLabel(centerX, drawY + pSize + 8, coord);
+                    }
                 }
             }
         }
@@ -6424,12 +6527,11 @@
         }
         
         function exportLayout() {
-            const exportData = { rotation, alliances: ALLIANCES.map(a => a.name), buildings: {} };
+            const exportData = { rotation, mapId: currentMapId, alliances: ALLIANCES.map(a => a.name), buildings: {} };
             for (const type of ['qi', 'bao', 'keng', 'kuang']) {
                 exportData.buildings[type] = buildings[type].map(b => {
-                    const coord = getBuildingDisplayCoord(type, b.x, b.y);
-                    // 交换坐标：内部y对应显示X，内部x对应显示Y
-                    const data = { gameX: b.y, gameY: b.x, displayX: coord.y, displayY: coord.x };
+                    const coord = exportBuildingCoord(b, type);
+                    const data = { ...coord };
                     if (type === 'qi') {
                         data.alliance = b.alliance;
                         data.allianceName = ALLIANCES[b.alliance].name;
@@ -6469,38 +6571,51 @@
                     
                     // 导入旗
                     if (data.buildings && data.buildings.qi) {
-                        buildings.qi = data.buildings.qi.map(b => ({
-                            x: b.gameX,
-                            y: b.gameY,
-                            alliance: b.alliance || 0
-                        }));
+                        buildings.qi = data.buildings.qi.map(b => {
+                            const pos = importBuildingCoord(b);
+                            return { x: pos.x, y: pos.y, alliance: b.alliance || 0 };
+                        });
                     }
                     
                     // 导入堡（包含序号和名称）
                     if (data.buildings && data.buildings.bao) {
-                        buildings.bao = data.buildings.bao.map(b => ({
-                            x: b.gameX,
-                            y: b.gameY,
-                            alliance: b.alliance !== undefined ? b.alliance : null,
-                            index: b.index || null,
-                            name: b.name || ''
-                        }));
+                        buildings.bao = data.buildings.bao.map(b => {
+                            const pos = importBuildingCoord(b);
+                            return {
+                                x: pos.x, y: pos.y,
+                                alliance: b.alliance !== undefined ? b.alliance : null,
+                                index: b.index || null,
+                                name: b.name || ''
+                            };
+                        });
                     }
                     
                     // 导入坑
                     if (data.buildings && data.buildings.keng) {
-                        buildings.keng = data.buildings.keng.map(b => ({
-                            x: b.gameX,
-                            y: b.gameY
-                        }));
+                        buildings.keng = data.buildings.keng.map(b => {
+                            const pos = importBuildingCoord(b);
+                            return { x: pos.x, y: pos.y };
+                        });
                     }
                     
                     // 导入矿
                     if (data.buildings && data.buildings.kuang) {
-                        buildings.kuang = data.buildings.kuang.map(b => ({
-                            x: b.gameX,
-                            y: b.gameY
-                        }));
+                        buildings.kuang = data.buildings.kuang.map(b => {
+                            const pos = importBuildingCoord(b);
+                            return { x: pos.x, y: pos.y };
+                        });
+                    }
+                    
+                    // 导入地图（不加载本地缓存，保留即将导入的建筑）
+                    if (data.mapId && MAP_CONFIGS[data.mapId] && data.mapId !== currentMapId) {
+                        currentMapId = data.mapId;
+                        const mapConfig = MAP_CONFIGS[data.mapId];
+                        GAME_SIZE = mapConfig.size;
+                        MAX_COORD = mapConfig.size - 1;
+                        document.querySelectorAll('.map-tab').forEach(btn => {
+                            btn.classList.toggle('active', btn.id === `map-${data.mapId}`);
+                        });
+                        updateMapTitle();
                     }
                     
                     // 导入旋转角度
@@ -6512,6 +6627,7 @@
                     
                     updateCoverage();
                     updateStats();
+                    saveMapDataToStorage();
                     render();
                     showValidationMessage(`已导入: 旗${buildings.qi.length} 堡${buildings.bao.length} 坑${buildings.keng.length} 矿${buildings.kuang.length}`);
                     
@@ -6526,38 +6642,42 @@
         
         // ========== 保存为图片 ==========
         function saveAsImage() {
-            // 创建临时canvas来绘制导出用图片
-            const tempCanvas = document.createElement('canvas');
-            const scale = 2; // 2倍清晰度
-            tempCanvas.width = canvas.width * scale;
-            tempCanvas.height = canvas.height * scale;
-            const tempCtx = tempCanvas.getContext('2d');
+            const scale = 4;
+            const origCanvas = canvas;
+            const origCtx = ctx;
+            const w = origCanvas.width;
+            const h = origCanvas.height;
             
-            // 缩放以获得更清晰的图片
-            tempCtx.scale(scale, scale);
+            const exportCanvas = document.createElement('canvas');
+            exportCanvas.width = w * scale;
+            exportCanvas.height = h * scale;
+            const exportCtx = exportCanvas.getContext('2d');
+            exportCtx.scale(scale, scale);
             
-            // 复制当前canvas内容
-            tempCtx.fillStyle = '#F0F8FF';
-            tempCtx.fillRect(0, 0, canvas.width, canvas.height);
-            tempCtx.drawImage(canvas, 0, 0);
+            canvas = exportCanvas;
+            ctx = exportCtx;
+            render();
             
-            // 添加版权水印（如果未去除）
             if (!watermarkRemoved) {
-                tempCtx.globalAlpha = 0.3;
-                tempCtx.font = 'bold 24px Arial';
-                tempCtx.fillStyle = '#fff';
-                tempCtx.textAlign = 'right';
-                tempCtx.textBaseline = 'bottom';
-                tempCtx.fillText('© 2607全民代表大会', canvas.width - 20, canvas.height - 20);
+                exportCtx.save();
+                exportCtx.globalAlpha = 0.3;
+                exportCtx.font = 'bold 24px Arial';
+                exportCtx.fillStyle = '#fff';
+                exportCtx.textAlign = 'right';
+                exportCtx.textBaseline = 'bottom';
+                exportCtx.fillText('© 2607全民代表大会', w - 20, h - 20);
+                exportCtx.restore();
             }
             
-            // 导出为图片
+            canvas = origCanvas;
+            ctx = origCtx;
+            
             const link = document.createElement('a');
             link.download = 'layout-' + new Date().toISOString().slice(0,10) + '.png';
-            link.href = tempCanvas.toDataURL('image/png');
+            link.href = exportCanvas.toDataURL('image/png');
             link.click();
             
-            showValidationMessage('已保存图片');
+            showValidationMessage('已保存高清图片');
         }
         
         // ========== 名称分配功能 ==========
