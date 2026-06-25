@@ -24,139 +24,159 @@
             color: #fff;
         }
         
-        /* 手机端工具栏折叠 */
-        .mobile-toolbar-toggle {
-            display: none;
-        }
+        /* 手机端专用工具栏 */
+        .mobile-tool-dock, .mobile-tool-more, .mobile-action-more { display: none; }
         
         /* 响应式布局 */
         @media (max-width: 768px) {
             body { flex-direction: column; min-height: 0; }
             
-            /* 顶部工具栏 - 紧凑单行布局 */
             .toolbar { 
                 width: 100% !important; min-width: 100% !important; 
                 flex: 0 0 auto;
-                flex-direction: row !important; flex-wrap: wrap;
-                padding: 4px 6px !important; gap: 3px !important;
-                max-height: none; overflow-y: visible;
+                flex-direction: column !important;
+                padding: 4px 6px !important; gap: 0 !important;
+                max-height: none; overflow: visible;
                 border-right: none; border-bottom: 1px solid #C8E0EC;
-                padding-bottom: 4px !important;
             }
             .toolbar h2 { display: none; }
-            .mobile-toolbar-toggle {
-                display: block;
-                flex: 0 0 100%;
-                order: 0;
-                padding: 3px 8px;
-                border: none;
-                border-radius: 4px;
-                background: rgba(200,224,236,0.5);
-                color: #5a7a8a;
-                font-size: 10px;
-                cursor: pointer;
-                text-align: center;
-            }
-            .toolbar.collapsed .alliance-section,
-            .toolbar.collapsed .mobile-tools-row { display: none !important; }
+            .mobile-toolbar-toggle { display: none !important; }
+            .mobile-tools-row { display: none !important; }
             
-            /* 联盟选择 - 仅颜色按钮 */
             .alliance-section { 
-                flex: 0 0 100%; order: 1; padding: 2px 4px !important;
+                padding: 2px 4px !important;
                 background: transparent;
             }
             .alliance-section h3 { display: none; }
             .alliance-stats { display: none !important; }
             .alliance-grid { 
-                grid-template-columns: repeat(6, 1fr) !important; gap: 2px; 
+                grid-template-columns: repeat(6, 1fr) !important; gap: 3px; 
             }
             .alliance-btn { 
-                padding: 4px 1px !important; font-size: 8px !important; 
+                padding: 5px 2px !important; font-size: 8px !important; 
                 border-radius: 4px;
             }
             .alliance-btn .alliance-name { display: none !important; }
-            .alliance-color { width: 16px !important; height: 16px !important; }
+            .alliance-color { width: 18px !important; height: 18px !important; }
             
-            /* 建筑+工具合并为一行图标按钮 */
-            .mobile-tools-row {
-                flex: 0 0 100%; order: 2;
-                display: grid;
-                grid-template-columns: repeat(9, 1fr);
+            .rotation-control, .action-btns, .rules-panel { display: none !important; }
+            
+            /* 手机端工具切换栏 - 始终可见 */
+            .mobile-tool-dock {
+                display: block;
+                flex: 0 0 auto;
+                background: rgba(255,255,255,0.95);
+                border-bottom: 1px solid #C8E0EC;
+                padding: 4px 6px;
+            }
+            .mobile-tool-dock-inner {
+                display: flex;
+                gap: 5px;
+                overflow-x: auto;
+                -webkit-overflow-scrolling: touch;
+                scrollbar-width: none;
+                padding-bottom: 1px;
+            }
+            .mobile-tool-dock-inner::-webkit-scrollbar { display: none; }
+            .mobile-tool-btn {
+                flex: 1 0 auto;
+                min-width: 52px;
+                padding: 6px 4px;
+                border: 2px solid transparent;
+                border-radius: 8px;
+                background: rgba(200,224,236,0.35);
+                color: #2c3e50;
+                font-size: 9px;
+                cursor: pointer;
+                display: flex;
+                flex-direction: column;
+                align-items: center;
                 gap: 2px;
-                padding: 2px;
-                background: rgba(200,224,236,0.15);
-                border-radius: 4px;
             }
-            .mobile-tools-row .tool-section {
-                display: contents;
+            .mobile-tool-btn span:first-child { font-size: 18px; line-height: 1; }
+            .mobile-tool-btn small { font-size: 8px; white-space: nowrap; }
+            .mobile-tool-btn.active {
+                border-color: #2980b9;
+                background: rgba(41,128,185,0.15);
+                box-shadow: 0 0 6px rgba(41,128,185,0.3);
             }
-            .tool-section { 
-                flex: 0 0 100%; order: 2; padding: 2px !important;
-                background: rgba(200,224,236,0.15); min-width: auto;
-                display: grid !important;
-                grid-template-columns: repeat(9, 1fr);
-                gap: 2px;
-                border-radius: 4px;
+            .mobile-tool-btn.tool-more { background: rgba(155,89,182,0.15); }
+            
+            .mobile-tool-more, .mobile-action-more {
+                display: none;
+                position: fixed;
+                left: 0; right: 0;
+                background: rgba(255,255,255,0.98);
+                border-top: 1px solid #C8E0EC;
+                padding: 8px 10px;
+                z-index: 1001;
+                box-shadow: 0 -4px 16px rgba(0,0,0,0.12);
             }
-            .tool-section h3 { display: none; }
-            .tool-btn { 
-                padding: 6px 2px !important; font-size: 8px !important; 
-                margin-bottom: 0 !important;
-                flex-direction: column !important;
+            .mobile-tool-more.show, .mobile-action-more.show { display: block; }
+            .mobile-tool-more { bottom: 48px; }
+            .mobile-action-more { bottom: 48px; }
+            .mobile-more-grid {
+                display: flex;
+                flex-wrap: wrap;
+                gap: 8px;
                 justify-content: center;
-                width: auto !important;
-                min-height: 0;
             }
-            .tool-btn span:last-child { display: none !important; }
-            .tool-icon { width: 18px !important; height: 18px !important; font-size: 14px !important; }
+            .mobile-more-btn {
+                min-width: 64px;
+                padding: 10px 8px;
+                border: none;
+                border-radius: 8px;
+                background: rgba(200,224,236,0.4);
+                color: #2c3e50;
+                font-size: 10px;
+                cursor: pointer;
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                gap: 3px;
+            }
+            .mobile-more-btn span { font-size: 20px; }
             
-            .rotation-control { display: none !important; }
-            .action-btns { display: none !important; }
-            .rules-panel { display: none !important; }
-            
-            /* 主区域占满剩余空间 */
             .main-area { flex: 1 1 0; min-height: 0; padding-bottom: 48px; display: flex; flex-direction: column; }
             .canvas-wrapper { flex: 1 1 0; min-height: 0; }
             
-            /* 地图Tab紧凑 */
-            .map-tabs { margin: 0 4px !important; padding: 2px !important; }
-            .map-tab { padding: 4px 2px !important; font-size: 9px !important; }
+            .map-tabs { margin: 0 !important; padding: 2px 4px !important; overflow-x: auto; flex-wrap: nowrap; }
+            .map-tab { padding: 5px 8px !important; font-size: 10px !important; white-space: nowrap; flex: 0 0 auto; }
             .map-tab .map-size { display: none; }
             
-            /* Header - 极简 */
-            .header { 
-                padding: 3px 6px !important; 
-                flex-wrap: nowrap;
-            }
+            .header { padding: 3px 6px !important; flex-wrap: nowrap; }
             #map-title { display: none !important; }
             .header-info { 
                 flex: 1; justify-content: space-between; 
                 gap: 4px !important; font-size: 9px !important;
-                flex-wrap: nowrap;
             }
-            .header-info span { padding: 2px 4px !important; }
             .header-info .header-rotation { display: none !important; }
             .header-info .coord-mobile { display: flex !important; }
-            #btn-zoom-out, #btn-zoom-in { width: 20px !important; height: 20px !important; font-size: 11px !important; }
-            #btn-zoom-reset { display: none !important; }
-            #btn-remove-watermark { display: none !important; }
-            #zoom-level { min-width: 32px !important; font-size: 9px !important; }
+            #btn-zoom-reset, #btn-remove-watermark { display: none !important; }
             
-            /* 状态栏移到工具栏上方，仅保留坐标 */
             .status-bar {
                 position: fixed;
                 bottom: 48px; left: 0; right: 0;
-                height: 24px;
-                padding: 0 8px;
-                font-size: 9px;
-                z-index: 998;
+                height: 22px; padding: 0 8px; font-size: 9px; z-index: 998;
             }
             .status-bar-left { display: none !important; }
             .status-bar-right { gap: 6px; width: 100%; justify-content: center; }
-            .status-bar-item.coord { font-size: 10px; }
             
-            .copyright-footer { display: none; }
-            .mobile-toolbar { display: flex !important; }
+            .mobile-toolbar {
+                display: flex !important;
+                overflow-x: auto;
+                -webkit-overflow-scrolling: touch;
+                scrollbar-width: none;
+                flex-wrap: nowrap;
+                justify-content: flex-start;
+                padding: 5px 8px;
+            }
+            .mobile-toolbar::-webkit-scrollbar { display: none; }
+            .mobile-toolbar-btn {
+                flex: 1 0 auto;
+                min-width: 56px;
+                max-width: none;
+            }
         }
         
         .header-info .coord-mobile { display: none; }
@@ -199,29 +219,25 @@
         
         /* 超小屏幕 (手机竖屏) 优化 */
         @media (max-width: 480px) {
-            .toolbar { padding: 3px 4px !important; }
-            .alliance-btn { padding: 3px 0 !important; }
-            .alliance-color { width: 14px !important; height: 14px !important; }
-            .tool-section { grid-template-columns: repeat(9, 1fr) !important; }
-            .tool-btn { padding: 5px 1px !important; }
-            .tool-icon { font-size: 12px !important; width: 16px !important; height: 16px !important; }
-            .map-tab { font-size: 8px !important; padding: 3px 1px !important; }
-            .mobile-toolbar { padding: 3px 4px; gap: 3px; }
-            .mobile-toolbar-btn { padding: 5px 1px; font-size: 7px; max-width: 52px; }
-            .mobile-toolbar-btn .mobile-icon { font-size: 13px; }
-            .status-bar { bottom: 42px; height: 22px; }
-            .main-area { padding-bottom: 42px; }
+            .alliance-color { width: 16px !important; height: 16px !important; }
+            .mobile-tool-btn { min-width: 46px; padding: 5px 3px; }
+            .mobile-tool-btn span:first-child { font-size: 16px; }
+            .map-tab { font-size: 9px !important; padding: 4px 6px !important; }
+            .mobile-toolbar-btn { min-width: 50px; padding: 6px 3px; font-size: 8px; }
+            .status-bar { bottom: 44px; height: 20px; }
+            .main-area { padding-bottom: 44px; }
+            .mobile-tool-more, .mobile-action-more { bottom: 44px; }
         }
         
         /* 横屏模式优化 */
         @media (max-width: 768px) and (orientation: landscape) {
-            .toolbar { max-height: 72px !important; overflow: hidden; }
-            .alliance-section { flex: 0 0 auto !important; max-width: 38%; }
-            .tool-section { flex: 1 1 auto !important; grid-template-columns: repeat(9, 1fr) !important; }
+            .toolbar { padding: 2px 6px !important; }
+            .mobile-tool-dock { padding: 3px 6px; }
             .main-area { padding-bottom: 38px; }
-            .mobile-toolbar { padding: 3px; }
-            .mobile-toolbar-btn { padding: 3px 1px; font-size: 7px; max-width: 48px; }
+            .mobile-toolbar { padding: 3px 6px; }
+            .mobile-toolbar-btn { min-width: 48px; padding: 4px 2px; font-size: 7px; }
             .status-bar { bottom: 38px; }
+            .mobile-tool-more, .mobile-action-more { bottom: 38px; }
         }
         
         .toolbar {
@@ -1275,7 +1291,6 @@
     </div>
     
     <div class="toolbar" id="toolbar">
-        <button class="mobile-toolbar-toggle" id="toolbar-toggle" onclick="toggleMobileToolbar()">▲ 收起工具栏</button>
         <h2><span class="logo-earth">🌍</span> 管理助手</h2>
         
         <!-- 地图选择移到header上方 -->
@@ -1363,6 +1378,18 @@
         <!-- 地图Tab页 -->
         <div class="map-tabs" id="map-tabs">
             <!-- 由JS生成 -->
+        </div>
+        
+        <!-- 手机端工具切换栏 -->
+        <div class="mobile-tool-dock" id="mobile-tool-dock">
+            <div class="mobile-tool-dock-inner">
+                <button class="mobile-tool-btn active" data-tool="move" onclick="selectTool('move')"><span>✋</span><small>移动</small></button>
+                <button class="mobile-tool-btn" data-tool="qi" onclick="selectTool('qi')"><span>🚩</span><small>旗</small></button>
+                <button class="mobile-tool-btn" data-tool="bao" onclick="selectTool('bao')"><span>🏰</span><small>堡</small></button>
+                <button class="mobile-tool-btn" data-tool="delete" onclick="selectTool('delete')"><span>🗑️</span><small>删除</small></button>
+                <button class="mobile-tool-btn" data-tool="pointer" onclick="selectTool('pointer')"><span>👆</span><small>坐标</small></button>
+                <button class="mobile-tool-btn tool-more" onclick="toggleMobileToolMore()"><span>⋯</span><small>更多</small></button>
+            </div>
         </div>
         
         <div class="header" style="border-radius: 0 0 8px 8px; margin-top: 0;">
@@ -1677,33 +1704,39 @@
     <!-- 移动端底部工具栏 -->
     <div class="mobile-toolbar" id="mobile-toolbar">
         <button class="mobile-toolbar-btn" onclick="undo()" id="mobile-btn-undo">
-            <span class="mobile-icon">↩️</span>
-            <span>撤销</span>
+            <span class="mobile-icon">↩️</span><span>撤销</span>
         </button>
         <button class="mobile-toolbar-btn" onclick="redo()" id="mobile-btn-redo">
-            <span class="mobile-icon">↪️</span>
-            <span>重做</span>
+            <span class="mobile-icon">↪️</span><span>重做</span>
         </button>
         <button class="mobile-toolbar-btn" onclick="centerView()">
-            <span class="mobile-icon">🎯</span>
-            <span>回中心</span>
+            <span class="mobile-icon">🎯</span><span>回中心</span>
         </button>
         <button class="mobile-toolbar-btn btn-success" onclick="exportLayout()">
-            <span class="mobile-icon">📤</span>
-            <span>导出</span>
+            <span class="mobile-icon">📤</span><span>导出</span>
         </button>
-        <button class="mobile-toolbar-btn btn-success" onclick="importLayout()">
-            <span class="mobile-icon">📥</span>
-            <span>导入</span>
+        <button class="mobile-toolbar-btn tool-more" onclick="toggleMobileActionMore()">
+            <span class="mobile-icon">⋯</span><span>更多</span>
         </button>
-        <button class="mobile-toolbar-btn" onclick="saveAsImage()">
-            <span class="mobile-icon">🖼️</span>
-            <span>保存图</span>
-        </button>
-        <button class="mobile-toolbar-btn btn-danger" onclick="openCountdownPanel()">
-            <span class="mobile-icon">🔊</span>
-            <span>倒计时</span>
-        </button>
+    </div>
+    
+    <!-- 手机端次要工具（不常用） -->
+    <div class="mobile-tool-more" id="mobile-tool-more">
+        <div class="mobile-more-grid">
+            <button class="mobile-more-btn" onclick="selectTool('keng');closeMobilePanels()"><span>⭕</span>坑</button>
+            <button class="mobile-more-btn" onclick="selectTool('kuang');closeMobilePanels()"><span>💎</span>矿</button>
+            <button class="mobile-more-btn" onclick="selectTool('drag');closeMobilePanels()"><span>🔀</span>拖动</button>
+            <button class="mobile-more-btn" onclick="toggleGridSnap();closeMobilePanels()"><span>🧲</span>吸附</button>
+        </div>
+    </div>
+    
+    <!-- 手机端次要操作（不常用） -->
+    <div class="mobile-action-more" id="mobile-action-more">
+        <div class="mobile-more-grid">
+            <button class="mobile-more-btn" onclick="importLayout();closeMobilePanels()"><span>📥</span>导入</button>
+            <button class="mobile-more-btn" onclick="saveAsImage();closeMobilePanels()"><span>🖼️</span>保存图</button>
+            <button class="mobile-more-btn" onclick="openCountdownPanel();closeMobilePanels()"><span>🔊</span>倒计时</button>
+        </div>
     </div>
     
     <!-- 堡垒改名弹窗 -->
@@ -2172,16 +2205,6 @@
                 document.getElementById('shortcut-bar').classList.add('hidden');
             }
             updateAllianceStats();
-            
-            if (window.innerWidth <= 768) {
-                const toolbar = document.getElementById('toolbar');
-                const toggleBtn = document.getElementById('toolbar-toggle');
-                if (toolbar && toggleBtn) {
-                    toolbar.classList.add('collapsed');
-                    toggleBtn.textContent = '▼ 展开工具栏';
-                    setTimeout(resizeCanvas, 50);
-                }
-            }
             
             // 初始化行军箭头工具
             initArrowTools();
@@ -4461,35 +4484,63 @@
             if (headerEl) headerEl.textContent = text;
         }
         
-        function drawCoordLabel(cx, cy, coord, maxWidth) {
+        function drawCoordLabel(cx, cy, coord, cellSize, clipRect) {
+            ctx.save();
+            if (clipRect) {
+                ctx.beginPath();
+                ctx.rect(clipRect.x + 0.5, clipRect.y + 0.5, clipRect.w - 1, clipRect.h - 1);
+                ctx.clip();
+            }
+            
             const text = `${coord.y}, ${coord.x}`;
-            let fontSize = 8;
+            const pSize = cellSize || 20;
+            const cellScreenH = pSize * zoom;
+            const minScreenFont = 7;
+            const maxScreenFont = Math.max(minScreenFont, Math.min(cellScreenH * 0.42, 11));
+            const screenFont = Math.max(minScreenFont, Math.min(maxScreenFont, 10));
+            let fontSize = screenFont / zoom;
+            
             ctx.font = `bold ${fontSize}px Arial`;
             let metrics = ctx.measureText(text);
-            const limit = maxWidth || 80;
-            while (metrics.width > limit && fontSize > 5) {
-                fontSize--;
+            const limit = pSize - 2;
+            while (metrics.width > limit && fontSize > 4 / zoom) {
+                fontSize -= 0.5;
                 ctx.font = `bold ${fontSize}px Arial`;
                 metrics = ctx.measureText(text);
             }
+            
+            const labelX = clipRect ? clipRect.x + clipRect.w / 2 : cx;
+            const labelY = clipRect ? clipRect.y + clipRect.h - fontSize * 0.55 - 1 : cy;
+            
             ctx.textAlign = 'center';
             ctx.textBaseline = 'middle';
             const padX = 2, padY = 1;
             const tw = metrics.width + padX * 2;
             const th = fontSize + padY * 2;
-            ctx.fillStyle = 'rgba(0, 0, 0, 0.75)';
-            ctx.fillRect(cx - tw / 2, cy - th / 2, tw, th);
+            ctx.fillStyle = 'rgba(0, 0, 0, 0.8)';
+            ctx.fillRect(labelX - tw / 2, labelY - th / 2, tw, th);
             ctx.fillStyle = '#fff';
-            ctx.fillText(text, cx, cy);
+            ctx.fillText(text, labelX, labelY);
+            ctx.restore();
         }
         
-        function toggleMobileToolbar() {
-            const toolbar = document.getElementById('toolbar');
-            const btn = document.getElementById('toolbar-toggle');
-            if (!toolbar || !btn) return;
-            toolbar.classList.toggle('collapsed');
-            btn.textContent = toolbar.classList.contains('collapsed') ? '▼ 展开工具栏' : '▲ 收起工具栏';
-            setTimeout(resizeCanvas, 50);
+        function toggleMobileToolMore() {
+            const panel = document.getElementById('mobile-tool-more');
+            const actionPanel = document.getElementById('mobile-action-more');
+            if (actionPanel) actionPanel.classList.remove('show');
+            if (panel) panel.classList.toggle('show');
+        }
+        
+        function toggleMobileActionMore() {
+            const panel = document.getElementById('mobile-action-more');
+            const toolPanel = document.getElementById('mobile-tool-more');
+            if (toolPanel) toolPanel.classList.remove('show');
+            if (panel) panel.classList.toggle('show');
+        }
+        
+        function closeMobilePanels() {
+            document.getElementById('mobile-tool-more')?.classList.remove('show');
+            document.getElementById('mobile-action-more')?.classList.remove('show');
         }
         
         // ========== 限制平移范围 ==========
@@ -4942,6 +4993,7 @@
         
         function onTouchStart(e) {
             e.preventDefault();
+            closeMobilePanels();
             touchStartTime = Date.now();
             isLongPress = false;
             
@@ -5261,6 +5313,16 @@
             document.querySelectorAll('.tool-btn').forEach(btn => btn.classList.remove('active'));
             const toolBtn = document.getElementById('tool-' + tool);
             if (toolBtn) toolBtn.classList.add('active');
+            
+            document.querySelectorAll('.mobile-tool-btn[data-tool]').forEach(btn => {
+                btn.classList.toggle('active', btn.dataset.tool === tool);
+            });
+            const secondaryTools = ['keng', 'kuang', 'drag'];
+            document.querySelectorAll('.mobile-tool-btn.tool-more').forEach(btn => {
+                btn.classList.toggle('active', secondaryTools.includes(tool));
+            });
+            
+            closeMobilePanels();
             
             // 切换工具时清除选中状态
             if (tool !== 'drag') {
@@ -6285,16 +6347,18 @@
                         ctx.fillText(teamName, centerX, drawY + 12);
                     }
                     
-                    // 坐标显示在格子底部内侧
-                    drawCoordLabel(centerX, drawY + pSize - 5, coord, pSize - 2);
+                    // 坐标显示在格子底部内侧（裁剪在格子范围内）
+                    const cellClip = { x: drawX, y: drawY, w: pSize, h: pSize };
+                    drawCoordLabel(centerX, 0, coord, pSize, cellClip);
                 } else {
-                    // 无名称时：联盟缩写在上方，坐标在格子中央偏下
+                    // 无名称时：联盟缩写在上方，坐标在格子内
                     if (allianceName) {
-                        ctx.font = 'bold 6px Arial';
+                        ctx.font = `bold ${Math.max(6, 6 / zoom)}px Arial`;
                         ctx.fillStyle = 'rgba(255,255,255,0.85)';
-                        ctx.fillText(allianceName.substring(0, 2), centerX, drawY + 7);
+                        ctx.fillText(allianceName.substring(0, 2), centerX, drawY + 7 / zoom + 4);
                     }
-                    drawCoordLabel(centerX, drawY + pSize - 5, coord, pSize - 2);
+                    const cellClip = { x: drawX, y: drawY, w: pSize, h: pSize };
+                    drawCoordLabel(centerX, 0, coord, pSize, cellClip);
                 }
             }
         }
