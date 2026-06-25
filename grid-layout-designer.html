@@ -4461,17 +4461,23 @@
             if (headerEl) headerEl.textContent = text;
         }
         
-        function drawCoordLabel(cx, cy, coord) {
+        function drawCoordLabel(cx, cy, coord, maxWidth) {
             const text = `${coord.y}, ${coord.x}`;
-            const fontSize = 10;
+            let fontSize = 8;
             ctx.font = `bold ${fontSize}px Arial`;
+            let metrics = ctx.measureText(text);
+            const limit = maxWidth || 80;
+            while (metrics.width > limit && fontSize > 5) {
+                fontSize--;
+                ctx.font = `bold ${fontSize}px Arial`;
+                metrics = ctx.measureText(text);
+            }
             ctx.textAlign = 'center';
             ctx.textBaseline = 'middle';
-            const metrics = ctx.measureText(text);
-            const padX = 4, padY = 2;
+            const padX = 2, padY = 1;
             const tw = metrics.width + padX * 2;
             const th = fontSize + padY * 2;
-            ctx.fillStyle = 'rgba(0, 0, 0, 0.7)';
+            ctx.fillStyle = 'rgba(0, 0, 0, 0.75)';
             ctx.fillRect(cx - tw / 2, cy - th / 2, tw, th);
             ctx.fillStyle = '#fff';
             ctx.fillText(text, cx, cy);
@@ -6244,7 +6250,6 @@
                 
                 // 多行显示
                 const centerX = drawX + pSize / 2;
-                const lineHeight = pSize / 4;
                 
                 // 左上角联盟标记（小圆点+缩写）
                 if (allianceConfig) {
@@ -6267,32 +6272,29 @@
                     if (displayName.length > 4) {
                         displayName = displayName.substring(0, 3) + '…';
                     }
-                    ctx.font = 'bold 8px Arial';
+                    ctx.font = 'bold 7px Arial';
                     ctx.fillStyle = '#fff';
-                    ctx.fillText(displayName, centerX, drawY + lineHeight * 1.2);
+                    ctx.fillText(displayName, centerX, drawY + 6);
                     
-                    // 显示小队名称（不显示战力）
+                    // 显示小队名称
                     if (memberTeam) {
-                        ctx.font = 'bold 6px Arial';
+                        ctx.font = 'bold 5px Arial';
                         ctx.fillStyle = '#87ceeb';
                         let teamName = memberTeam.name;
                         if (teamName.length > 4) teamName = teamName.substring(0, 3) + '…';
-                        ctx.fillText(teamName, centerX, drawY + lineHeight * 2.3);
+                        ctx.fillText(teamName, centerX, drawY + 12);
                     }
                     
-                    if (currentTool === 'pointer' || zoom >= 0.4) {
-                        drawCoordLabel(centerX, drawY + pSize + 8, coord);
-                    }
+                    // 坐标显示在格子底部内侧
+                    drawCoordLabel(centerX, drawY + pSize - 5, coord, pSize - 2);
                 } else {
-                    // 无名称时显示联盟缩写
+                    // 无名称时：联盟缩写在上方，坐标在格子中央偏下
                     if (allianceName) {
-                        ctx.font = 'bold 7px Arial';
-                        ctx.fillStyle = 'rgba(255,255,255,0.8)';
-                        ctx.fillText(allianceName.substring(0, 2), centerX, drawY + pSize / 2 - 2);
+                        ctx.font = 'bold 6px Arial';
+                        ctx.fillStyle = 'rgba(255,255,255,0.85)';
+                        ctx.fillText(allianceName.substring(0, 2), centerX, drawY + 7);
                     }
-                    if (currentTool === 'pointer' || zoom >= 0.4) {
-                        drawCoordLabel(centerX, drawY + pSize + 8, coord);
-                    }
+                    drawCoordLabel(centerX, drawY + pSize - 5, coord, pSize - 2);
                 }
             }
         }
