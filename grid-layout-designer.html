@@ -1207,6 +1207,20 @@
             min-height: 18px; transition: opacity 0.3s;
         }
         .login-footer { color: #7f8c8d; font-size: 10px; margin-top: 30px; }
+        .login-tabs { display: flex; gap: 8px; margin-bottom: 16px; }
+        .login-tab {
+            flex: 1; padding: 8px; border: none; border-radius: 6px;
+            background: rgba(200,224,236,0.4); color: #5a7a8a; cursor: pointer; font-size: 12px;
+        }
+        .login-tab.active { background: #3498db; color: #fff; font-weight: bold; }
+        .login-hint { color: #95a5a6; font-size: 10px; margin: -8px 0 12px; text-align: left; }
+        .cloud-sync-status {
+            font-size: 9px; padding: 2px 6px; border-radius: 4px;
+            background: rgba(200,224,236,0.4); color: #5a7a8a;
+        }
+        .cloud-sync-status.ok { color: #27ae60; }
+        .cloud-sync-status.error { color: #e74c3c; }
+        .cloud-sync-status.saving { color: #f39c12; }
         
         .rule-item { background: rgba(255,255,255,0.05); padding: 8px; border-radius: 6px; margin-bottom: 6px; border-left: 3px solid #4ecca3; }
         .rule-item.warning { border-left-color: #ffd93d; }
@@ -1281,10 +1295,16 @@
         </svg>
         <div class="login-box">
             <h2><span class="logo-earth">🌍</span> 管理助手</h2>
-            <div class="subtitle">❄️ 请输入账号密码登录 ❄️</div>
-            <input type="text" class="login-input" id="login-username" placeholder="用户名" autocomplete="off">
-            <input type="password" class="login-input" id="login-password" placeholder="密码" autocomplete="off">
-            <button class="login-btn" onclick="handleLogin()">登 录</button>
+            <div class="login-tabs">
+                <button class="login-tab active" id="login-tab-signin" onclick="switchLoginTab('signin')">登录</button>
+                <button class="login-tab" id="login-tab-signup" onclick="switchLoginTab('signup')">注册</button>
+            </div>
+            <div class="subtitle" id="login-subtitle">云端账号登录，数据自动同步</div>
+            <input type="text" class="login-input" id="login-username" placeholder="用户名" autocomplete="username">
+            <input type="password" class="login-input" id="login-password" placeholder="密码" autocomplete="current-password">
+            <input type="text" class="login-input" id="login-workspace" placeholder="工作区 ID（联盟共用同一 ID 即可协作）" autocomplete="off">
+            <div class="login-hint">💡 同一工作区 ID 的用户共享布局数据，如：2607-kvk</div>
+            <button class="login-btn" id="login-submit-btn" onclick="handleLogin()">登 录</button>
             <div class="login-error" id="login-error"></div>
             <div class="login-footer">© 2607全民代表大会 | 技术：兔弟</div>
         </div>
@@ -1298,7 +1318,10 @@
         <div class="alliance-section">
             <h3 style="display:flex;justify-content:space-between;align-items:center;">
                 🏴 选择联盟
-                <span id="save-indicator" style="font-size:9px;color:#27ae60;opacity:0;transition:opacity 0.3s;">✓ 已保存</span>
+                <span style="display:flex;align-items:center;gap:4px;">
+                    <span id="cloud-sync-status" class="cloud-sync-status" style="display:none;"></span>
+                    <span id="save-indicator" style="font-size:9px;color:#27ae60;opacity:0;transition:opacity 0.3s;">✓ 已保存</span>
+                </span>
             </h3>
             <div class="alliance-grid" id="alliance-grid">
                 <!-- 联盟按钮由JS生成 -->
@@ -1775,6 +1798,9 @@
         </div>
     </div>
 
+    <script src="cloud-config.js"></script>
+    <script>window.CLOUD_CONFIG = window.CLOUD_CONFIG || { enabled: false, allowOfflineFallback: true, defaultWorkspace: '2607' };</script>
+    <script src="cloud-sync.js"></script>
     <script>
         /**
          * ============================================
@@ -1801,49 +1827,270 @@
             console.log('%c本程序由 2607全民代表大会 授权，技术支持：兔弟，未经授权禁止复制、修改或分发。', 'color: #f39c12; font-size: 14px;');
         })();
         
-        // ========== 登录验证 ==========
+        // ========== 登录与云端同步 ==========
         const AUTH_USER = '2607';
         const AUTH_PASS = 'godm';
+        let loginMode = 'signin';
+        let cloudReady = false;
+        let appDataBootstrapped = false;
+        
+        function switchLoginTab(mode) {
+            loginMode = mode;
+            document.getElementById('login-tab-signin').classList.toggle('active', mode === 'signin');
+            document.getElementById('login-tab-signup').classList.toggle('active', mode === 'signup');
+            document.getElementById('login-submit-btn').textContent = mode === 'signin' ? '登 录' : '注 册';
+            document.getElementById('login-subtitle').textContent = mode === 'signin'
+                ? '云端账号登录，数据自动同步' : '创建账号，注册后可直接登录';
+            document.getElementById('login-error').textContent = '';
+        }
+        
+        function initCloudSync() {
+            if (typeof CloudSync === 'undefined') return false;
+            const cfg = window.CLOUD_CONFIG || { enabled: false };
+            cloudReady = CloudSync.init(cfg);
+            CloudSync.onStatusChange = updateCloudSyncStatus;
+            if (cloudReady) {
+                const wsInput = document.getElementById('login-workspace');
+                if (wsInput && !wsInput.value) {
+                    wsInput.value = cfg.defaultWorkspace || '2607';
+                }
+                const statusEl = document.getElementById('cloud-sync-status');
+                if (statusEl) statusEl.style.display = 'inline';
+            } else {
+                const wsRow = document.getElementById('login-workspace');
+                if (wsRow) wsRow.style.display = 'none';
+                document.querySelector('.login-hint').style.display = 'none';
+                document.getElementById('login-subtitle').textContent = '❄️ 离线模式：请输入账号密码 ❄️';
+            }
+            return cloudReady;
+        }
+        
+        function updateCloudSyncStatus(status, message) {
+            const el = document.getElementById('cloud-sync-status');
+            if (!el) return;
+            el.style.display = 'inline';
+            el.className = 'cloud-sync-status ' + (status || '');
+            const labels = { loading: '☁️', saving: '☁️', ok: '☁️', error: '⚠️' };
+            el.textContent = (labels[status] || '☁️') + ' ' + (message || '');
+            el.title = (message || '') + '（点击刷新云端数据）';
+            el.style.cursor = cloudReady ? 'pointer' : 'default';
+            el.onclick = cloudReady ? refreshCloudData : null;
+        }
         
         function checkLogin() {
+            if (cloudReady && CloudSync.isLoggedIn()) return true;
             return sessionStorage.getItem('loggedIn') === 'true';
         }
         
-        function handleLogin() {
+        async function handleLogin() {
             const username = document.getElementById('login-username').value.trim();
             const password = document.getElementById('login-password').value;
+            const workspace = document.getElementById('login-workspace').value.trim();
             const errorEl = document.getElementById('login-error');
+            const submitBtn = document.getElementById('login-submit-btn');
             
-            if (username === AUTH_USER && password === AUTH_PASS) {
-                sessionStorage.setItem('loggedIn', 'true');
-                document.getElementById('login-overlay').classList.add('hidden');
-                errorEl.textContent = '';
-                initApp();
-            } else {
-                errorEl.textContent = '用户名或密码错误';
-                document.getElementById('login-password').value = '';
+            if (!username || !password) {
+                errorEl.textContent = '请输入用户名和密码';
+                return;
+            }
+            
+            submitBtn.disabled = true;
+            submitBtn.textContent = loginMode === 'signin' ? '登录中…' : '注册中…';
+            errorEl.textContent = '';
+            
+            try {
+                if (cloudReady) {
+                    if (workspace) CloudSync.setWorkspace(workspace);
+                    if (loginMode === 'signup') {
+                        await CloudSync.signUp(username, password);
+                    } else {
+                        await CloudSync.signIn(username, password);
+                    }
+                    sessionStorage.setItem('loggedIn', 'true');
+                    document.getElementById('login-overlay').classList.add('hidden');
+                    await bootstrapAppData();
+                    initApp();
+                } else {
+                    const cfg = window.CLOUD_CONFIG || {};
+                    if (username === AUTH_USER && password === AUTH_PASS) {
+                        sessionStorage.setItem('loggedIn', 'true');
+                        document.getElementById('login-overlay').classList.add('hidden');
+                        initApp();
+                    } else if (cfg.allowOfflineFallback !== false) {
+                        errorEl.textContent = '用户名或密码错误（离线模式）';
+                    } else {
+                        errorEl.textContent = '请先配置 cloud-config.js 启用云端登录';
+                    }
+                }
+            } catch (e) {
+                errorEl.textContent = e.message || '登录失败';
+            } finally {
+                submitBtn.disabled = false;
+                submitBtn.textContent = loginMode === 'signin' ? '登 录' : '注 册';
+                if (!checkLogin()) {
+                    document.getElementById('login-password').value = '';
+                }
             }
         }
         
+        function collectAppData() {
+            return {
+                version: 1,
+                mapBuildings: JSON.parse(JSON.stringify(mapBuildings)),
+                currentMapId,
+                allianceMembers: JSON.parse(JSON.stringify(allianceMembers)),
+                teams: JSON.parse(JSON.stringify(teams)),
+                memberIdCounter,
+                teamIdCounter,
+                arrows: JSON.parse(JSON.stringify(arrows)),
+                timelineSnapshots: JSON.parse(JSON.stringify(timelineSnapshots)),
+                rotation,
+                savedAt: new Date().toISOString()
+            };
+        }
+        
+        function applyAppData(data) {
+            if (!data || typeof data !== 'object') return false;
+            if (data.mapBuildings) mapBuildings = data.mapBuildings;
+            if (data.allianceMembers) allianceMembers = data.allianceMembers;
+            if (data.teams) teams = data.teams;
+            if (data.arrows) arrows = data.arrows;
+            if (data.timelineSnapshots) timelineSnapshots = data.timelineSnapshots;
+            if (data.memberIdCounter != null) memberIdCounter = data.memberIdCounter;
+            if (data.teamIdCounter != null) teamIdCounter = data.teamIdCounter;
+            if (data.rotation != null) {
+                rotation = data.rotation;
+                const slider = document.getElementById('rotation-slider');
+                if (slider) slider.value = rotation;
+                const rotVal = document.getElementById('rotation-value');
+                if (rotVal) rotVal.textContent = rotation + '°';
+                const rotDisplay = document.getElementById('rotation-display');
+                if (rotDisplay) rotDisplay.textContent = rotation;
+            }
+            if (data.currentMapId && MAP_CONFIGS[data.currentMapId]) {
+                currentMapId = data.currentMapId;
+                const mapConfig = MAP_CONFIGS[currentMapId];
+                GAME_SIZE = mapConfig.size;
+                MAX_COORD = mapConfig.size - 1;
+                buildings = mapBuildings[currentMapId] || { qi: [], bao: [], keng: [], kuang: [] };
+                document.querySelectorAll('.map-tab').forEach(btn => {
+                    btn.classList.toggle('active', btn.id === `map-${currentMapId}`);
+                });
+                updateMapTitle();
+            } else {
+                buildings = mapBuildings[currentMapId] || { qi: [], bao: [], keng: [], kuang: [] };
+            }
+            saveLocalAppData(data);
+            appDataBootstrapped = true;
+            return true;
+        }
+        
+        function saveLocalAppData(data) {
+            try {
+                const payload = data || collectAppData();
+                localStorage.setItem('appData', JSON.stringify(payload));
+                localStorage.setItem('mapBuildings', JSON.stringify(payload.mapBuildings));
+                localStorage.setItem('currentMapId', payload.currentMapId);
+                localStorage.setItem('allianceMembers', JSON.stringify(payload.allianceMembers));
+                localStorage.setItem('teams', JSON.stringify(payload.teams));
+                localStorage.setItem('arrows', JSON.stringify(payload.arrows));
+                localStorage.setItem('timelineSnapshots', JSON.stringify(payload.timelineSnapshots));
+            } catch (e) {
+                console.warn('本地保存失败:', e);
+            }
+        }
+        
+        function loadLocalAppData() {
+            try {
+                const raw = localStorage.getItem('appData');
+                if (raw) return JSON.parse(raw);
+            } catch (e) { /* fall through */ }
+            return null;
+        }
+        
+        async function bootstrapAppData() {
+            if (cloudReady && CloudSync.isLoggedIn()) {
+                try {
+                    const cloudData = await CloudSync.loadLayout();
+                    if (cloudData && Object.keys(cloudData).length > 0) {
+                        applyAppData(cloudData);
+                        return;
+                    }
+                } catch (e) {
+                    console.warn('云端加载失败，使用本地备份:', e);
+                }
+            }
+            const local = loadLocalAppData();
+            if (local) applyAppData(local);
+        }
+        
+        function scheduleCloudSave() {
+            if (!cloudReady || !CloudSync.isLoggedIn()) return;
+            CloudSync.scheduleSave(collectAppData(), 2000);
+        }
+        
+        async function refreshCloudData() {
+            if (!cloudReady || !CloudSync.isLoggedIn()) return;
+            try {
+                const remote = await CloudSync.loadLayout();
+                if (remote && Object.keys(remote).length > 0) {
+                    applyAppData(remote);
+                    updateCoverage();
+                    updateStats();
+                    render();
+                    showValidationMessage('已从云端刷新最新布局');
+                }
+            } catch (e) {
+                showValidationMessage('云端刷新失败');
+            }
+        }
+        
+        function persistAllData() {
+            const data = collectAppData();
+            saveLocalAppData(data);
+            scheduleCloudSave();
+        }
+        
         // 回车键登录
-        document.addEventListener('DOMContentLoaded', function() {
+        document.addEventListener('DOMContentLoaded', async function() {
+            initCloudSync();
+            
             const usernameInput = document.getElementById('login-username');
             const passwordInput = document.getElementById('login-password');
+            const workspaceInput = document.getElementById('login-workspace');
             
             usernameInput.addEventListener('keydown', function(e) {
                 if (e.key === 'Enter') passwordInput.focus();
             });
             passwordInput.addEventListener('keydown', function(e) {
-                if (e.key === 'Enter') handleLogin();
+                if (e.key === 'Enter') {
+                    if (workspaceInput && workspaceInput.style.display !== 'none') workspaceInput.focus();
+                    else handleLogin();
+                }
             });
+            if (workspaceInput) {
+                workspaceInput.addEventListener('keydown', function(e) {
+                    if (e.key === 'Enter') handleLogin();
+                });
+            }
             
-            // 检查是否已登录
             if (checkLogin()) {
                 document.getElementById('login-overlay').classList.add('hidden');
+                if (cloudReady && CloudSync.isLoggedIn()) {
+                    await bootstrapAppData();
+                }
                 initApp();
             } else {
                 usernameInput.focus();
             }
+            
+            window.addEventListener('beforeunload', function() {
+                if (cloudReady && CloudSync.isLoggedIn()) {
+                    const data = collectAppData();
+                    saveLocalAppData(data);
+                    CloudSync.saveLayoutKeepalive(data);
+                }
+            });
         });
         
         function initApp() {
@@ -2191,24 +2438,31 @@
             resizeCanvas();
             window.addEventListener('resize', resizeCanvas);
             bindEvents();
-            setupCanvasDragDrop();  // 初始化成员拖拽放置
-            loadMembersFromStorage();  // 加载已保存的成员
-            loadMapDataFromStorage();  // 加载已保存的地图数据
-            // 设置默认工具为移动画布
+            setupCanvasDragDrop();
+            if (!appDataBootstrapped) {
+                loadMembersFromStorage();
+                loadTeamsFromStorage();
+            }
+            loadMapDataFromStorage();
             selectTool('move');
-            // 设置默认旋转角度
-            setRotation(45);
+            if (!appDataBootstrapped) {
+                setRotation(45);
+            } else {
+                setRotation(rotation);
+            }
+            updateCoverage();
+            updateCaches();
             render();
             
-            // 用户体验增强初始化
             if (localStorage.getItem('shortcutBarHidden')) {
                 document.getElementById('shortcut-bar').classList.add('hidden');
             }
             updateAllianceStats();
             
-            // 初始化行军箭头工具
             initArrowTools();
-            loadArrowsFromStorage();
+            if (!appDataBootstrapped) {
+                loadArrowsFromStorage();
+            }
             
             // 启动箭头动画循环
             startArrowAnimation();
@@ -2321,17 +2575,21 @@
         
         function saveMapDataToStorage() {
             try {
-                // 保存当前地图数据
                 mapBuildings[currentMapId] = JSON.parse(JSON.stringify(buildings));
-                localStorage.setItem('mapBuildings', JSON.stringify(mapBuildings));
-                localStorage.setItem('currentMapId', currentMapId);
+                persistAllData();
             } catch (e) {
                 console.warn('保存地图数据失败:', e);
             }
         }
         
         function loadMapDataFromStorage() {
+            if (appDataBootstrapped) return;
             try {
+                const local = loadLocalAppData();
+                if (local) {
+                    applyAppData(local);
+                    return;
+                }
                 const savedMapId = localStorage.getItem('currentMapId');
                 const savedMapBuildings = localStorage.getItem('mapBuildings');
                 
@@ -2346,14 +2604,12 @@
                     MAX_COORD = mapConfig.size - 1;
                     buildings = mapBuildings[currentMapId] || { qi: [], bao: [], keng: [], kuang: [] };
                     
-                    // 更新UI
                     document.querySelectorAll('.map-tab').forEach(btn => {
                         btn.classList.toggle('active', btn.id === `map-${currentMapId}`);
                     });
                     updateMapTitle();
                 }
                 
-                // 加载时间轴数据
                 const savedTimeline = localStorage.getItem('timelineSnapshots');
                 if (savedTimeline) {
                     timelineSnapshots = JSON.parse(savedTimeline);
@@ -2939,7 +3195,7 @@
         // 保存箭头数据
         function saveArrowsToStorage() {
             try {
-                localStorage.setItem('arrows', JSON.stringify(arrows));
+                persistAllData();
             } catch (e) {
                 console.warn('保存箭头数据失败:', e);
             }
@@ -3493,9 +3749,8 @@
                 savedAt: new Date().toISOString()
             };
             
-            // 保存到localStorage
             try {
-                localStorage.setItem('timelineSnapshots', JSON.stringify(timelineSnapshots));
+                persistAllData();
             } catch (e) {
                 console.warn('保存时间轴快照失败:', e);
             }
@@ -3512,7 +3767,7 @@
                 delete timelineSnapshots[mapKey][time];
                 
                 try {
-                    localStorage.setItem('timelineSnapshots', JSON.stringify(timelineSnapshots));
+                    persistAllData();
                 } catch (e) {
                     console.warn('清除时间轴快照失败:', e);
                 }
@@ -4124,7 +4379,7 @@
         
         function saveTeamsToStorage() {
             try {
-                localStorage.setItem('teams', JSON.stringify(teams));
+                persistAllData();
             } catch (e) {
                 console.warn('保存小队数据失败:', e);
             }
@@ -4328,7 +4583,7 @@
         
         function saveMembersToStorage() {
             try {
-                localStorage.setItem('allianceMembers', JSON.stringify(allianceMembers));
+                persistAllData();
             } catch (e) {
                 console.warn('保存成员数据失败:', e);
             }
