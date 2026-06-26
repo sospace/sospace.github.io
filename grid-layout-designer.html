@@ -1302,9 +1302,10 @@
             <div class="subtitle" id="login-subtitle">云端账号登录，数据自动同步</div>
             <input type="text" class="login-input" id="login-username" placeholder="用户名" autocomplete="username">
             <input type="password" class="login-input" id="login-password" placeholder="密码" autocomplete="current-password">
-            <input type="text" class="login-input" id="login-workspace" placeholder="工作区 ID（联盟共用同一 ID 即可协作）" autocomplete="off">
+            <input type="text" class="login-input" id="login-workspace" placeholder="工作区 ID（如 2607-kvk）" autocomplete="off">
+            <input type="password" class="login-input" id="login-workspace-key" placeholder="工作区密钥（新建必填；已是成员可留空）" autocomplete="off">
             <input type="text" class="login-input" id="login-invite-code" placeholder="邀请码（注册必填，一码一用）" autocomplete="off" style="display:none;">
-            <div class="login-hint" id="login-hint-workspace">💡 同一工作区 ID 的用户共享布局数据，如：2607-kvk</div>
+            <div class="login-hint" id="login-hint-workspace">🔒 需知道「ID + 密钥」才能进入他人工作区；已是成员再次登录可只填 ID</div>
             <div class="login-hint" id="login-hint-invite" style="display:none;">💡 邀请码由管理员发放，使用后失效；过期码无法注册</div>
             <button class="login-btn" id="login-submit-btn" onclick="handleLogin()">登 录</button>
             <div class="login-error" id="login-error"></div>
@@ -1888,10 +1889,12 @@
             }
             sessionStorage.removeItem('loggedIn');
             sessionStorage.removeItem('cloudWorkspace');
+            sessionStorage.removeItem('cloudWorkspaceKey');
             appDataBootstrapped = false;
             updateLogoutUI();
             document.getElementById('login-overlay').classList.remove('hidden');
             document.getElementById('login-password').value = '';
+            document.getElementById('login-workspace-key').value = '';
             document.getElementById('login-error').textContent = '';
             switchLoginTab('signin');
             showValidationMessage('已退出登录');
@@ -1941,12 +1944,21 @@
             const username = document.getElementById('login-username').value.trim();
             const password = document.getElementById('login-password').value;
             const workspace = document.getElementById('login-workspace').value.trim();
+            const workspaceKey = document.getElementById('login-workspace-key').value;
             const inviteCode = document.getElementById('login-invite-code')?.value.trim() || '';
             const errorEl = document.getElementById('login-error');
             const submitBtn = document.getElementById('login-submit-btn');
             
             if (!username || !password) {
                 errorEl.textContent = '请输入用户名和密码';
+                return;
+            }
+            if (cloudReady && !workspace) {
+                errorEl.textContent = '请输入工作区 ID';
+                return;
+            }
+            if (cloudReady && workspaceKey.length > 0 && workspaceKey.length < 4) {
+                errorEl.textContent = '工作区密钥至少 4 位';
                 return;
             }
             
@@ -1956,12 +1968,12 @@
             
             try {
                 if (cloudReady) {
-                    if (workspace) CloudSync.setWorkspace(workspace);
                     if (loginMode === 'signup') {
                         await CloudSync.signUp(username, password, inviteCode);
                     } else {
                         await CloudSync.signIn(username, password);
                     }
+                    await CloudSync.joinOrCreateWorkspace(workspace, workspaceKey);
                     sessionStorage.setItem('loggedIn', 'true');
                     document.getElementById('login-overlay').classList.add('hidden');
                     await bootstrapAppData();
@@ -1979,8 +1991,11 @@
                         errorEl.textContent = '请先配置 cloud-config.js 启用云端登录';
                     }
                 }
-            } catch (e) {
+                } catch (e) {
                 errorEl.textContent = e.message || '登录失败';
+                if (cloudReady && CloudSync.isLoggedIn()) {
+                    CloudSync.signOut();
+                }
             } finally {
                 submitBtn.disabled = false;
                 submitBtn.textContent = loginMode === 'signin' ? '登 录' : '注 册';
@@ -2122,12 +2137,20 @@
             });
             passwordInput.addEventListener('keydown', function(e) {
                 if (e.key === 'Enter') {
+                    const wsKey = document.getElementById('login-workspace-key');
                     if (workspaceInput && workspaceInput.style.display !== 'none') workspaceInput.focus();
+                    else if (wsKey) wsKey.focus();
                     else handleLogin();
                 }
             });
             if (workspaceInput) {
                 workspaceInput.addEventListener('keydown', function(e) {
+                    if (e.key === 'Enter') document.getElementById('login-workspace-key')?.focus();
+                });
+            }
+            const workspaceKeyInput = document.getElementById('login-workspace-key');
+            if (workspaceKeyInput) {
+                workspaceKeyInput.addEventListener('keydown', function(e) {
                     if (e.key === 'Enter') handleLogin();
                 });
             }

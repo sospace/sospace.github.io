@@ -154,15 +154,47 @@
             this.session = null;
             sessionStorage.removeItem('cloudSession');
             sessionStorage.removeItem('loggedIn');
+            sessionStorage.removeItem('cloudWorkspace');
+            sessionStorage.removeItem('cloudWorkspaceKey');
         },
 
-        setWorkspace(id) {
+        setWorkspace(id, accessKey) {
             this.workspaceId = (id || 'default').trim() || 'default';
             sessionStorage.setItem('cloudWorkspace', this.workspaceId);
+            if (accessKey != null) {
+                sessionStorage.setItem('cloudWorkspaceKey', accessKey);
+            }
+        },
+
+        getWorkspaceKey() {
+            return sessionStorage.getItem('cloudWorkspaceKey') || '';
+        },
+
+        async joinOrCreateWorkspace(workspaceId, accessKey) {
+            if (!this.isLoggedIn()) return false;
+            const body = await this._fetch('/rest/v1/rpc/join_or_create_workspace', {
+                method: 'POST',
+                body: JSON.stringify({
+                    p_workspace_id: workspaceId.trim(),
+                    p_access_key: accessKey || ''
+                })
+            });
+            if (body !== true) {
+                throw new Error('工作区 ID 或密钥错误，无法进入');
+            }
+            this.setWorkspace(workspaceId, accessKey);
+            return true;
+        },
+
+        async ensureWorkspaceAccess() {
+            if (!this.isLoggedIn()) return false;
+            const key = this.getWorkspaceKey();
+            return this.joinOrCreateWorkspace(this.workspaceId, key);
         },
 
         async loadLayout() {
             if (!this.isLoggedIn()) return null;
+            await this.ensureWorkspaceAccess();
             this.setStatus('loading', '正在加载云端数据…');
             try {
                 const rows = await this._fetch(
@@ -183,6 +215,7 @@
 
         async saveLayout(data) {
             if (!this.isLoggedIn()) return false;
+            await this.ensureWorkspaceAccess();
             this.setStatus('saving', '保存中…');
             try {
                 const payload = { id: this.workspaceId, data };
