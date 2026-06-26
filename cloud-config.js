@@ -15,5 +15,6 @@ window.CLOUD_CONFIG = {
     // 默认工作区（联盟共用同一 workspace 即可协作编辑）
     defaultWorkspace: '2607',
     // 未配置云端时是否允许本地离线模式（硬编码账号）
-    allowOfflineFallback: true
+    allowOfflineFallback: true,
+    requireInviteCode: true
 };

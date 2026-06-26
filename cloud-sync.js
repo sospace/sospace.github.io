@@ -81,7 +81,43 @@
             sessionStorage.setItem('loggedIn', 'true');
         },
 
-        async signUp(username, password) {
+        async validateInviteCode(code) {
+            if (!code || !this.isEnabled()) return false;
+            try {
+                const result = await this._fetch('/rest/v1/rpc/validate_invite_code', {
+                    method: 'POST',
+                    body: JSON.stringify({ invite_code: code.trim() })
+                });
+                return result === true;
+            } catch (e) {
+                return false;
+            }
+        },
+
+        async consumeInviteCode(code) {
+            if (!code || !this.isLoggedIn()) return false;
+            try {
+                const result = await this._fetch('/rest/v1/rpc/consume_invite_code', {
+                    method: 'POST',
+                    body: JSON.stringify({ invite_code: code.trim() })
+                });
+                return result === true;
+            } catch (e) {
+                return false;
+            }
+        },
+
+        async signUp(username, password, inviteCode) {
+            const cfg = this.config || {};
+            if (cfg.requireInviteCode !== false) {
+                if (!inviteCode || !inviteCode.trim()) {
+                    throw new Error('请输入邀请码');
+                }
+                const valid = await this.validateInviteCode(inviteCode);
+                if (!valid) {
+                    throw new Error('邀请码无效、已使用或已过期');
+                }
+            }
             const email = this.usernameToEmail(username);
             const body = await this._fetch('/auth/v1/signup', {
                 method: 'POST',
@@ -89,6 +125,13 @@
             });
             if (body.access_token) {
                 this._saveSession(body);
+                if (cfg.requireInviteCode !== false && inviteCode) {
+                    const consumed = await this.consumeInviteCode(inviteCode);
+                    if (!consumed) {
+                        this.signOut();
+                        throw new Error('邀请码消耗失败，请更换邀请码后重试');
+                    }
+                }
                 return body;
             }
             if (body.user && !body.session) {

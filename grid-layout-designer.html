@@ -1303,7 +1303,9 @@
             <input type="text" class="login-input" id="login-username" placeholder="用户名" autocomplete="username">
             <input type="password" class="login-input" id="login-password" placeholder="密码" autocomplete="current-password">
             <input type="text" class="login-input" id="login-workspace" placeholder="工作区 ID（联盟共用同一 ID 即可协作）" autocomplete="off">
-            <div class="login-hint">💡 同一工作区 ID 的用户共享布局数据，如：2607-kvk</div>
+            <input type="text" class="login-input" id="login-invite-code" placeholder="邀请码（注册必填，一码一用）" autocomplete="off" style="display:none;">
+            <div class="login-hint" id="login-hint-workspace">💡 同一工作区 ID 的用户共享布局数据，如：2607-kvk</div>
+            <div class="login-hint" id="login-hint-invite" style="display:none;">💡 邀请码由管理员发放，使用后失效；过期码无法注册</div>
             <button class="login-btn" id="login-submit-btn" onclick="handleLogin()">登 录</button>
             <div class="login-error" id="login-error"></div>
             <div class="login-footer">© 2607全民代表大会 | 技术：兔弟</div>
@@ -1320,6 +1322,7 @@
                 🏴 选择联盟
                 <span style="display:flex;align-items:center;gap:4px;">
                     <span id="cloud-sync-status" class="cloud-sync-status" style="display:none;"></span>
+                    <button id="btn-logout" onclick="handleLogout()" style="display:none;padding:2px 8px;border:none;border-radius:4px;background:#e74c3c;color:#fff;font-size:9px;cursor:pointer;" title="退出登录">退出</button>
                     <span id="save-indicator" style="font-size:9px;color:#27ae60;opacity:0;transition:opacity 0.3s;">✓ 已保存</span>
                 </span>
             </h3>
@@ -1759,6 +1762,7 @@
             <button class="mobile-more-btn" onclick="importLayout();closeMobilePanels()"><span>📥</span>导入</button>
             <button class="mobile-more-btn" onclick="saveAsImage();closeMobilePanels()"><span>🖼️</span>保存图</button>
             <button class="mobile-more-btn" onclick="openCountdownPanel();closeMobilePanels()"><span>🔊</span>倒计时</button>
+            <button class="mobile-more-btn" onclick="handleLogout();closeMobilePanels()" style="color:#e74c3c;"><span>🚪</span>退出</button>
         </div>
     </div>
     
@@ -1771,6 +1775,19 @@
             <div class="modal-btns">
                 <button class="modal-btn modal-btn-secondary" onclick="closeRenameBaoModal()">取消</button>
                 <button class="modal-btn modal-btn-primary" onclick="confirmRenameBao()">确定</button>
+            </div>
+        </div>
+    </div>
+    
+    <!-- 路线改名弹窗 -->
+    <div class="modal-overlay" id="rename-arrow-modal">
+        <div class="modal" style="max-width:360px">
+            <h3>🏹 路线命名</h3>
+            <div id="rename-arrow-type" style="color:#888;font-size:12px;margin-bottom:12px"></div>
+            <input type="text" class="modal-input" id="rename-arrow-input" placeholder="输入路线名称（留空则清除）" maxlength="30" onkeydown="if(event.key==='Enter')confirmRenameArrow()">
+            <div class="modal-btns">
+                <button class="modal-btn modal-btn-secondary" onclick="closeRenameArrowModal()">取消</button>
+                <button class="modal-btn modal-btn-primary" onclick="confirmRenameArrow()">确定</button>
             </div>
         </div>
     </div>
@@ -1840,8 +1857,44 @@
             document.getElementById('login-tab-signup').classList.toggle('active', mode === 'signup');
             document.getElementById('login-submit-btn').textContent = mode === 'signin' ? '登 录' : '注 册';
             document.getElementById('login-subtitle').textContent = mode === 'signin'
-                ? '云端账号登录，数据自动同步' : '创建账号，注册后可直接登录';
+                ? '云端账号登录，数据自动同步' : '需有效邀请码，一码仅可注册一次';
             document.getElementById('login-error').textContent = '';
+            const inviteInput = document.getElementById('login-invite-code');
+            const inviteHint = document.getElementById('login-hint-invite');
+            const wsHint = document.getElementById('login-hint-workspace');
+            const cfg = window.CLOUD_CONFIG || {};
+            const needInvite = cloudReady && cfg.requireInviteCode !== false;
+            if (inviteInput) inviteInput.style.display = (mode === 'signup' && needInvite) ? 'block' : 'none';
+            if (inviteHint) inviteHint.style.display = (mode === 'signup' && needInvite) ? 'block' : 'none';
+            if (wsHint) wsHint.style.display = mode === 'signin' || mode === 'signup' ? 'block' : 'none';
+        }
+        
+        function updateLogoutUI() {
+            const btn = document.getElementById('btn-logout');
+            if (!btn) return;
+            const show = cloudReady && CloudSync.isLoggedIn();
+            btn.style.display = show ? 'inline-block' : 'none';
+        }
+        
+        function handleLogout() {
+            if (!confirm('确定退出登录？未同步的数据已保存在本地。')) return;
+            if (cloudReady && CloudSync.isLoggedIn()) {
+                try {
+                    const data = collectAppData();
+                    saveLocalAppData(data);
+                    CloudSync.saveLayoutKeepalive(data);
+                } catch (e) { /* app 未初始化时跳过 */ }
+                CloudSync.signOut();
+            }
+            sessionStorage.removeItem('loggedIn');
+            sessionStorage.removeItem('cloudWorkspace');
+            appDataBootstrapped = false;
+            updateLogoutUI();
+            document.getElementById('login-overlay').classList.remove('hidden');
+            document.getElementById('login-password').value = '';
+            document.getElementById('login-error').textContent = '';
+            switchLoginTab('signin');
+            showValidationMessage('已退出登录');
         }
         
         function initCloudSync() {
@@ -1859,9 +1912,11 @@
             } else {
                 const wsRow = document.getElementById('login-workspace');
                 if (wsRow) wsRow.style.display = 'none';
-                document.querySelector('.login-hint').style.display = 'none';
+                const wsHint = document.getElementById('login-hint-workspace');
+                if (wsHint) wsHint.style.display = 'none';
                 document.getElementById('login-subtitle').textContent = '❄️ 离线模式：请输入账号密码 ❄️';
             }
+            updateLogoutUI();
             return cloudReady;
         }
         
@@ -1886,6 +1941,7 @@
             const username = document.getElementById('login-username').value.trim();
             const password = document.getElementById('login-password').value;
             const workspace = document.getElementById('login-workspace').value.trim();
+            const inviteCode = document.getElementById('login-invite-code')?.value.trim() || '';
             const errorEl = document.getElementById('login-error');
             const submitBtn = document.getElementById('login-submit-btn');
             
@@ -1902,13 +1958,14 @@
                 if (cloudReady) {
                     if (workspace) CloudSync.setWorkspace(workspace);
                     if (loginMode === 'signup') {
-                        await CloudSync.signUp(username, password);
+                        await CloudSync.signUp(username, password, inviteCode);
                     } else {
                         await CloudSync.signIn(username, password);
                     }
                     sessionStorage.setItem('loggedIn', 'true');
                     document.getElementById('login-overlay').classList.add('hidden');
                     await bootstrapAppData();
+                    updateLogoutUI();
                     initApp();
                 } else {
                     const cfg = window.CLOUD_CONFIG || {};
@@ -2054,6 +2111,7 @@
         // 回车键登录
         document.addEventListener('DOMContentLoaded', async function() {
             initCloudSync();
+            switchLoginTab('signin');
             
             const usernameInput = document.getElementById('login-username');
             const passwordInput = document.getElementById('login-password');
@@ -2079,6 +2137,7 @@
                 if (cloudReady && CloudSync.isLoggedIn()) {
                     await bootstrapAppData();
                 }
+                updateLogoutUI();
                 initApp();
             } else {
                 usernameInput.focus();
@@ -2297,6 +2356,8 @@
         let zoom = 1;
         let rotation = 45;  // 默认旋转45度
         let isDragging = false;
+        let panDidMove = false;
+        let selectedGridCell = null;
         let dragStart = { x: 0, y: 0 };
         let panStart = { x: 0, y: 0 };
         let previewPos = null;
@@ -2832,20 +2893,36 @@
         }
         
         // 双击箭头弹出命名
+        let renameArrowId = null;
+        
         function renameArrow(arrowId) {
             const arrow = arrows.find(a => a.id === arrowId);
             if (!arrow) return;
-            
+            renameArrowId = arrowId;
             const typeConfig = ARROW_TYPES[arrow.type];
-            const newName = prompt(`给这条${typeConfig.name}路线命名：`, arrow.label || '');
-            
-            if (newName !== null) {
-                arrow.label = newName;
-                renderArrowList();
-                saveArrowsToStorage();
-                render();
-                showToast(`✏️ 路线已命名为「${newName || '无名'}」`, 'success');
-            }
+            document.getElementById('rename-arrow-type').textContent = `${typeConfig.icon} ${typeConfig.name}路线`;
+            const input = document.getElementById('rename-arrow-input');
+            input.value = arrow.label || '';
+            document.getElementById('rename-arrow-modal').classList.add('show');
+            setTimeout(() => { input.focus(); input.select(); }, 100);
+        }
+        
+        function closeRenameArrowModal() {
+            document.getElementById('rename-arrow-modal').classList.remove('show');
+            renameArrowId = null;
+        }
+        
+        function confirmRenameArrow() {
+            if (renameArrowId == null) return;
+            const arrow = arrows.find(a => a.id === renameArrowId);
+            if (!arrow) { closeRenameArrowModal(); return; }
+            const newName = document.getElementById('rename-arrow-input').value.trim();
+            arrow.label = newName;
+            closeRenameArrowModal();
+            renderArrowList();
+            saveArrowsToStorage();
+            render();
+            showValidationMessage(newName ? `🏹 路线已命名为: ${newName}` : '🏹 路线名称已清除');
         }
         
         // 检测点击是否在箭头上
@@ -4830,6 +4907,9 @@
             if (currentTool === 'move' && isDragging) {
                 let dx = (e.clientX - dragStart.x) / zoom;
                 let dy = (e.clientY - dragStart.y) / zoom;
+                if (Math.abs(e.clientX - dragStart.x) > 5 || Math.abs(e.clientY - dragStart.y) > 5) {
+                    panDidMove = true;
+                }
                 
                 // 根据旋转角度调整拖动方向
                 if (rotation !== 0) {
@@ -5028,6 +5108,7 @@
             
             if (currentTool === 'move') {
                 isDragging = true;
+                panDidMove = false;
                 dragStart = { x: e.clientX, y: e.clientY };
                 panStart = { x: panOffset.x, y: panOffset.y };
                 canvas.style.cursor = 'grabbing';
@@ -5090,7 +5171,47 @@
             }
         }
         
+        function handleMoveModeClick(gameX, gameY) {
+            const gx = Math.floor(gameX);
+            const gy = Math.floor(gameY);
+            selectedGridCell = { x: gx, y: gy };
+            updateCoordDisplay(gy, gx);
+            
+            const baoIdx = findBaoIndexAt(gx, gy);
+            if (baoIdx >= 0) {
+                showValidationMessage(`已选中格子 (${gy}, ${gx}) · 双击可命名堡垒`);
+            } else {
+                const arrow = findArrowAtPosition(gx, gy);
+                if (arrow) {
+                    showValidationMessage(`已选中路线 · 双击可命名`);
+                } else {
+                    showValidationMessage(`已选中格子 (${gy}, ${gx})`);
+                }
+            }
+            render();
+        }
+        
+        function drawSelectedGridCell() {
+            if (!selectedGridCell) return;
+            const pos = gameToCanvas(selectedGridCell.x, selectedGridCell.y);
+            ctx.strokeStyle = '#00d4ff';
+            ctx.lineWidth = 2;
+            ctx.setLineDash([4, 3]);
+            ctx.strokeRect(pos.x - CELL_SIZE + 0.5, pos.y - CELL_SIZE + 0.5, CELL_SIZE - 1, CELL_SIZE - 1);
+            ctx.setLineDash([]);
+        }
+        
         function onMouseUp(e) {
+            if (currentTool === 'move' && isDragging) {
+                if (!panDidMove) {
+                    const gamePos = screenToGame(e.clientX, e.clientY);
+                    handleMoveModeClick(gamePos.x, gamePos.y);
+                }
+                isDragging = false;
+                canvas.style.cursor = 'grab';
+                return;
+            }
+            
             isDragging = false;
             if (currentTool === 'move') canvas.style.cursor = 'grab';
             
@@ -5286,6 +5407,7 @@
             
             if (currentTool === 'move') {
                 isDragging = true;
+                panDidMove = false;
                 dragStart = { x: pos.clientX, y: pos.clientY };
                 panStart = { x: panOffset.x, y: panOffset.y };
             } else {
@@ -5320,6 +5442,9 @@
             const pos = getTouchPos(e);
             
             if (currentTool === 'move' && isDragging) {
+                if (Math.abs(pos.clientX - dragStart.x) > 8 || Math.abs(pos.clientY - dragStart.y) > 8) {
+                    panDidMove = true;
+                }
                 let dx = (pos.clientX - dragStart.x) / zoom;
                 let dy = (pos.clientY - dragStart.y) / zoom;
                 
@@ -5342,27 +5467,46 @@
         }
         
         let lastTapTime = 0;
-        let lastTapBuildingKey = null;
+        let lastTapKey = null;
         
-        function tryDoubleTapRename(pos) {
+        function tryDoubleTapAction(pos) {
             const gamePos = screenToGame(pos.x, pos.y);
-            const baoIdx = findBaoIndexAt(gamePos.x, gamePos.y);
-            if (baoIdx < 0) {
-                lastTapTime = 0;
-                lastTapBuildingKey = null;
-                return false;
-            }
-            const key = String(baoIdx);
+            const gx = Math.floor(gamePos.x);
+            const gy = Math.floor(gamePos.y);
             const now = Date.now();
-            if (now - lastTapTime < 400 && lastTapBuildingKey === key) {
-                renameBao(baoIdx, buildings.bao[baoIdx]);
-                lastTapTime = 0;
-                lastTapBuildingKey = null;
+            
+            const arrow = findArrowAtPosition(gx, gy);
+            if (arrow) {
+                const key = 'arrow-' + arrow.id;
+                if (now - lastTapTime < 450 && lastTapKey === key) {
+                    renameArrow(arrow.id);
+                    lastTapTime = 0;
+                    lastTapKey = null;
+                    return true;
+                }
+                lastTapTime = now;
+                lastTapKey = key;
+                handleMoveModeClick(gx, gy);
                 return true;
             }
-            lastTapTime = now;
-            lastTapBuildingKey = key;
-            if (!['qi', 'bao', 'keng', 'kuang'].includes(currentTool)) {
+            
+            const baoIdx = findBaoIndexAt(gx, gy);
+            if (baoIdx >= 0) {
+                const key = 'bao-' + baoIdx;
+                if (now - lastTapTime < 450 && lastTapKey === key) {
+                    renameBao(baoIdx, buildings.bao[baoIdx]);
+                    lastTapTime = 0;
+                    lastTapKey = null;
+                    return true;
+                }
+                lastTapTime = now;
+                lastTapKey = key;
+                handleMoveModeClick(gx, gy);
+                return true;
+            }
+            
+            if (currentTool === 'move') {
+                handleMoveModeClick(gx, gy);
                 return true;
             }
             return false;
@@ -5391,6 +5535,17 @@
             
             if (currentTool === 'move') {
                 isDragging = false;
+                if (!isLongPress && !panDidMove && touchDuration < 300 && touchStartPos) {
+                    const moveDistance = Math.sqrt(
+                        Math.pow(endPos.clientX - touchStartPos.x, 2) +
+                        Math.pow(endPos.clientY - touchStartPos.y, 2)
+                    );
+                    if (moveDistance < 15) {
+                        const usePos = touchStartPos;
+                        tryDoubleTapAction(usePos);
+                    }
+                }
+                panDidMove = false;
             } else if (!isLongPress && touchDuration < 300 && touchStartPos) {
                 const moveDistance = Math.sqrt(
                     Math.pow(endPos.clientX - touchStartPos.x, 2) + 
@@ -5398,7 +5553,7 @@
                 );
                 const usePos = moveDistance < 15 ? touchStartPos : endPos;
                 
-                if (tryDoubleTapRename(usePos)) {
+                if (tryDoubleTapAction(usePos)) {
                     touchStartPos = null;
                     isLongPress = false;
                     hideTooltip();
@@ -5579,7 +5734,8 @@
             
             closeMobilePanels();
             
-            // 切换工具时清除选中状态
+            // 切换工具时清除格子选中（移动模式除外）
+            if (tool !== 'move') selectedGridCell = null;
             if (tool !== 'drag') {
                 clearSelection();
             }
@@ -6206,6 +6362,8 @@
             
             // 绘制拖动预览
             drawDragPreview();
+            
+            drawSelectedGridCell();
             
             ctx.restore();
         }
@@ -6964,41 +7122,51 @@
         // ========== 保存为图片 ==========
         function saveAsImage() {
             const scale = 4;
+            const w = canvas.width;
+            const h = canvas.height;
+            if (w <= 0 || h <= 0) {
+                showValidationMessage('画布尺寸无效，请刷新页面后重试');
+                return;
+            }
+            
+            const offscreen = document.createElement('canvas');
+            offscreen.width = w;
+            offscreen.height = h;
+            const offCtx = offscreen.getContext('2d');
+            
             const origCanvas = canvas;
             const origCtx = ctx;
-            const w = origCanvas.width;
-            const h = origCanvas.height;
+            canvas = offscreen;
+            ctx = offCtx;
+            render();
+            canvas = origCanvas;
+            ctx = origCtx;
             
             const exportCanvas = document.createElement('canvas');
             exportCanvas.width = w * scale;
             exportCanvas.height = h * scale;
             const exportCtx = exportCanvas.getContext('2d');
-            exportCtx.scale(scale, scale);
-            
-            canvas = exportCanvas;
-            ctx = exportCtx;
-            render();
+            exportCtx.imageSmoothingEnabled = true;
+            exportCtx.imageSmoothingQuality = 'high';
+            exportCtx.drawImage(offscreen, 0, 0, w * scale, h * scale);
             
             if (!watermarkRemoved) {
                 exportCtx.save();
                 exportCtx.globalAlpha = 0.3;
-                exportCtx.font = 'bold 24px Arial';
+                exportCtx.font = `bold ${24 * scale}px Arial`;
                 exportCtx.fillStyle = '#fff';
                 exportCtx.textAlign = 'right';
                 exportCtx.textBaseline = 'bottom';
-                exportCtx.fillText('© 2607全民代表大会', w - 20, h - 20);
+                exportCtx.fillText('© 2607全民代表大会', w * scale - 20 * scale, h * scale - 20 * scale);
                 exportCtx.restore();
             }
-            
-            canvas = origCanvas;
-            ctx = origCtx;
             
             const link = document.createElement('a');
             link.download = 'layout-' + new Date().toISOString().slice(0,10) + '.png';
             link.href = exportCanvas.toDataURL('image/png');
             link.click();
             
-            showValidationMessage('已保存高清图片');
+            showValidationMessage('已保存高清图片（含网格与建筑）');
         }
         
         // ========== 名称分配功能 ==========
