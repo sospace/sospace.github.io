@@ -10,11 +10,10 @@ window.CLOUD_CONFIG = {
     enabled: true,
     supabaseUrl: 'https://jimxmdbfzfinaotjontu.supabase.co',
     supabaseAnonKey: 'sb_publishable_Hgyb08BoXxowoYkIdWmtSQ_K4WWVTiN',
-    // 登录时将用户名映射为邮箱（用户只需记用户名）
+    // 登录时将手机号映射为邮箱（如 13800138000@sospace.local）
     emailDomain: 'sospace.local',
-    // 默认工作区（联盟共用同一 workspace 即可协作编辑）
-    defaultWorkspace: '2607',
-    // 未配置云端时是否允许本地离线模式（硬编码账号）
+    // 未配置云端时，本地可仅使用浏览器存储（不连 Supabase）
     allowOfflineFallback: true,
-    requireInviteCode: true
+    // 注册是否必须邀请码（暂时关闭）
+    requireInviteCode: false
 };

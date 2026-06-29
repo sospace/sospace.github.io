@@ -6,6 +6,7 @@
     <meta name="author" content="兔弟">
     <meta name="copyright" content="© 2026 2607全民代表大会 版权所有">
     <title>管理助手 | 2607全民代表大会</title>
+    <script>(function(){try{document.documentElement.setAttribute('data-theme',localStorage.getItem('appTheme')||'dark');}catch(e){}})();</script>
     <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><defs><linearGradient id='g' x1='0%25' y1='0%25' x2='100%25' y2='100%25'><stop offset='0%25' style='stop-color:%2300d4ff'/><stop offset='100%25' style='stop-color:%230066cc'/></linearGradient></defs><circle cx='50' cy='50' r='45' fill='url(%23g)'/><ellipse cx='50' cy='50' rx='45' ry='18' fill='none' stroke='%23fff' stroke-width='2' opacity='0.6'/><ellipse cx='50' cy='50' rx='18' ry='45' fill='none' stroke='%23fff' stroke-width='2' opacity='0.6'/><path d='M10 35 Q50 25 90 35' fill='none' stroke='%234ecca3' stroke-width='3' opacity='0.8'/><path d='M10 65 Q50 75 90 65' fill='none' stroke='%234ecca3' stroke-width='3' opacity='0.8'/></svg>">
     <style>
         /* 
@@ -16,12 +17,90 @@
          * ============================================
          */
         * { margin: 0; padding: 0; box-sizing: border-box; user-select: none; -webkit-user-select: none; }
+        
+        /* 主题变量：light=浅色（默认） / dark=深色 */
+        :root, html[data-theme="light"] {
+            color-scheme: light;
+            --app-bg: linear-gradient(180deg, #E8F4F8 0%, #F5F9FC 100%);
+            --surface: rgba(255,255,255,0.88);
+            --surface-2: rgba(200,224,236,0.35);
+            --surface-solid: #ffffff;
+            --text: #2c3e50;
+            --text-2: #5a7a8a;
+            --text-muted: #7f8c8d;
+            --border: #C8E0EC;
+            --accent: #2980b9;
+            --accent-2: #3498db;
+            --header-bg: rgba(255,255,255,0.92);
+            --canvas-bg: linear-gradient(135deg, #E0F4FF 0%, #F0F8FF 50%, #FAFEFE 100%);
+            --status-bg: linear-gradient(135deg, #ecf0f1 0%, #dfe6e9 100%);
+            --status-text: #2c3e50;
+            --status-border: #bdc3c7;
+            --modal-bg: #ffffff;
+            --modal-text: #2c3e50;
+            --modal-title: #2980b9;
+            --modal-border: #3498db;
+            --modal-overlay-bg: rgba(0,0,0,0.5);
+            --input-bg: #f8f9fa;
+            --input-border: #dee2e6;
+            --input-text: #2c3e50;
+            --ws-item-bg: rgba(200,224,236,0.4);
+            --shortcut-bar-bg: rgba(255,255,255,0.96);
+            --shortcut-bar-text: #2c3e50;
+            --login-bg: linear-gradient(180deg, #87CEEB 0%, #B0E0E6 30%, #E0F4FF 60%, #F5F9FC 100%);
+            --login-box-bg: rgba(255,255,255,0.92);
+            --mobile-bar-bg: rgba(255,255,255,0.96);
+            --panel-shadow: rgba(168,200,216,0.35);
+            --chip-bg: rgba(200,224,236,0.5);
+        }
+        html[data-theme="dark"] {
+            color-scheme: dark;
+            --app-bg: linear-gradient(180deg, #1a1a2e 0%, #16213e 100%);
+            --surface: rgba(30,39,46,0.96);
+            --surface-2: rgba(255,255,255,0.07);
+            --surface-solid: #1e272e;
+            --text: #ecf0f1;
+            --text-2: #bdc3c7;
+            --text-muted: #95a5a6;
+            --border: #34495e;
+            --accent: #00d4ff;
+            --accent-2: #3498db;
+            --header-bg: rgba(30,39,46,0.98);
+            --canvas-bg: linear-gradient(135deg, #1e272e 0%, #2c3e50 50%, #34495e 100%);
+            --status-bg: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+            --status-text: #ecf0f1;
+            --status-border: #2d4059;
+            --modal-bg: #1e272e;
+            --modal-text: #ecf0f1;
+            --modal-title: #00d4ff;
+            --modal-border: #00d4ff;
+            --modal-overlay-bg: rgba(0,0,0,0.85);
+            --input-bg: rgba(0,0,0,0.35);
+            --input-border: rgba(255,255,255,0.15);
+            --input-text: #ecf0f1;
+            --ws-item-bg: rgba(0,0,0,0.28);
+            --shortcut-bar-bg: rgba(44,62,80,0.94);
+            --shortcut-bar-text: #ecf0f1;
+            --login-bg: linear-gradient(180deg, #0f0f23 0%, #1a1a2e 50%, #16213e 100%);
+            --login-box-bg: rgba(30,39,46,0.96);
+            --mobile-bar-bg: rgba(30,39,46,0.98);
+            --panel-shadow: rgba(0,0,0,0.45);
+            --chip-bg: rgba(255,255,255,0.08);
+        }
+        
+        .theme-toggle-btn {
+            padding: 3px 8px; border: 1px solid var(--border); border-radius: 6px;
+            background: var(--surface-2); color: var(--text); font-size: 14px;
+            cursor: pointer; line-height: 1; transition: background 0.2s;
+        }
+        .theme-toggle-btn:hover { background: var(--chip-bg); }
+        
         html, body { height: 100%; overflow: hidden; touch-action: none; }
         body {
             font-family: 'Microsoft YaHei', 'PingFang SC', sans-serif;
-            background: linear-gradient(180deg, #E8F4F8 0%, #F5F9FC 100%);
+            background: var(--app-bg);
             display: flex;
-            color: #fff;
+            color: var(--text);
         }
         
         /* 手机端专用工具栏 */
@@ -65,8 +144,8 @@
             .mobile-tool-dock {
                 display: block;
                 flex: 0 0 auto;
-                background: rgba(255,255,255,0.95);
-                border-bottom: 1px solid #C8E0EC;
+                background: var(--mobile-bar-bg);
+                border-bottom: 1px solid var(--border);
                 padding: 4px 6px;
             }
             .mobile-tool-dock-inner {
@@ -84,8 +163,8 @@
                 padding: 6px 4px;
                 border: 2px solid transparent;
                 border-radius: 8px;
-                background: rgba(200,224,236,0.35);
-                color: #2c3e50;
+                background: var(--surface-2);
+                color: var(--text);
                 font-size: 9px;
                 cursor: pointer;
                 display: flex;
@@ -106,8 +185,8 @@
                 display: none;
                 position: fixed;
                 left: 0; right: 0;
-                background: rgba(255,255,255,0.98);
-                border-top: 1px solid #C8E0EC;
+                background: var(--mobile-bar-bg);
+                border-top: 1px solid var(--border);
                 padding: 8px 10px;
                 z-index: 1001;
                 box-shadow: 0 -4px 16px rgba(0,0,0,0.12);
@@ -126,8 +205,8 @@
                 padding: 10px 8px;
                 border: none;
                 border-radius: 8px;
-                background: rgba(200,224,236,0.4);
-                color: #2c3e50;
+                background: var(--surface-2);
+                color: var(--text);
                 font-size: 10px;
                 cursor: pointer;
                 display: flex;
@@ -186,9 +265,9 @@
             display: none;
             position: fixed;
             bottom: 0; left: 0; right: 0;
-            background: rgba(255,255,255,0.95);
+            background: var(--mobile-bar-bg);
             backdrop-filter: blur(10px);
-            border-top: 1px solid #C8E0EC;
+            border-top: 1px solid var(--border);
             padding: 6px 8px;
             z-index: 999;
             gap: 6px;
@@ -243,18 +322,18 @@
         .toolbar {
             width: 200px;
             min-width: 200px;
-            background: rgba(255,255,255,0.85);
+            background: var(--surface);
             padding: 12px;
-            padding-bottom: 35px;  /* 避免被版权栏遮挡 */
+            padding-bottom: 35px;
             display: flex;
             flex-direction: column;
             gap: 10px;
-            border-right: 1px solid #C8E0EC;
+            border-right: 1px solid var(--border);
             overflow-y: auto;
             backdrop-filter: blur(10px);
-            box-shadow: 2px 0 10px rgba(168,200,216,0.3);
+            box-shadow: 2px 0 10px var(--panel-shadow);
         }
-        .toolbar h2 { color: #2980b9; font-size: 16px; text-align: center; padding-bottom: 8px; border-bottom: 1px solid #C8E0EC; }
+        .toolbar h2 { color: var(--accent); font-size: 16px; text-align: center; padding-bottom: 8px; border-bottom: 1px solid var(--border); }
         
         /* 地球闪烁动画 */
         @keyframes sparkle {
@@ -270,9 +349,9 @@
             vertical-align: middle;
             margin-right: 5px;
         }
-        .tool-section { background: rgba(200,224,236,0.3); padding: 10px; border-radius: 8px; }
+        .tool-section { background: var(--surface-2); padding: 10px; border-radius: 8px; }
         .mobile-tools-row { display: flex; flex-direction: column; gap: 10px; }
-        .tool-section h3 { font-size: 11px; color: #5a7a8a; margin-bottom: 6px; }
+        .tool-section h3 { font-size: 11px; color: var(--text-2); margin-bottom: 6px; }
         .tool-btn {
             width: 100%; padding: 8px; margin-bottom: 4px;
             border: 2px solid transparent; border-radius: 6px;
@@ -293,8 +372,8 @@
         .tool-icon { width: 20px; height: 20px; display: flex; align-items: center; justify-content: center; font-size: 11px; }
         
         /* 联盟选择 */
-        .alliance-section { background: rgba(200,224,236,0.3); padding: 10px; border-radius: 8px; }
-        .alliance-section h3 { font-size: 11px; color: #2c3e50; margin-bottom: 6px; font-weight: bold; }
+        .alliance-section { background: var(--surface-2); padding: 10px; border-radius: 8px; }
+        .alliance-section h3 { font-size: 11px; color: var(--text); margin-bottom: 6px; font-weight: bold; }
         .alliance-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 4px; }
         .alliance-btn {
             padding: 8px 4px; border: 2px solid rgba(0,0,0,0.2); border-radius: 6px;
@@ -308,31 +387,31 @@
         .alliance-btn.active { border-color: #2980b9; box-shadow: 0 0 10px rgba(41,128,185,0.5); }
         .alliance-color { width: 20px; height: 20px; border-radius: 4px; border: 1px solid rgba(255,255,255,0.3); }
         
-        .rotation-control { background: rgba(200,224,236,0.3); padding: 10px; border-radius: 8px; }
-        .rotation-control h3 { font-size: 11px; color: #5a7a8a; margin-bottom: 6px; }
+        .rotation-control { background: var(--surface-2); padding: 10px; border-radius: 8px; }
+        .rotation-control h3 { font-size: 11px; color: var(--text-2); margin-bottom: 6px; }
         .rotation-slider { width: 100%; margin: 6px 0; }
-        .rotation-value { text-align: center; color: #2980b9; font-weight: bold; font-size: 16px; }
+        .rotation-value { text-align: center; color: var(--accent); font-weight: bold; font-size: 16px; }
         .rotation-presets { display: flex; gap: 4px; flex-wrap: wrap; margin-top: 6px; }
-        .rotation-preset { padding: 4px 8px; background: rgba(255,255,255,0.1); border: none; border-radius: 4px; color: #fff; cursor: pointer; font-size: 10px; }
-        .rotation-preset:hover { background: rgba(255,255,255,0.2); }
-        .rotation-preset.active { background: #00d4ff; color: #000; }
+        .rotation-preset { padding: 4px 8px; background: var(--chip-bg); border: none; border-radius: 4px; color: var(--text-2); cursor: pointer; font-size: 10px; }
+        .rotation-preset:hover { background: var(--surface-2); }
+        .rotation-preset.active { background: var(--accent-2); color: #fff; }
         
         /* 地图Tab页 */
         .map-tabs {
-            display: flex; gap: 2px; background: rgba(44,62,80,0.1);
+            display: flex; gap: 2px; background: var(--surface-2);
             padding: 3px; border-radius: 8px 8px 0 0; margin: 0 15px;
         }
         .map-tab {
             flex: 1; padding: 8px 12px; border: none; border-radius: 6px 6px 0 0;
             cursor: pointer; font-weight: bold; font-size: 11px;
-            background: transparent; color: #7f8c8d;
+            background: transparent; color: var(--text-muted);
             transition: all 0.2s; text-align: center;
             position: relative;
         }
-        .map-tab:hover { background: rgba(255,255,255,0.3); color: #2c3e50; }
+        .map-tab:hover { background: var(--chip-bg); color: var(--text); }
         .map-tab.active { 
-            background: #fff; color: #e67e22; 
-            box-shadow: 0 -2px 8px rgba(0,0,0,0.1);
+            background: var(--surface-solid); color: #e67e22; 
+            box-shadow: 0 -2px 8px var(--panel-shadow);
         }
         .map-tab.active::after {
             content: ''; position: absolute; bottom: -3px; left: 10%; right: 10%;
@@ -630,28 +709,36 @@
         .btn-auto { background: #ffd93d; color: #333; }
         .btn-center { background: #a29bfe; color: #fff; }
         
-        .shortcuts { font-size: 9px; color: #5a7a8a; padding: 6px; background: rgba(200,224,236,0.3); border-radius: 4px; }
-        .shortcuts kbd { background: rgba(41,128,185,0.15); padding: 1px 4px; border-radius: 2px; color: #2980b9; }
+        .shortcuts { font-size: 9px; color: var(--text-2); padding: 6px; background: var(--surface-2); border-radius: 4px; }
+        .shortcuts kbd { background: var(--chip-bg); padding: 1px 4px; border-radius: 2px; color: var(--accent); }
         
-        .main-area { flex: 1; display: flex; flex-direction: column; overflow: hidden; padding-bottom: 36px; } /* 为底部状态栏留空间 */
-        .header { padding: 8px 15px; background: rgba(255,255,255,0.8); display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #C8E0EC; }
-        .header h1 { color: #2980b9; font-size: 16px; }
-        .header-info { display: flex; gap: 12px; font-size: 11px; color: #5a7a8a; }
-        .header-info span { background: rgba(200,224,236,0.5); padding: 3px 8px; border-radius: 4px; }
-        .header-info .highlight { background: rgba(41, 128, 185, 0.2); color: #2980b9; font-weight: bold; }
+        .main-area { flex: 1; display: flex; flex-direction: column; overflow: hidden; padding-bottom: 36px; }
+        .header { padding: 8px 15px; background: var(--header-bg); display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--border); }
+        .header h1 { color: var(--accent); font-size: 16px; }
+        .header-info { display: flex; gap: 12px; font-size: 11px; color: var(--text-2); align-items: center; flex-wrap: wrap; }
+        .header-info span { background: var(--chip-bg); padding: 3px 8px; border-radius: 4px; }
+        .header-info .highlight { background: rgba(41,128,185,0.2); color: var(--accent); font-weight: bold; }
+        .header .rotation-preset-btn {
+            padding: 2px 6px; border: none; border-radius: 3px;
+            background: var(--chip-bg); color: var(--text-2);
+            font-size: 10px; cursor: pointer;
+        }
+        .header .rotation-preset-btn.active { background: var(--accent-2); color: #fff; }
+        html[data-theme="dark"] .header .rotation-preset-btn.active { color: #000; background: var(--accent); }
+        .header #rotation-display { color: var(--accent); font-weight: bold; }
         
-        .canvas-wrapper { flex: 1; overflow: hidden; background: linear-gradient(135deg, #E0F4FF 0%, #F0F8FF 50%, #FAFEFE 100%); position: relative; }
+        .canvas-wrapper { flex: 1; overflow: hidden; background: var(--canvas-bg); position: relative; }
         canvas { display: block; cursor: crosshair; }
         
         .rules-panel {
             width: 220px; min-width: 220px;
-            background: rgba(255,255,255,0.85);
+            background: var(--surface);
             padding: 12px;
-            border-left: 1px solid #C8E0EC;
+            border-left: 1px solid var(--border);
             overflow-y: auto;
             backdrop-filter: blur(10px);
         }
-        .rules-panel h2 { color: #2980b9; font-size: 14px; margin-bottom: 10px; }
+        .rules-panel h2 { color: var(--accent); font-size: 14px; margin-bottom: 10px; }
         
         /* 版权水印 - 移到状态栏内显示，不再遮挡画布 */
         .copyright-watermark {
@@ -668,14 +755,14 @@
             position: fixed;
             bottom: 0; left: 0; right: 0;
             height: 36px;
-            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
-            border-top: 1px solid #2d4059;
+            background: var(--status-bg);
+            border-top: 1px solid var(--status-border);
             display: flex;
             align-items: center;
             justify-content: space-between;
             padding: 0 12px;
             z-index: 990;
-            color: #fff;
+            color: var(--status-text);
             font-size: 12px;
         }
         .status-bar-left {
@@ -939,12 +1026,38 @@
         /* 快捷键提示条 */
         .shortcut-bar {
             position: fixed; bottom: 25px; left: 50%; transform: translateX(-50%);
-            background: rgba(44,62,80,0.9); padding: 6px 15px; border-radius: 20px;
-            display: flex; gap: 12px; font-size: 10px; color: #ecf0f1;
-            z-index: 999; box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+            background: var(--shortcut-bar-bg); padding: 6px 12px 6px 15px; border-radius: 20px;
+            display: flex; gap: 10px; font-size: 10px; color: var(--shortcut-bar-text);
+            z-index: 999; box-shadow: 0 2px 10px var(--panel-shadow);
             transition: opacity 0.3s, transform 0.3s;
+            align-items: center;
+            border: 1px solid var(--border);
         }
         .shortcut-bar.hidden { opacity: 0; transform: translateX(-50%) translateY(20px); pointer-events: none; }
+        .shortcut-close-btn {
+            padding: 3px 10px; border: none; border-radius: 12px;
+            background: rgba(231,76,60,0.85); color: #fff; font-size: 10px;
+            cursor: pointer; white-space: nowrap; flex-shrink: 0;
+        }
+        .shortcut-close-btn:active { transform: scale(0.95); }
+        @media (max-width: 768px) {
+            .shortcut-bar {
+                bottom: 74px;
+                max-width: calc(100% - 16px);
+                flex-wrap: wrap;
+                justify-content: center;
+                border-radius: 12px;
+                padding: 8px 10px;
+                gap: 6px;
+            }
+            .shortcut-item { font-size: 9px; }
+            .shortcut-close-btn {
+                flex: 0 0 100%;
+                margin-top: 2px;
+                padding: 6px;
+                font-size: 11px;
+            }
+        }
         .shortcut-item { display: flex; align-items: center; gap: 4px; }
         .shortcut-key {
             background: rgba(255,255,255,0.2); padding: 2px 6px; border-radius: 4px;
@@ -982,7 +1095,7 @@
         
         /* Toast提示 */
         .toast-container {
-            position: fixed; top: 80px; right: 20px; z-index: 10002;
+            position: fixed; top: 80px; right: 20px; z-index: 100050;
             display: flex; flex-direction: column; gap: 8px;
         }
         .toast {
@@ -1005,14 +1118,15 @@
         
         /* 联盟统计卡片 */
         .alliance-stats {
-            background: rgba(255,255,255,0.95); padding: 8px 12px; border-radius: 8px;
-            margin-top: 8px; font-size: 10px; box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            background: var(--surface-solid); padding: 8px 12px; border-radius: 8px;
+            margin-top: 8px; font-size: 10px; box-shadow: 0 2px 8px var(--panel-shadow);
+            border: 1px solid var(--border);
         }
-        .alliance-stats-title { font-weight: bold; color: #2c3e50; margin-bottom: 6px; display: flex; justify-content: space-between; }
-        .alliance-stats-row { display: flex; justify-content: space-between; padding: 3px 0; border-bottom: 1px solid #f0f0f0; }
+        .alliance-stats-title { font-weight: bold; color: var(--text); margin-bottom: 6px; display: flex; justify-content: space-between; }
+        .alliance-stats-row { display: flex; justify-content: space-between; padding: 3px 0; border-bottom: 1px solid var(--border); }
         .alliance-stats-row:last-child { border-bottom: none; }
-        .stats-label { color: #7f8c8d; }
-        .stats-value { font-weight: bold; color: #2c3e50; }
+        .stats-label { color: var(--text-muted); }
+        .stats-value { font-weight: bold; color: var(--text); }
         .stats-value.highlight { color: #e67e22; }
         
         /* 欢迎引导 */
@@ -1098,63 +1212,65 @@
             background: #e74c3c; color: #fff; cursor: pointer; font-size: 10px;
         }
         
-        /* 弹窗样式 */
         .modal-overlay {
             position: fixed; top: 0; left: 0; right: 0; bottom: 0;
-            background: rgba(0,0,0,0.8); z-index: 2000;
+            background: var(--modal-overlay-bg); z-index: 2000;
             display: none; justify-content: center; align-items: center;
         }
         .modal-overlay.show { display: flex; }
         .modal {
-            background: #1a1a2e; border-radius: 12px; padding: 20px;
+            background: var(--modal-bg); border-radius: 12px; padding: 20px;
             max-width: 500px; width: 90%; max-height: 80vh;
-            border: 2px solid #00d4ff; box-shadow: 0 0 30px rgba(0,212,255,0.3);
+            border: 2px solid var(--modal-border); box-shadow: 0 0 30px var(--panel-shadow);
+            color: var(--modal-text);
         }
-        .modal h3 { color: #00d4ff; margin-bottom: 15px; font-size: 16px; }
+        .modal h3 { color: var(--modal-title); margin-bottom: 15px; font-size: 16px; }
         .modal-tabs { display: flex; gap: 8px; margin-bottom: 15px; }
         .modal-tab {
             padding: 8px 16px; border: none; border-radius: 6px;
-            background: rgba(255,255,255,0.1); color: #888; cursor: pointer;
+            background: var(--surface-2); color: var(--text-muted); cursor: pointer;
             font-size: 12px;
         }
-        .modal-tab.active { background: #00d4ff; color: #000; }
+        .modal-tab.active { background: var(--accent-2); color: #fff; }
+        html[data-theme="dark"] .modal-tab.active { background: var(--accent); color: #000; }
         .modal textarea {
-            width: 100%; height: 150px; background: rgba(0,0,0,0.3);
-            border: 1px solid rgba(255,255,255,0.2); border-radius: 6px;
-            color: #fff; padding: 10px; font-size: 12px; resize: none;
+            width: 100%; height: 150px; background: var(--input-bg);
+            border: 1px solid var(--input-border); border-radius: 6px;
+            color: var(--input-text); padding: 10px; font-size: 12px; resize: none;
             font-family: inherit;
         }
-        .modal textarea:focus { outline: none; border-color: #00d4ff; }
-        .modal-hint { color: #888; font-size: 10px; margin: 8px 0; }
+        .modal textarea:focus { outline: none; border-color: var(--modal-border); }
+        .modal-hint { color: var(--text-muted); font-size: 10px; margin: 8px 0; }
         .modal-preview {
-            max-height: 120px; overflow-y: auto; background: rgba(0,0,0,0.3);
+            max-height: 120px; overflow-y: auto; background: var(--input-bg);
             border-radius: 6px; padding: 8px; margin: 10px 0;
         }
         .modal-preview-item {
             display: flex; justify-content: space-between; padding: 4px 0;
-            border-bottom: 1px solid rgba(255,255,255,0.1); font-size: 11px;
+            border-bottom: 1px solid var(--border); font-size: 11px;
         }
         .modal-preview-item:last-child { border-bottom: none; }
-        .modal-preview-num { color: #00d4ff; font-weight: bold; }
-        .modal-preview-name { color: #fff; }
+        .modal-preview-num { color: var(--accent); font-weight: bold; }
+        .modal-preview-name { color: var(--modal-text); }
         .modal-btns { display: flex; gap: 10px; margin-top: 15px; }
         .modal-btn {
             flex: 1; padding: 10px; border: none; border-radius: 6px;
             cursor: pointer; font-weight: bold; font-size: 12px;
         }
-        .modal-btn-primary { background: #00d4ff; color: #000; }
-        .modal-btn-secondary { background: rgba(255,255,255,0.1); color: #fff; }
+        .modal-btn-primary { background: var(--accent-2); color: #fff; }
+        html[data-theme="dark"] .modal-btn-primary { background: var(--accent); color: #000; }
+        .modal-btn-secondary { background: var(--surface-2); color: var(--modal-text); }
         .modal-input {
-            width: 100%; padding: 10px 12px; background: rgba(0,0,0,0.3);
-            border: 1px solid rgba(255,255,255,0.2); border-radius: 6px;
-            color: #fff; font-size: 14px; font-family: inherit;
+            width: 100%; padding: 10px 12px; background: var(--input-bg);
+            border: 1px solid var(--input-border); border-radius: 6px;
+            color: var(--input-text); font-size: 14px; font-family: inherit;
         }
-        .modal-input:focus { outline: none; border-color: #00d4ff; }
+        .modal-input:focus { outline: none; border-color: var(--modal-border); }
         
         /* 登录界面样式 - 冬日雪景 */
         .login-overlay {
             position: fixed; top: 0; left: 0; right: 0; bottom: 0;
-            background: linear-gradient(180deg, #87CEEB 0%, #B0E0E6 30%, #E0F4FF 60%, #F5F9FC 100%);
+            background: var(--login-bg);
             z-index: 9999; display: flex; justify-content: center; align-items: center;
             overflow: hidden;
         }
@@ -1176,15 +1292,16 @@
         }
         .login-overlay.hidden { display: none; }
         .login-box {
-            background: rgba(255,255,255,0.85); border-radius: 20px; padding: 40px;
+            background: var(--login-box-bg); border-radius: 20px; padding: 40px;
             border: 1px solid rgba(255,255,255,0.9); 
             box-shadow: 0 8px 32px rgba(135,206,235,0.3), 0 0 60px rgba(255,255,255,0.5);
             text-align: center; min-width: 320px;
             backdrop-filter: blur(10px);
             position: relative; z-index: 1;
         }
-        .login-box h2 { color: #2980b9; font-size: 24px; margin-bottom: 8px; text-shadow: 1px 1px 2px rgba(255,255,255,0.8); }
-        .login-box .subtitle { color: #5a7a8a; font-size: 12px; margin-bottom: 30px; }
+        .login-box h2 { color: var(--accent); font-size: 24px; margin-bottom: 8px; }
+        html[data-theme="light"] .login-box h2 { text-shadow: 1px 1px 2px rgba(255,255,255,0.8); }
+        .login-box .subtitle { color: var(--text-2); font-size: 12px; margin-bottom: 30px; }
         .login-input {
             width: 100%; padding: 12px 16px; margin-bottom: 16px;
             background: rgba(255,255,255,0.9); border: 1px solid #B0E0E6;
@@ -1222,15 +1339,77 @@
         .cloud-sync-status.error { color: #e74c3c; }
         .cloud-sync-status.saving { color: #f39c12; }
         
-        .rule-item { background: rgba(255,255,255,0.05); padding: 8px; border-radius: 6px; margin-bottom: 6px; border-left: 3px solid #4ecca3; }
+        /* 工作区面板 */
+        .ws-panel .modal { max-width: 420px; max-height: 85vh; display: flex; flex-direction: column; }
+        .ws-panel-body { overflow-y: auto; flex: 1; }
+        .ws-current { background: var(--surface-2); border: 1px solid var(--border); border-radius: 8px; padding: 10px; margin-bottom: 12px; font-size: 12px; color: var(--modal-text); }
+        .ws-section-title { font-size: 11px; color: var(--text-muted); margin: 12px 0 6px; font-weight: bold; }
+        .ws-item {
+            display: flex; align-items: center; gap: 8px; padding: 10px;
+            background: var(--ws-item-bg); border-radius: 8px; margin-bottom: 6px; font-size: 12px;
+        }
+        .ws-item.active { border: 1px solid var(--modal-border); }
+        .ws-item-info { flex: 1; min-width: 0; }
+        .ws-item-name { color: var(--modal-text); font-weight: bold; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+        .ws-item-meta { color: var(--text-muted); font-size: 10px; margin-top: 2px; }
+        .ws-item-actions { display: flex; gap: 4px; flex-shrink: 0; }
+        .ws-item-btn {
+            padding: 4px 8px; border: none; border-radius: 4px; font-size: 10px; cursor: pointer;
+            background: var(--surface-2); color: var(--text-2);
+        }
+        .ws-item-btn.primary { background: var(--accent-2); color: #fff; }
+        .ws-item-btn.danger { background: rgba(231,76,60,0.85); color: #fff; }
+        .ws-form { background: var(--surface-2); border-radius: 8px; padding: 10px; margin-top: 8px; }
+        .ws-form label { color: var(--text-2); }
+        .ws-form input { width: 100%; padding: 8px; margin: 4px 0 8px; border-radius: 6px; border: 1px solid var(--input-border); background: var(--input-bg); color: var(--input-text); font-size: 12px; }
+        .ws-form-error { color: #e74c3c; font-size: 11px; min-height: 0; margin-top: 4px; line-height: 1.4; }
+        .ws-form-error:not(:empty) { padding: 8px 10px; background: rgba(231,76,60,0.12); border-radius: 6px; border: 1px solid rgba(231,76,60,0.35); }
+        .ws-tabs { display: flex; gap: 4px; margin-bottom: 12px; }
+        .ws-tab { flex: 1; padding: 8px; border: none; border-radius: 6px; background: var(--surface-2); color: var(--text-muted); cursor: pointer; font-size: 11px; }
+        .ws-tab.active { background: var(--accent-2); color: #fff; font-weight: bold; }
+        html[data-theme="dark"] .ws-tab.active { background: var(--accent); color: #000; }
+        .ws-share-result { background: rgba(39,174,96,0.15); border: 1px solid #27ae60; border-radius: 8px; padding: 10px; margin-top: 8px; font-size: 12px; color: #27ae60; word-break: break-all; }
+        html[data-theme="dark"] .ws-share-result { color: #4ecca3; }
+        .ws-share-mode { display: flex; flex-direction: column; gap: 6px; margin: 6px 0 10px; font-size: 11px; color: var(--text-2); }
+        .ws-share-mode label { display: flex; align-items: center; gap: 6px; cursor: pointer; padding: 6px 8px; border-radius: 6px; background: var(--input-bg); border: 1px solid transparent; }
+        .ws-share-mode label:has(input:checked) { border-color: var(--modal-border); background: var(--surface-2); }
+        .ws-badge { display: inline-block; padding: 1px 6px; border-radius: 4px; font-size: 9px; font-weight: bold; margin-left: 4px; vertical-align: middle; }
+        .ws-badge.view { background: rgba(241,196,15,0.2); color: #d68910; }
+        .ws-badge.edit { background: rgba(39,174,96,0.18); color: #27ae60; }
+        .ws-badge.owner { background: rgba(52,152,219,0.18); color: #2980b9; }
+        .ws-item-btn.copy { background: rgba(155,89,182,0.25); color: var(--text); }
+        .readonly-banner {
+            display: none; flex: 0 0 auto; align-items: center; justify-content: center; gap: 8px;
+            padding: 6px 12px; background: rgba(241,196,15,0.15); border-bottom: 1px solid rgba(241,196,15,0.35);
+            color: #b7950b; font-size: 11px; text-align: center;
+        }
+        html[data-theme="dark"] .readonly-banner { background: rgba(241,196,15,0.12); color: #f1c40f; }
+        .readonly-banner.show { display: flex; }
+        body.readonly-mode .tool-btn-qi,
+        body.readonly-mode .tool-btn-bao,
+        body.readonly-mode .tool-btn-keng,
+        body.readonly-mode .tool-btn-kuang,
+        body.readonly-mode .tool-btn-delete,
+        body.readonly-mode .tool-btn-drag,
+        body.readonly-mode .mobile-tool-btn[data-tool="qi"],
+        body.readonly-mode .mobile-tool-btn[data-tool="bao"],
+        body.readonly-mode .mobile-tool-btn[data-tool="delete"],
+        body.readonly-mode .mobile-tool-btn[data-tool="keng"],
+        body.readonly-mode .mobile-tool-btn[data-tool="kuang"],
+        body.readonly-mode .mobile-tool-btn[data-tool="drag"] { opacity: 0.35; pointer-events: none; }
+        body.readonly-mode .action-btns .btn-export,
+        body.readonly-mode #btn-undo,
+        body.readonly-mode #btn-redo { opacity: 0.35; pointer-events: none; }
+        
+        .rule-item { background: var(--surface-2); padding: 8px; border-radius: 6px; margin-bottom: 6px; border-left: 3px solid #4ecca3; }
         .rule-item.warning { border-left-color: #ffd93d; }
         .rule-item.info { border-left-color: #6495ED; }
-        .rule-item h4 { color: #fff; font-size: 11px; margin-bottom: 3px; }
-        .rule-item p { color: #888; font-size: 9px; line-height: 1.4; }
+        .rule-item h4 { color: var(--text); font-size: 11px; margin-bottom: 3px; }
+        .rule-item p { color: var(--text-muted); font-size: 9px; line-height: 1.4; }
         
-        .coord-info { background: rgba(0,212,255,0.1); padding: 8px; border-radius: 6px; margin-bottom: 8px; border: 1px solid rgba(0,212,255,0.3); }
-        .coord-info h4 { color: #00d4ff; font-size: 11px; margin-bottom: 4px; }
-        .coord-info p { color: #aaa; font-size: 9px; line-height: 1.5; }
+        .coord-info { background: var(--surface-2); padding: 8px; border-radius: 6px; margin-bottom: 8px; border: 1px solid var(--border); }
+        .coord-info h4 { color: var(--accent); font-size: 11px; margin-bottom: 4px; }
+        .coord-info p { color: var(--text-2); font-size: 9px; line-height: 1.5; }
         
         .building-info {
             position: fixed; background: rgba(255,255,255,0.98); color: #2c3e50;
@@ -1299,17 +1478,25 @@
                 <button class="login-tab active" id="login-tab-signin" onclick="switchLoginTab('signin')">登录</button>
                 <button class="login-tab" id="login-tab-signup" onclick="switchLoginTab('signup')">注册</button>
             </div>
-            <div class="subtitle" id="login-subtitle">云端账号登录，数据自动同步</div>
-            <input type="text" class="login-input" id="login-username" placeholder="用户名" autocomplete="username">
+            <div class="subtitle" id="login-subtitle">使用手机号登录，数据自动云端同步</div>
+            <input type="tel" class="login-input" id="login-username" placeholder="手机号（11位）" autocomplete="tel" maxlength="11" inputmode="numeric">
             <input type="password" class="login-input" id="login-password" placeholder="密码" autocomplete="current-password">
-            <input type="text" class="login-input" id="login-workspace" placeholder="工作区 ID（如 2607-kvk）" autocomplete="off">
-            <input type="password" class="login-input" id="login-workspace-key" placeholder="工作区密钥（新建必填；已是成员可留空）" autocomplete="off">
-            <input type="text" class="login-input" id="login-invite-code" placeholder="邀请码（注册必填，一码一用）" autocomplete="off" style="display:none;">
-            <div class="login-hint" id="login-hint-workspace">🔒 需知道「ID + 密钥」才能进入他人工作区；已是成员再次登录可只填 ID</div>
-            <div class="login-hint" id="login-hint-invite" style="display:none;">💡 邀请码由管理员发放，使用后失效；过期码无法注册</div>
             <button class="login-btn" id="login-submit-btn" onclick="handleLogin()">登 录</button>
             <div class="login-error" id="login-error"></div>
+            <button type="button" class="theme-toggle-btn" id="btn-theme-toggle-login" onclick="toggleTheme()" title="切换浅色/深色" style="margin-top:8px;">🌙</button>
             <div class="login-footer">© 2607全民代表大会 | 技术：兔弟</div>
+        </div>
+    </div>
+    
+    <!-- 只读分享匿名查看（?view= 长链接） -->
+    <div class="login-overlay hidden" id="view-access-overlay">
+        <div class="login-box">
+            <h2>👁️ 只读查看</h2>
+            <div class="subtitle">通过分享链接打开，输入访问密码即可查看布局（无需登录）</div>
+            <input type="password" class="login-input" id="view-access-password" placeholder="访问密码" autocomplete="current-password" onkeydown="if(event.key==='Enter')handleViewAccessSubmit()">
+            <button class="login-btn" id="view-access-btn" onclick="handleViewAccessSubmit()">查看布局</button>
+            <div class="login-error" id="view-access-error"></div>
+            <button type="button" class="login-tab" style="margin-top:12px;width:100%;" onclick="showLoginFromGuest()">已有账号？去登录</button>
         </div>
     </div>
     
@@ -1323,6 +1510,7 @@
                 🏴 选择联盟
                 <span style="display:flex;align-items:center;gap:4px;">
                     <span id="cloud-sync-status" class="cloud-sync-status" style="display:none;"></span>
+                    <button id="btn-workspace" onclick="openWorkspacePanel()" style="display:none;padding:2px 8px;border:none;border-radius:4px;background:#8e44ad;color:#fff;font-size:9px;cursor:pointer;" title="工作区管理">📁 工作区</button>
                     <button id="btn-logout" onclick="handleLogout()" style="display:none;padding:2px 8px;border:none;border-radius:4px;background:#e74c3c;color:#fff;font-size:9px;cursor:pointer;" title="退出登录">退出</button>
                     <span id="save-indicator" style="font-size:9px;color:#27ae60;opacity:0;transition:opacity 0.3s;">✓ 已保存</span>
                 </span>
@@ -1419,6 +1607,10 @@
             </div>
         </div>
         
+        <div class="readonly-banner" id="readonly-banner">
+            👁️ <strong>只读工作区</strong> — 可查看、缩放、切换地图、导出图片；不可增删改布局
+            <button onclick="refreshCloudData()" style="margin-left:8px;padding:2px 8px;border:none;border-radius:4px;background:rgba(255,255,255,0.2);cursor:pointer;font-size:10px;">刷新</button>
+        </div>
         <div class="header" style="border-radius: 0 0 8px 8px; margin-top: 0;">
             <h1 id="map-title">🏯 地图设计</h1>
             <div class="header-info">
@@ -1434,12 +1626,13 @@
                 </span>
                 <span class="header-rotation" style="display:flex;align-items:center;gap:4px;">
                     旋转: 
-                    <button onclick="setRotation(0)" class="rotation-preset-btn" style="padding:2px 6px;border:none;border-radius:3px;background:rgba(255,255,255,0.15);color:#fff;font-size:10px;cursor:pointer;">0°</button>
-                    <button onclick="setRotation(45)" class="rotation-preset-btn active" style="padding:2px 6px;border:none;border-radius:3px;background:#00d4ff;color:#000;font-size:10px;cursor:pointer;">45°</button>
-                    <button onclick="setRotation(90)" class="rotation-preset-btn" style="padding:2px 6px;border:none;border-radius:3px;background:rgba(255,255,255,0.15);color:#fff;font-size:10px;cursor:pointer;">90°</button>
+                    <button onclick="setRotation(0)" class="rotation-preset-btn">0°</button>
+                    <button onclick="setRotation(45)" class="rotation-preset-btn active">45°</button>
+                    <button onclick="setRotation(90)" class="rotation-preset-btn">90°</button>
                     <input type="range" id="rotation-slider" min="0" max="360" value="45" step="15" oninput="setRotation(this.value)" style="width:50px;cursor:pointer;">
-                    <span id="rotation-display" style="min-width:28px;text-align:center;color:#00d4ff;font-weight:bold;">45</span>°
+                    <span id="rotation-display" style="min-width:28px;text-align:center;">45</span>°
                 </span>
+                <button id="btn-theme-toggle" class="theme-toggle-btn" onclick="toggleTheme()" title="切换浅色/深色">🌙</button>
                 <button id="btn-remove-watermark" onclick="removeWatermark()" style="padding:2px 8px;border:none;border-radius:4px;background:#e67e22;color:#fff;cursor:pointer;font-size:10px;">🔓 去水印</button>
                 <span id="boundary-status"></span>
             </div>
@@ -1672,7 +1865,7 @@
         <div class="shortcut-item"><span class="shortcut-key">D</span><span>删除</span></div>
         <div class="shortcut-item"><span class="shortcut-key">空格</span><span>移动</span></div>
         <div class="shortcut-item"><span class="shortcut-key">Q/E</span><span>联盟</span></div>
-        <div class="shortcut-item" style="cursor:pointer;opacity:0.6;" onclick="hideShortcutBar()">✕</div>
+        <button class="shortcut-close-btn" onclick="hideShortcutBar()" title="关闭操作说明">✕ 关闭</button>
     </div>
     
     <!-- Toast提示容器 -->
@@ -1762,8 +1955,79 @@
         <div class="mobile-more-grid">
             <button class="mobile-more-btn" onclick="importLayout();closeMobilePanels()"><span>📥</span>导入</button>
             <button class="mobile-more-btn" onclick="saveAsImage();closeMobilePanels()"><span>🖼️</span>保存图</button>
+            <button class="mobile-more-btn" onclick="openWorkspacePanel();closeMobilePanels()"><span>📁</span>工作区</button>
+            <button class="mobile-more-btn" id="btn-theme-toggle-mobile" onclick="toggleTheme();closeMobilePanels()"><span>🌙</span>主题</button>
             <button class="mobile-more-btn" onclick="openCountdownPanel();closeMobilePanels()"><span>🔊</span>倒计时</button>
             <button class="mobile-more-btn" onclick="handleLogout();closeMobilePanels()" style="color:#e74c3c;"><span>🚪</span>退出</button>
+        </div>
+    </div>
+    
+    <!-- 工作区管理面板 -->
+    <div class="modal-overlay ws-panel" id="workspace-panel">
+        <div class="modal">
+            <h3>📁 工作区管理</h3>
+            <div class="ws-current" id="ws-current-info">当前：加载中…</div>
+            <div id="ws-cloud-required" class="ws-form" style="display:none;margin-bottom:12px;">
+                <p style="font-size:12px;line-height:1.6;color:var(--text-2);margin-bottom:10px;">
+                    工作区需要<strong style="color:var(--modal-text)">云端账号</strong>。请用注册时的手机号登录一次（与画布登录相同）。
+                </p>
+                <label style="font-size:11px;">手机号</label>
+                <input type="tel" id="ws-cloud-phone" placeholder="11位手机号" maxlength="11" inputmode="numeric">
+                <label style="font-size:11px;">密码</label>
+                <input type="password" id="ws-cloud-password" placeholder="密码" onkeydown="if(event.key==='Enter')handleCloudLoginFromWorkspace()">
+                <div class="ws-form-error" id="ws-cloud-login-error"></div>
+                <button class="modal-btn modal-btn-primary" style="width:100%;margin-top:6px;" id="ws-cloud-login-btn" onclick="handleCloudLoginFromWorkspace()">登录并打开工作区</button>
+            </div>
+            <div id="ws-cloud-content">
+            <div class="ws-tabs">
+                <button class="ws-tab active" id="ws-tab-list" onclick="switchWsTab('list')">列表</button>
+                <button class="ws-tab" id="ws-tab-join" onclick="switchWsTab('join')">加入</button>
+                <button class="ws-tab" id="ws-tab-share" onclick="switchWsTab('share')">分享</button>
+            </div>
+            <div class="ws-panel-body">
+                <div id="ws-panel-list">
+                    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;">
+                        <div class="ws-section-title" style="margin:0;">我的私人空间</div>
+                        <button class="ws-item-btn" onclick="refreshWorkspaceList()" title="刷新列表">🔄 刷新</button>
+                    </div>
+                    <div id="ws-list-personal"></div>
+                    <div class="ws-section-title">我分享的</div>
+                    <div id="ws-list-owned"></div>
+                    <div class="ws-section-title">他人分享的</div>
+                    <div id="ws-list-joined"></div>
+                </div>
+                <div id="ws-panel-join" style="display:none;">
+                    <div class="ws-form">
+                        <label style="font-size:11px;">分享码（12位字母或数字）</label>
+                        <input type="text" id="ws-join-code" placeholder="如 DX394GDEUYVA，可粘贴完整链接" maxlength="256" autocomplete="off" spellcheck="false" autocapitalize="characters" oninput="onJoinCodeInput(this)">
+                        <div id="ws-join-code-hint" style="font-size:10px;color:var(--text-muted);margin:-4px 0 8px;">0/12 位 · 也可粘贴只读长链接</div>
+                        <label style="font-size:11px;">访问密码</label>
+                        <input type="password" id="ws-join-password" placeholder="分享者提供的密码" onkeydown="if(event.key==='Enter')handleJoinWorkspace()">
+                        <div class="ws-form-error" id="ws-join-error"></div>
+                        <button class="modal-btn modal-btn-primary" id="ws-join-btn" style="width:100%;margin-top:4px;" onclick="handleJoinWorkspace()">加入工作区</button>
+                    </div>
+                </div>
+                <div id="ws-panel-share" style="display:none;">
+                    <div class="ws-form">
+                        <p style="color:var(--text-muted);font-size:11px;margin-bottom:8px;">将<strong style="color:var(--modal-text)">当前工作区</strong>的数据复制并分享</p>
+                        <label style="font-size:11px;">备注名称（可选）</label>
+                        <input type="text" id="ws-share-label" placeholder="如：2607-kvk 布局" maxlength="30">
+                        <label style="font-size:11px;">分享类型</label>
+                        <div class="ws-share-mode">
+                            <label><input type="radio" name="ws-share-mode" value="edit" checked> 🤝 协作分享 — 队友可编辑并保存</label>
+                            <label><input type="radio" name="ws-share-mode" value="view"> 👁️ 只读分享 — 生成匿名长链接，仅查看</label>
+                        </div>
+                        <label style="font-size:11px;">访问密码（至少4位）</label>
+                        <input type="password" id="ws-share-password" placeholder="队友需此密码才能加入">
+                        <button class="modal-btn modal-btn-primary" style="width:100%;margin-top:4px;" onclick="handleShareWorkspace()">生成分享</button>
+                        <div class="ws-share-result" id="ws-share-result" style="display:none;"></div>
+                    </div>
+                </div>
+            </div>
+            </div>
+            <div class="modal-btns" style="margin-top:12px;">
+                <button class="modal-btn modal-btn-secondary" onclick="closeWorkspacePanel()">关闭</button>
+            </div>
         </div>
     </div>
     
@@ -1816,9 +2080,11 @@
         </div>
     </div>
 
-    <script src="cloud-config.js"></script>
-    <script>window.CLOUD_CONFIG = window.CLOUD_CONFIG || { enabled: false, allowOfflineFallback: true, defaultWorkspace: '2607' };</script>
-    <script src="cloud-sync.js"></script>
+    <script src="cloud-config.js" onerror="window.__cloudConfigLoadFailed=true"></script>
+    <script>
+        window.CLOUD_CONFIG = window.CLOUD_CONFIG || { enabled: false, allowOfflineFallback: false };
+    </script>
+    <script src="cloud-sync.js" onerror="window.__cloudSyncLoadFailed=true"></script>
     <script>
         /**
          * ============================================
@@ -1846,38 +2112,104 @@
         })();
         
         // ========== 登录与云端同步 ==========
-        const AUTH_USER = '2607';
-        const AUTH_PASS = 'godm';
         let loginMode = 'signin';
         let cloudReady = false;
         let appDataBootstrapped = false;
+        let appStarted = false;
+        let guestViewMode = false;
+        let pendingViewToken = null;
+        
+        function ensureAppStarted() {
+            document.getElementById('login-overlay')?.classList.add('hidden');
+            document.getElementById('view-access-overlay')?.classList.add('hidden');
+            if (!appStarted) {
+                appStarted = true;
+                init();
+            } else {
+                resizeCanvas();
+                updateCoverage();
+                updateStats();
+                render();
+            }
+            const relayout = () => {
+                resizeCanvas();
+                render();
+            };
+            requestAnimationFrame(() => {
+                relayout();
+                requestAnimationFrame(relayout);
+            });
+        }
+        
+        function normalizePhone(raw) {
+            return String(raw || '').replace(/\D/g, '').slice(0, 11);
+        }
+        
+        function isValidPhone(phone) {
+            return /^1\d{10}$/.test(phone);
+        }
+        
+        function formatAuthError(err) {
+            const msg = (err && err.message) || String(err || '');
+            const code = err && err.code;
+            if (code === 'invalid_credentials' || /invalid login credentials/i.test(msg)) {
+                return loginMode === 'signin'
+                    ? '手机号或密码错误。若无账号请先点上方「注册」'
+                    : '手机号或密码错误';
+            }
+            if (/could not choose the best candidate function/i.test(msg)) {
+                return '数据库函数冲突，请在 Supabase 重新执行 supabase-schema.sql';
+            }
+            if (/gen_salt|pgcrypto|function crypt/i.test(msg)) {
+                return '数据库缺少 pgcrypto 扩展，请在 Supabase SQL Editor 执行 supabase-schema.sql 开头部分';
+            }
+            if (/already registered|user already registered|already exists|user_already_exists/i.test(msg)) {
+                return '该手机号已注册，请直接登录';
+            }
+            if (/password.*(short|least|6)/i.test(msg)) return '密码至少 6 位';
+            if (/email.*invalid/i.test(msg)) return '手机号格式不正确';
+            if (/fetch|network|failed to fetch/i.test(msg)) return '网络异常，请稍后重试';
+            return msg || '登录失败';
+        }
         
         function switchLoginTab(mode) {
             loginMode = mode;
             document.getElementById('login-tab-signin').classList.toggle('active', mode === 'signin');
             document.getElementById('login-tab-signup').classList.toggle('active', mode === 'signup');
             document.getElementById('login-submit-btn').textContent = mode === 'signin' ? '登 录' : '注 册';
-            document.getElementById('login-subtitle').textContent = mode === 'signin'
-                ? '云端账号登录，数据自动同步' : '需有效邀请码，一码仅可注册一次';
+            if (cloudReady) {
+                document.getElementById('login-subtitle').textContent = mode === 'signin'
+                    ? '使用手机号登录，登录后可在「工作区」中分享或加入协作'
+                    : '注册手机号，登录后管理工作区';
+            }
             document.getElementById('login-error').textContent = '';
-            const inviteInput = document.getElementById('login-invite-code');
-            const inviteHint = document.getElementById('login-hint-invite');
-            const wsHint = document.getElementById('login-hint-workspace');
-            const cfg = window.CLOUD_CONFIG || {};
-            const needInvite = cloudReady && cfg.requireInviteCode !== false;
-            if (inviteInput) inviteInput.style.display = (mode === 'signup' && needInvite) ? 'block' : 'none';
-            if (inviteHint) inviteHint.style.display = (mode === 'signup' && needInvite) ? 'block' : 'none';
-            if (wsHint) wsHint.style.display = mode === 'signin' || mode === 'signup' ? 'block' : 'none';
+        }
+        
+        function isCloudLoggedIn() {
+            return cloudReady && CloudSync.isLoggedIn();
         }
         
         function updateLogoutUI() {
+            const loggedIn = checkLogin() && !guestViewMode;
+            const cloudLoggedIn = isCloudLoggedIn();
             const btn = document.getElementById('btn-logout');
-            if (!btn) return;
-            const show = cloudReady && CloudSync.isLoggedIn();
-            btn.style.display = show ? 'inline-block' : 'none';
+            const wsBtn = document.getElementById('btn-workspace');
+            if (btn) btn.style.display = loggedIn ? 'inline-block' : 'none';
+            if (wsBtn) {
+                wsBtn.style.display = (loggedIn || guestViewMode) ? 'inline-block' : 'none';
+                wsBtn.title = guestViewMode ? '只读预览' : (cloudLoggedIn ? '工作区管理' : '工作区（需登录云端）');
+            }
         }
         
         function handleLogout() {
+            if (guestViewMode) {
+                guestViewMode = false;
+                pendingViewToken = null;
+                appDataBootstrapped = false;
+                appStarted = false;
+                location.href = location.pathname;
+                return;
+            }
             if (!confirm('确定退出登录？未同步的数据已保存在本地。')) return;
             if (cloudReady && CloudSync.isLoggedIn()) {
                 try {
@@ -1888,36 +2220,603 @@
                 CloudSync.signOut();
             }
             sessionStorage.removeItem('loggedIn');
+            sessionStorage.removeItem('localOnlyMode');
             sessionStorage.removeItem('cloudWorkspace');
-            sessionStorage.removeItem('cloudWorkspaceKey');
             appDataBootstrapped = false;
             updateLogoutUI();
             document.getElementById('login-overlay').classList.remove('hidden');
             document.getElementById('login-password').value = '';
-            document.getElementById('login-workspace-key').value = '';
             document.getElementById('login-error').textContent = '';
             switchLoginTab('signin');
             showValidationMessage('已退出登录');
         }
         
-        function initCloudSync() {
-            if (typeof CloudSync === 'undefined') return false;
+        async function afterCloudLogin() {
+            const personalId = await CloudSync.ensurePersonalWorkspace();
+            if (!sessionStorage.getItem('cloudWorkspace')) {
+                CloudSync.setWorkspace(personalId);
+            }
+            await CloudSync.syncWorkspaceAccess();
+            syncReadOnlyMode();
+        }
+        
+        function canModifyLayout() {
+            if (guestViewMode) {
+                showToast('只读预览，无法修改布局', 'warning');
+                return false;
+            }
+            if (cloudReady && CloudSync.isLoggedIn() && !CloudSync.canEdit()) {
+                showToast('只读工作区，无法修改布局', 'warning');
+                return false;
+            }
+            return true;
+        }
+        
+        function syncReadOnlyMode() {
+            const readonly = guestViewMode || (cloudReady && CloudSync.isLoggedIn() && !CloudSync.canEdit());
+            document.body.classList.toggle('readonly-mode', readonly);
+            document.body.classList.toggle('guest-view-mode', guestViewMode);
+            const banner = document.getElementById('readonly-banner');
+            if (banner) {
+                banner.classList.toggle('show', readonly);
+                if (guestViewMode) {
+                    banner.innerHTML = '👁️ 只读预览（匿名） · <a href="#" onclick="showLoginFromGuest();return false;" style="color:#f1c40f;text-decoration:underline;">登录</a> 后可加入工作区协作';
+                }
+            }
+            const shareTab = document.getElementById('ws-tab-share');
+            if (shareTab && !guestViewMode) shareTab.style.display = CloudSync.canEdit() ? '' : 'none';
+            if (readonly && !['move', 'pointer'].includes(currentTool)) {
+                selectTool('move');
+            }
+        }
+        
+        function formatWsTime(iso) {
+            if (!iso) return '';
+            const d = new Date(iso);
+            const diff = (Date.now() - d.getTime()) / 1000;
+            if (diff < 60) return '刚刚';
+            if (diff < 3600) return Math.floor(diff / 60) + ' 分钟前';
+            if (diff < 86400) return Math.floor(diff / 3600) + ' 小时前';
+            return d.toLocaleDateString('zh-CN', { month: 'numeric', day: 'numeric', hour: '2-digit', minute: '2-digit' });
+        }
+        
+        function wsRoleBadge(ws) {
+            if (ws.is_personal) return '<span class="ws-badge owner">私人</span>';
+            if (ws.role === 'viewer') return '<span class="ws-badge view">只读</span>';
+            if (ws.access_mode === 'view' && ws.is_owner) return '<span class="ws-badge view">只读分享</span>';
+            if (ws.is_owner) return '<span class="ws-badge owner">我创建</span>';
+            return '<span class="ws-badge edit">协作</span>';
+        }
+        
+        function copyWsShareCode(code) {
+            copyText(String(code || '').trim());
+        }
+        window.copyWsShareCode = copyWsShareCode;
+        
+        function copyText(text) {
+            const t = String(text || '').trim();
+            if (!t) return;
+            navigator.clipboard.writeText(t).then(() => showToast('已复制', 'success'))
+                .catch(() => { prompt('复制：', t); });
+        }
+        window.copyText = copyText;
+        
+        function buildViewShareUrl(viewToken) {
+            const url = new URL(location.href);
+            url.search = '';
+            url.searchParams.set('view', viewToken);
+            return url.toString();
+        }
+        window.buildViewShareUrl = buildViewShareUrl;
+        
+        function showLoginFromGuest() {
+            document.getElementById('view-access-overlay')?.classList.add('hidden');
+            document.getElementById('login-overlay')?.classList.remove('hidden');
+            document.getElementById('login-username')?.focus();
+        }
+        window.showLoginFromGuest = showLoginFromGuest;
+        
+        async function openGuestView(viewToken, password) {
+            if (!cloudReady) throw new Error(diagnoseCloudInit());
+            showLoading('加载只读布局…');
+            try {
+                const result = await CloudSync.fetchViewShare(viewToken, password);
+                const layout = result && result.data;
+                if (!layout || typeof layout !== 'object') throw new Error('布局数据无效');
+                applyAppData(layout);
+                guestViewMode = true;
+                appDataBootstrapped = true;
+                pendingViewToken = viewToken;
+                ensureAppStarted();
+                syncReadOnlyMode();
+                updateLogoutUI();
+                showToast('已打开：' + (result.label || '只读分享'), 'success');
+            } finally {
+                hideLoading();
+            }
+        }
+        
+        async function handleViewAccessSubmit() {
+            const token = pendingViewToken || new URLSearchParams(location.search).get('view');
+            const pwd = document.getElementById('view-access-password')?.value || '';
+            const errEl = document.getElementById('view-access-error');
+            const btn = document.getElementById('view-access-btn');
+            if (errEl) errEl.textContent = '';
+            if (!token) { if (errEl) errEl.textContent = '链接无效'; return; }
+            if (!pwd) { if (errEl) errEl.textContent = '请输入访问密码'; return; }
+            if (btn) { btn.disabled = true; btn.textContent = '加载中…'; }
+            try {
+                await openGuestView(token, pwd);
+            } catch (e) {
+                const msg = e.message || '打开失败';
+                if (errEl) errEl.textContent = msg;
+                showToast(msg, 'error');
+            } finally {
+                if (btn) { btn.disabled = false; btn.textContent = '查看布局'; }
+            }
+        }
+        window.handleViewAccessSubmit = handleViewAccessSubmit;
+        
+        function getShareAccessMode() {
+            const el = document.querySelector('input[name="ws-share-mode"]:checked');
+            return el && el.value === 'view' ? 'view' : 'edit';
+        }
+        
+        // ========== 工作区管理 ==========
+        let wsTab = 'list';
+        
+        function openWorkspacePanel() {
+            if (guestViewMode) {
+                showToast('只读预览中，登录后可加入工作区', 'info');
+                showLoginFromGuest();
+                return;
+            }
+            if (!checkLogin()) return;
+            const cloudLoggedIn = isCloudLoggedIn();
+            document.getElementById('ws-cloud-required').style.display = cloudLoggedIn ? 'none' : 'block';
+            document.getElementById('ws-cloud-content').style.display = cloudLoggedIn ? 'block' : 'none';
+            document.getElementById('ws-current-info').style.display = cloudLoggedIn ? 'block' : 'none';
+            if (!cloudLoggedIn) {
+                document.getElementById('ws-current-info').textContent = '当前：未连接云端';
+                const phoneInput = document.getElementById('ws-cloud-phone');
+                const mainPhone = document.getElementById('login-username').value;
+                if (phoneInput && !phoneInput.value && mainPhone) phoneInput.value = normalizePhone(mainPhone);
+                document.getElementById('ws-cloud-login-error').textContent = '';
+                document.getElementById('workspace-panel').classList.add('show');
+                return;
+            }
+            document.getElementById('workspace-panel').classList.add('show');
+            syncReadOnlyMode();
+            switchWsTab('list');
+            refreshWorkspaceList();
+        }
+        
+        window.handleCloudLoginFromWorkspace = handleCloudLoginFromWorkspace;
+        
+        function closeWorkspacePanel() {
+            document.getElementById('workspace-panel').classList.remove('show');
+        }
+        
+        function switchWsTab(tab) {
+            wsTab = tab;
+            ['list', 'join', 'share'].forEach(t => {
+                document.getElementById('ws-tab-' + t)?.classList.toggle('active', t === tab);
+                document.getElementById('ws-panel-' + t).style.display = t === tab ? 'block' : 'none';
+            });
+            if (tab === 'join') setWsJoinError('');
+        }
+        
+        function normalizeShareCode(raw) {
+            return String(raw || '').replace(/[^A-Za-z0-9]/g, '').toUpperCase().slice(0, 12);
+        }
+        
+        function parseJoinInput(raw) {
+            const s = String(raw || '').trim();
+            if (!s) return { kind: 'code', code: '' };
+            if (/^https?:\/\//i.test(s) || s.includes('view=') || s.includes('?')) {
+                try {
+                    const url = new URL(s.includes('://') ? s : (location.origin + location.pathname + (s.startsWith('?') ? s : '?' + s)));
+                    const view = url.searchParams.get('view');
+                    if (view && String(view).trim().length >= 16) {
+                        return { kind: 'view', viewToken: String(view).trim() };
+                    }
+                    const fromUrl = url.searchParams.get('code') || url.searchParams.get('share');
+                    if (fromUrl) return { kind: 'code', code: normalizeShareCode(fromUrl) };
+                } catch (e) { /* fall through */ }
+            }
+            const compact = normalizeShareCode(s);
+            if (compact.length === 12) return { kind: 'code', code: compact };
+            const match = s.toUpperCase().match(/[A-Z0-9]{12}/);
+            if (match) return { kind: 'code', code: match[0] };
+            return { kind: 'code', code: compact };
+        }
+        
+        function onJoinCodeInput(el) {
+            const parsed = parseJoinInput(el.value);
+            const hint = document.getElementById('ws-join-code-hint');
+            if (parsed.kind === 'view') {
+                el.dataset.viewToken = parsed.viewToken;
+                if (hint) {
+                    hint.textContent = '✓ 已识别只读链接，输入密码后点「加入」即可匿名查看';
+                    hint.style.color = '#27ae60';
+                }
+            } else {
+                delete el.dataset.viewToken;
+                if (el.value !== parsed.code) el.value = parsed.code;
+                if (hint) {
+                    hint.textContent = parsed.code.length === 12
+                        ? '✓ 已识别 12 位分享码'
+                        : `${parsed.code.length}/12 位（粘贴完整分享码或链接）`;
+                    hint.style.color = parsed.code.length === 12 ? '#27ae60' : 'var(--text-muted)';
+                }
+            }
+            setWsJoinError('');
+        }
+        window.onJoinCodeInput = onJoinCodeInput;
+        
+        function setWsJoinError(msg) {
+            const el = document.getElementById('ws-join-error');
+            if (el) el.textContent = msg || '';
+        }
+        window.normalizeShareCode = normalizeShareCode;
+        
+        function updateWsCurrentInfo(label) {
+            const el = document.getElementById('ws-current-info');
+            if (!el) return;
+            const id = CloudSync.workspaceId || '';
+            let badge = '';
+            if (CloudSync.isViewer()) badge = ' <span class="ws-badge view">只读</span>';
+            else if (CloudSync.canEdit()) badge = ' <span class="ws-badge edit">可编辑</span>';
+            const personal = CloudSync.workspaceId === CloudSync.personalWorkspaceId ? ' <span style="color:#888">(私人)</span>' : '';
+            el.innerHTML = `当前：<strong>${label || id}</strong>${personal}${badge}`;
+        }
+        
+        async function refreshWorkspaceList() {
+            if (!cloudReady || !CloudSync.isLoggedIn()) return [];
+            try {
+                const list = await CloudSync.listWorkspaces();
+                const personal = document.getElementById('ws-list-personal');
+                const owned = document.getElementById('ws-list-owned');
+                const joined = document.getElementById('ws-list-joined');
+                personal.innerHTML = '';
+                owned.innerHTML = '';
+                joined.innerHTML = '';
+                
+                let currentLabel = CloudSync.workspaceId;
+                for (const ws of list) {
+                    if (ws.workspace_id === CloudSync.workspaceId) currentLabel = ws.label || ws.share_code || ws.workspace_id;
+                    const html = renderWsItem(ws);
+                    if (ws.is_personal) personal.innerHTML += html;
+                    else if (ws.is_owner) owned.innerHTML += html;
+                    else joined.innerHTML += html;
+                }
+                if (!personal.innerHTML) personal.innerHTML = '<div style="color:#666;font-size:11px;padding:8px;">暂无</div>';
+                if (!owned.innerHTML) owned.innerHTML = '<div style="color:#666;font-size:11px;padding:8px;">暂无，可在「分享」标签创建</div>';
+                if (!joined.innerHTML) joined.innerHTML = '<div style="color:#666;font-size:11px;padding:8px;">暂无，可在「加入」标签输入分享码</div>';
+                updateWsCurrentInfo(currentLabel);
+                return list;
+            } catch (e) {
+                const msg = '加载工作区列表失败: ' + (formatAuthError(e) || e.message);
+                showValidationMessage(msg);
+                showToast(msg, 'error');
+                console.error('[工作区]', e);
+                return [];
+            }
+        }
+        
+        function highlightWsItem(workspaceId) {
+            if (!workspaceId) return;
+            const el = document.querySelector(`.ws-item[data-ws-id="${workspaceId}"]`);
+            if (el) {
+                el.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
+                el.style.boxShadow = '0 0 0 2px var(--accent-2)';
+                setTimeout(() => { el.style.boxShadow = ''; }, 2500);
+            }
+        }
+        
+        function renderWsItem(ws) {
+            const isActive = ws.workspace_id === CloudSync.workspaceId;
+            const code = ws.share_code ? `<span style="color:#4ecca3;font-family:monospace;">${ws.share_code}</span>` : '';
+            const time = ws.updated_at ? formatWsTime(ws.updated_at) : '';
+            let actions = `<button class="ws-item-btn primary" onclick="switchToWorkspace('${ws.workspace_id}')">${isActive ? '当前' : '切换'}</button>`;
+            if (ws.share_code) {
+                actions += `<button class="ws-item-btn copy" onclick="copyWsShareCode('${ws.share_code}')" title="复制分享码">复制</button>`;
+            }
+            if (ws.view_token && ws.is_owner) {
+                actions += `<button class="ws-item-btn copy" onclick="copyText(buildViewShareUrl('${ws.view_token}'))" title="复制只读链接">链接</button>`;
+            }
+            if (ws.is_owner && !ws.is_personal) {
+                actions += `<button class="ws-item-btn" onclick="changeWsPassword('${ws.workspace_id}')">改密</button>`;
+            }
+            if (!ws.is_personal) {
+                actions += `<button class="ws-item-btn danger" onclick="removeWsFromList('${ws.workspace_id}','${(ws.label||'').replace(/'/g,"\\'")}',${ws.is_owner})">删除</button>`;
+            }
+            const roleHint = ws.role === 'viewer' ? ' · 仅查看' : (ws.can_edit === false ? ' · 只读' : ' · 可编辑');
+            return `<div class="ws-item${isActive ? ' active' : ''}" data-ws-id="${ws.workspace_id}">
+                <div class="ws-item-info">
+                    <div class="ws-item-name">${ws.label || ws.share_code || ws.workspace_id}${wsRoleBadge(ws)}</div>
+                    <div class="ws-item-meta">${code}${time ? ' · ' + time : ''}${roleHint}</div>
+                </div>
+                <div class="ws-item-actions">${actions}</div>
+            </div>`;
+        }
+        
+        async function switchToWorkspace(workspaceId) {
+            if (workspaceId === CloudSync.workspaceId) {
+                closeWorkspacePanel();
+                await refreshWorkspaceList();
+                showToast('已在当前工作区', 'info');
+                return;
+            }
+            try {
+                showLoading('切换工作区…');
+                if (cloudReady && CloudSync.canEdit()) await CloudSync.flushSave(collectAppData());
+                CloudSync.setWorkspace(workspaceId);
+                const data = await CloudSync.loadLayout();
+                if (data && Object.keys(data).length > 0) applyAppData(data);
+                else applyAppData(emptyAppData());
+                await CloudSync.syncWorkspaceAccess();
+                syncReadOnlyMode();
+                updateCoverage();
+                updateStats();
+                render();
+                closeWorkspacePanel();
+                const modeMsg = CloudSync.isViewer() ? '（只读）' : '';
+                showToast('已切换工作区' + modeMsg, 'success');
+                showValidationMessage('已切换工作区' + modeMsg);
+            } catch (e) {
+                showToast('切换失败: ' + e.message, 'error');
+                showValidationMessage('切换失败: ' + e.message);
+            } finally {
+                hideLoading();
+            }
+        }
+        
+        async function handleJoinWorkspace() {
+            const rawJoin = document.getElementById('ws-join-code').value;
+            const parsed = parseJoinInput(rawJoin);
+            const password = document.getElementById('ws-join-password').value;
+            const btn = document.getElementById('ws-join-btn');
+            
+            setWsJoinError('');
+            
+            if (parsed.kind === 'view') {
+                if (!password) {
+                    setWsJoinError('请输入访问密码');
+                    return;
+                }
+                if (btn) { btn.disabled = true; btn.textContent = '打开中…'; }
+                try {
+                    await openGuestView(parsed.viewToken, password);
+                    document.getElementById('ws-join-code').value = '';
+                    document.getElementById('ws-join-password').value = '';
+                    onJoinCodeInput(document.getElementById('ws-join-code'));
+                    closeWorkspacePanel();
+                } catch (e) {
+                    setWsJoinError(e.message || '打开失败');
+                } finally {
+                    if (btn) { btn.disabled = false; btn.textContent = '加入工作区'; }
+                }
+                return;
+            }
+            
+            const code = parsed.code;
+            
+            if (!cloudReady || !CloudSync.isLoggedIn()) {
+                const msg = '请先登录云端账号（只读链接可粘贴后直接输入密码匿名查看）';
+                setWsJoinError(msg);
+                return;
+            }
+            if (code.length !== 12) {
+                const msg = code.length === 0
+                    ? '请输入 12 位分享码（不是备注名称）'
+                    : `分享码须为 12 位（当前 ${code.length} 位）`;
+                setWsJoinError(msg);
+                return;
+            }
+            if (!password) {
+                setWsJoinError('请输入访问密码');
+                return;
+            }
+            
+            if (btn) { btn.disabled = true; btn.textContent = '加入中…'; }
+            try {
+                showLoading('加入工作区…');
+                await CloudSync.joinByCode(code, password);
+                document.getElementById('ws-join-code').value = '';
+                document.getElementById('ws-join-password').value = '';
+                onJoinCodeInput(document.getElementById('ws-join-code'));
+                hideLoading();
+                await switchToWorkspace(code);
+            } catch (e) {
+                const msg = e.message || '加入失败，请检查分享码和密码';
+                setWsJoinError(msg);
+                showToast(msg, 'error');
+            } finally {
+                hideLoading();
+                if (btn) { btn.disabled = false; btn.textContent = '加入工作区'; }
+            }
+        }
+        window.handleJoinWorkspace = handleJoinWorkspace;
+        
+        async function handleShareWorkspace() {
+            if (!CloudSync.canEdit()) { showToast('只读工作区无法分享', 'warning'); return; }
+            const label = document.getElementById('ws-share-label').value.trim();
+            const password = document.getElementById('ws-share-password').value;
+            const accessMode = getShareAccessMode();
+            if (password.length < 4) { showValidationMessage('访问密码至少 4 位'); return; }
+            try {
+                showLoading('生成分享…');
+                await CloudSync.flushSave(collectAppData());
+                const { shareCode, viewToken } = await CloudSync.createSharedWorkspace(label, password, CloudSync.workspaceId, accessMode);
+                if (!shareCode || shareCode.length < 12) throw new Error('分享码生成异常，请重试');
+                const modeLabel = accessMode === 'view' ? '只读分享' : '协作分享';
+                const modeHint = accessMode === 'view'
+                    ? '加入者<strong>仅可查看</strong>，不能增删改'
+                    : '加入者<strong>可协作编辑</strong>并保存';
+                let linkBlock = '';
+                if (viewToken) {
+                    const viewUrl = buildViewShareUrl(viewToken);
+                    linkBlock = `<br><br>只读链接（匿名查看，无需登录）：<br>
+                        <code style="font-size:11px;word-break:break-all;">${viewUrl}</code>
+                        <button class="ws-item-btn copy" style="margin-left:6px;" onclick="copyText(${JSON.stringify(viewUrl)})">复制链接</button>`;
+                }
+                const resultEl = document.getElementById('ws-share-result');
+                resultEl.style.display = 'block';
+                resultEl.innerHTML = `✅ ${modeLabel}成功！<br><br>类型：${modeHint}<br>分享码：<strong style="font-family:monospace;font-size:16px;">${shareCode}</strong>
+                    <button class="ws-item-btn copy" style="margin-left:6px;" onclick="copyWsShareCode('${shareCode}')">复制</button><br>
+                    密码：<strong>${password}</strong>${linkBlock}<br><br>已加入「我分享的」列表。`;
+                document.getElementById('ws-share-password').value = '';
+                switchWsTab('list');
+                const list = await refreshWorkspaceList();
+                const found = list.some(w => w.workspace_id === shareCode || w.share_code === shareCode);
+                if (found) {
+                    highlightWsItem(shareCode);
+                    showToast('分享成功，已在「我分享的」中', 'success');
+                } else {
+                    showToast('分享已生成：' + shareCode + '（列表同步中，请点刷新）', 'warning', 5000);
+                }
+            } catch (e) {
+                const msg = formatAuthError(e) || e.message || '分享失败';
+                showValidationMessage(msg);
+                showToast(msg, 'error');
+                console.error('[工作区] 分享失败', e);
+            } finally {
+                hideLoading();
+            }
+        }
+        
+        async function changeWsPassword(workspaceId) {
+            const newPwd = prompt('输入新的访问密码（至少4位）：');
+            if (!newPwd) return;
+            if (newPwd.length < 4) { showValidationMessage('密码至少 4 位'); return; }
+            try {
+                await CloudSync.updateWorkspacePassword(workspaceId, newPwd);
+                showValidationMessage('密码已更新');
+            } catch (e) {
+                showValidationMessage(e.message || '修改失败');
+            }
+        }
+        
+        async function removeWsFromList(workspaceId, label, isOwner) {
+            const msg = isOwner
+                ? `确定删除分享工作区「${label}」？所有成员将无法访问，数据不可恢复。`
+                : `确定从列表移除「${label}」？仅退出协作，不影响其他人。`;
+            if (!confirm(msg)) return;
+            try {
+                showLoading('处理中…');
+                await CloudSync.removeWorkspace(workspaceId);
+                if (workspaceId === CloudSync.workspaceId) {
+                    await CloudSync.ensurePersonalWorkspace();
+                    CloudSync.setWorkspace(CloudSync.personalWorkspaceId);
+                    const data = await CloudSync.loadLayout();
+                    if (data && Object.keys(data).length > 0) applyAppData(data);
+                    else applyAppData(emptyAppData());
+                    await CloudSync.syncWorkspaceAccess();
+                    syncReadOnlyMode();
+                    updateCoverage();
+                    updateStats();
+                    render();
+                }
+                await refreshWorkspaceList();
+                showValidationMessage(isOwner ? '工作区已删除' : '已从列表移除');
+            } catch (e) {
+                showValidationMessage(e.message || '操作失败');
+            } finally {
+                hideLoading();
+            }
+        }
+        
+        function isLocalDevHost() {
+            const h = location.hostname;
+            return h === 'localhost' || h === '127.0.0.1' || location.protocol === 'file:';
+        }
+        
+        function isLocalOnlyMode() {
+            return sessionStorage.getItem('localOnlyMode') === 'true';
+        }
+        
+        function hasValidCloudConfig(cfg) {
+            cfg = cfg || window.CLOUD_CONFIG;
+            if (typeof CloudSync !== 'undefined') return CloudSync.validateConfig(cfg) === null;
+            return !!(cfg && cfg.enabled && cfg.supabaseUrl && (cfg.supabaseAnonKey || cfg.supabaseKey));
+        }
+        
+        async function loadCloudConfigFiles() {
+            if (hasValidCloudConfig()) return true;
+            const files = ['cloud-config.js', 'cloud-config.local.js'];
+            for (const file of files) {
+                try {
+                    const res = await fetch(file + '?_=' + Date.now());
+                    if (!res.ok) continue;
+                    const text = await res.text();
+                    if (!text.includes('CLOUD_CONFIG')) continue;
+                    new Function(text)();
+                    if (hasValidCloudConfig()) {
+                        window.__cloudConfigLoadFailed = false;
+                        window.__cloudConfigLoadedFrom = file;
+                        console.info('[云端] 已从', file, '加载配置');
+                        return true;
+                    }
+                } catch (e) {
+                    console.warn('[云端] 加载', file, '失败', e);
+                }
+            }
+            return hasValidCloudConfig();
+        }
+        
+        function diagnoseCloudInit() {
+            if (window.__cloudSyncLoadFailed || typeof CloudSync === 'undefined') {
+                return 'cloud-sync.js 未加载，请确认与 HTML 在同一文件夹';
+            }
+            if (typeof CloudSync.validateConfig === 'function') {
+                const err = CloudSync.validateConfig(window.CLOUD_CONFIG);
+                if (err) {
+                    if (location.protocol === 'file:') {
+                        return err + '。本地请运行 start-local.bat，访问 http://localhost:8765/grid-layout-designer.html';
+                    }
+                    if (window.__cloudConfigLoadFailed) {
+                        return 'cloud-config.js 未加载。若用 Live Preview，请改用 start-local.bat，或复制为 cloud-config.local.js';
+                    }
+                    return err;
+                }
+            }
+            if (window.__cloudConfigLoadFailed) {
+                return 'cloud-config.js 未加载。请运行 start-local.bat，或复制 cloud-config.js 为 cloud-config.local.js';
+            }
+            return '云端初始化失败，请打开 F12 查看 Console';
+        }
+        
+        async function initCloudSync() {
+            await loadCloudConfigFiles();
+            if (typeof CloudSync === 'undefined') {
+                cloudReady = false;
+                const hint = diagnoseCloudInit();
+                console.warn('[云端]', hint);
+                document.getElementById('login-subtitle').textContent = '⚠️ ' + hint;
+                updateLogoutUI();
+                return false;
+            }
             const cfg = window.CLOUD_CONFIG || { enabled: false };
             cloudReady = CloudSync.init(cfg);
             CloudSync.onStatusChange = updateCloudSyncStatus;
             if (cloudReady) {
-                const wsInput = document.getElementById('login-workspace');
-                if (wsInput && !wsInput.value) {
-                    wsInput.value = cfg.defaultWorkspace || '2607';
+                if (CloudSync.isLoggedIn()) {
+                    sessionStorage.setItem('loggedIn', 'true');
+                    sessionStorage.removeItem('localOnlyMode');
+                    const statusEl = document.getElementById('cloud-sync-status');
+                    if (statusEl) statusEl.style.display = 'inline';
+                    switchLoginTab(loginMode);
                 }
-                const statusEl = document.getElementById('cloud-sync-status');
-                if (statusEl) statusEl.style.display = 'inline';
             } else {
-                const wsRow = document.getElementById('login-workspace');
-                if (wsRow) wsRow.style.display = 'none';
-                const wsHint = document.getElementById('login-hint-workspace');
-                if (wsHint) wsHint.style.display = 'none';
-                document.getElementById('login-subtitle').textContent = '❄️ 离线模式：请输入账号密码 ❄️';
+                const hint = diagnoseCloudInit();
+                console.warn('[云端]', hint, cfg);
+                if (isLocalDevHost() && cfg.allowOfflineFallback !== false) {
+                    document.getElementById('login-subtitle').textContent =
+                        '⚠️ 云端未连接（可本地使用）。' + hint + ' — 登录后将仅保存到本机浏览器';
+                } else {
+                    document.getElementById('login-subtitle').textContent = '⚠️ ' + hint;
+                }
             }
             updateLogoutUI();
             return cloudReady;
@@ -1936,29 +2835,96 @@
         }
         
         function checkLogin() {
-            if (cloudReady && CloudSync.isLoggedIn()) return true;
-            return sessionStorage.getItem('loggedIn') === 'true';
+            if (cloudReady) {
+                return typeof CloudSync !== 'undefined' && CloudSync.isLoggedIn();
+            }
+            return isLocalOnlyMode() && sessionStorage.getItem('loggedIn') === 'true';
+        }
+        
+        async function completeCloudLogin(phone, password, errorEl) {
+            if (!cloudReady) throw new Error(diagnoseCloudInit());
+            showLoading(loginMode === 'signup' ? '注册并加载…' : '登录并加载…');
+            try {
+                const hadLocalData = appDataBootstrapped || isLocalOnlyMode();
+                if (loginMode === 'signup') {
+                    await CloudSync.signUp(phone, password, '');
+                } else {
+                    await CloudSync.signIn(phone, password);
+                }
+                sessionStorage.removeItem('localOnlyMode');
+                sessionStorage.setItem('loggedIn', 'true');
+                await afterCloudLogin();
+                if (hadLocalData) {
+                    await CloudSync.flushSave(collectAppData());
+                } else {
+                    await bootstrapAppData();
+                }
+                updateLogoutUI();
+                syncReadOnlyMode();
+                ensureAppStarted();
+                return hadLocalData;
+            } finally {
+                hideLoading();
+            }
+        }
+        
+        async function handleCloudLoginFromWorkspace() {
+            const phone = normalizePhone(document.getElementById('ws-cloud-phone').value);
+            const password = document.getElementById('ws-cloud-password').value;
+            const errEl = document.getElementById('ws-cloud-login-error');
+            const btn = document.getElementById('ws-cloud-login-btn');
+            errEl.textContent = '';
+            if (!isValidPhone(phone)) { errEl.textContent = '请输入11位手机号'; return; }
+            if (!password) { errEl.textContent = '请输入密码'; return; }
+            btn.disabled = true;
+            btn.textContent = '登录中…';
+            try {
+                loginMode = 'signin';
+                const hadLocal = await completeCloudLogin(phone, password, errEl);
+                document.getElementById('ws-cloud-required').style.display = 'none';
+                document.getElementById('ws-cloud-content').style.display = 'block';
+                document.getElementById('ws-current-info').style.display = 'block';
+                switchWsTab('list');
+                await refreshWorkspaceList();
+                showToast(hadLocal ? '已连接云端，工作区已启用' : '登录成功', 'success');
+            } catch (e) {
+                const errText = formatAuthError(e);
+                errEl.textContent = errText;
+                if (/若无账号请先/.test(errText)) switchLoginTab('signup');
+                if (CloudSync.isLoggedIn()) CloudSync.signOut();
+            } finally {
+                btn.disabled = false;
+                btn.textContent = '登录并打开工作区';
+            }
         }
         
         async function handleLogin() {
-            const username = document.getElementById('login-username').value.trim();
+            const phone = normalizePhone(document.getElementById('login-username').value);
+            document.getElementById('login-username').value = phone;
             const password = document.getElementById('login-password').value;
-            const workspace = document.getElementById('login-workspace').value.trim();
-            const workspaceKey = document.getElementById('login-workspace-key').value;
-            const inviteCode = document.getElementById('login-invite-code')?.value.trim() || '';
             const errorEl = document.getElementById('login-error');
             const submitBtn = document.getElementById('login-submit-btn');
             
-            if (!username || !password) {
-                errorEl.textContent = '请输入用户名和密码';
+            if (!phone || !password) {
+                errorEl.textContent = '请输入手机号和密码';
                 return;
             }
-            if (cloudReady && !workspace) {
-                errorEl.textContent = '请输入工作区 ID';
+            if (!isValidPhone(phone)) {
+                errorEl.textContent = '请输入11位中国大陆手机号';
                 return;
             }
-            if (cloudReady && workspaceKey.length > 0 && workspaceKey.length < 4) {
-                errorEl.textContent = '工作区密钥至少 4 位';
+            if (!cloudReady) {
+                const cfg = window.CLOUD_CONFIG || {};
+                if (cfg.allowOfflineFallback !== false && isLocalDevHost()) {
+                    sessionStorage.setItem('loggedIn', 'true');
+                    sessionStorage.setItem('localOnlyMode', 'true');
+                    document.getElementById('login-overlay').classList.add('hidden');
+                    updateLogoutUI();
+                    ensureAppStarted();
+                    showToast('本地模式：画布可用；工作区需登录云端', 'warning', 6000);
+                    return;
+                }
+                errorEl.textContent = diagnoseCloudInit();
                 return;
             }
             
@@ -1967,33 +2933,13 @@
             errorEl.textContent = '';
             
             try {
-                if (cloudReady) {
-                    if (loginMode === 'signup') {
-                        await CloudSync.signUp(username, password, inviteCode);
-                    } else {
-                        await CloudSync.signIn(username, password);
-                    }
-                    await CloudSync.joinOrCreateWorkspace(workspace, workspaceKey);
-                    sessionStorage.setItem('loggedIn', 'true');
-                    document.getElementById('login-overlay').classList.add('hidden');
-                    await bootstrapAppData();
-                    updateLogoutUI();
-                    initApp();
-                } else {
-                    const cfg = window.CLOUD_CONFIG || {};
-                    if (username === AUTH_USER && password === AUTH_PASS) {
-                        sessionStorage.setItem('loggedIn', 'true');
-                        document.getElementById('login-overlay').classList.add('hidden');
-                        initApp();
-                    } else if (cfg.allowOfflineFallback !== false) {
-                        errorEl.textContent = '用户名或密码错误（离线模式）';
-                    } else {
-                        errorEl.textContent = '请先配置 cloud-config.js 启用云端登录';
-                    }
-                }
-                } catch (e) {
-                errorEl.textContent = e.message || '登录失败';
-                if (cloudReady && CloudSync.isLoggedIn()) {
+                await completeCloudLogin(phone, password, errorEl);
+                showToast('登录成功', 'success');
+            } catch (e) {
+                const errText = formatAuthError(e);
+                errorEl.textContent = errText;
+                if (/若无账号请先/.test(errText)) switchLoginTab('signup');
+                if (CloudSync.isLoggedIn()) {
                     CloudSync.signOut();
                 }
             } finally {
@@ -2018,6 +2964,26 @@
                 timelineSnapshots: JSON.parse(JSON.stringify(timelineSnapshots)),
                 rotation,
                 savedAt: new Date().toISOString()
+            };
+        }
+        
+        function emptyAppData() {
+            return {
+                version: 1,
+                mapBuildings: {
+                    wangcheng: { qi: [], bao: [], keng: [], kuang: [] },
+                    binggongchang: { qi: [], bao: [], keng: [], kuang: [] },
+                    xiagu: { qi: [], bao: [], keng: [], kuang: [] },
+                    shuanglong: { qi: [], bao: [], keng: [], kuang: [] }
+                },
+                currentMapId: 'wangcheng',
+                allianceMembers: [],
+                teams: [],
+                memberIdCounter: 0,
+                teamIdCounter: 0,
+                arrows: [],
+                timelineSnapshots: {},
+                rotation: 0
             };
         }
         
@@ -2097,7 +3063,8 @@
         }
         
         function scheduleCloudSave() {
-            if (!cloudReady || !CloudSync.isLoggedIn()) return;
+            if (guestViewMode) return;
+            if (!cloudReady || !CloudSync.isLoggedIn() || !CloudSync.canEdit()) return;
             CloudSync.scheduleSave(collectAppData(), 2000);
         }
         
@@ -2125,43 +3092,52 @@
         
         // 回车键登录
         document.addEventListener('DOMContentLoaded', async function() {
-            initCloudSync();
+            initTheme();
+            await initCloudSync();
             switchLoginTab('signin');
+            
+            const viewTokenFromUrl = new URLSearchParams(location.search).get('view');
+            if (viewTokenFromUrl && cloudReady) {
+                pendingViewToken = viewTokenFromUrl;
+                document.getElementById('login-overlay').classList.add('hidden');
+                document.getElementById('view-access-overlay').classList.remove('hidden');
+                document.getElementById('view-access-password')?.focus();
+                return;
+            }
             
             const usernameInput = document.getElementById('login-username');
             const passwordInput = document.getElementById('login-password');
-            const workspaceInput = document.getElementById('login-workspace');
             
+            usernameInput.addEventListener('input', function() {
+                this.value = normalizePhone(this.value);
+            });
             usernameInput.addEventListener('keydown', function(e) {
                 if (e.key === 'Enter') passwordInput.focus();
             });
             passwordInput.addEventListener('keydown', function(e) {
-                if (e.key === 'Enter') {
-                    const wsKey = document.getElementById('login-workspace-key');
-                    if (workspaceInput && workspaceInput.style.display !== 'none') workspaceInput.focus();
-                    else if (wsKey) wsKey.focus();
-                    else handleLogin();
-                }
+                if (e.key === 'Enter') handleLogin();
             });
-            if (workspaceInput) {
-                workspaceInput.addEventListener('keydown', function(e) {
-                    if (e.key === 'Enter') document.getElementById('login-workspace-key')?.focus();
-                });
-            }
-            const workspaceKeyInput = document.getElementById('login-workspace-key');
-            if (workspaceKeyInput) {
-                workspaceKeyInput.addEventListener('keydown', function(e) {
-                    if (e.key === 'Enter') handleLogin();
-                });
-            }
             
-            if (checkLogin()) {
-                document.getElementById('login-overlay').classList.add('hidden');
-                if (cloudReady && CloudSync.isLoggedIn()) {
+            if (cloudReady && CloudSync.isLoggedIn()) {
+                showLoading('恢复登录…');
+                try {
+                    sessionStorage.setItem('loggedIn', 'true');
+                    await afterCloudLogin();
                     await bootstrapAppData();
+                    updateLogoutUI();
+                    ensureAppStarted();
+                } finally {
+                    hideLoading();
                 }
+            } else if (cloudReady) {
+                sessionStorage.removeItem('loggedIn');
+                sessionStorage.removeItem('localOnlyMode');
+                document.getElementById('login-subtitle').textContent = '使用手机号登录，登录后自动同步并启用工作区';
+                usernameInput.focus();
+            } else if (checkLogin()) {
+                document.getElementById('login-overlay').classList.add('hidden');
                 updateLogoutUI();
-                initApp();
+                ensureAppStarted();
             } else {
                 usernameInput.focus();
             }
@@ -2176,8 +3152,7 @@
         });
         
         function initApp() {
-            // 延迟初始化，确保DOM完全加载
-            setTimeout(init, 100);
+            ensureAppStarted();
         }
         
         const canvasWrapper = document.getElementById('canvas-wrapper');
@@ -2426,6 +3401,7 @@
         
         // 撤销操作
         function undo() {
+            if (!canModifyLayout()) return;
             if (historyStack.length === 0) {
                 showValidationMessage('⚠️ 没有可撤销的操作');
                 return;
@@ -2458,6 +3434,7 @@
         
         // 重做操作
         function redo() {
+            if (!canModifyLayout()) return;
             if (redoStack.length === 0) {
                 showValidationMessage('⚠️ 没有可重做的操作');
                 return;
@@ -2544,6 +3521,7 @@
             updateAllianceStats();
             
             initArrowTools();
+            syncReadOnlyMode();
             if (!appDataBootstrapped) {
                 loadArrowsFromStorage();
             }
@@ -5742,6 +6720,12 @@
         }
         
         function selectTool(tool) {
+            if (cloudReady && CloudSync.isLoggedIn() && !CloudSync.canEdit()) {
+                if (!['move', 'pointer'].includes(tool)) {
+                    showToast('只读模式：仅可使用移动和查看坐标', 'warning');
+                    tool = 'move';
+                }
+            }
             currentTool = tool;
             document.querySelectorAll('.tool-btn').forEach(btn => btn.classList.remove('active'));
             const toolBtn = document.getElementById('tool-' + tool);
@@ -6193,6 +7177,7 @@
         }
         
         function placeBuilding(type, x, y) {
+            if (!canModifyLayout()) return;
             saveToHistory();  // 保存到历史记录
             if (type === 'qi') {
                 buildings[type].push({ x, y, alliance: currentAlliance });
@@ -6866,6 +7851,32 @@
         function hideTooltip() { tooltip.style.display = 'none'; }
         function showValidationMessage(msg) { document.getElementById('validation-msg').textContent = msg; }
         
+        function initTheme() {
+            applyTheme(localStorage.getItem('appTheme') || 'dark');
+        }
+        
+        function applyTheme(theme) {
+            const t = theme === 'dark' ? 'dark' : 'light';
+            document.documentElement.setAttribute('data-theme', t);
+            localStorage.setItem('appTheme', t);
+            const icon = t === 'dark' ? '☀️' : '🌙';
+            ['btn-theme-toggle', 'btn-theme-toggle-login'].forEach(id => {
+                const btn = document.getElementById(id);
+                if (btn) btn.textContent = icon;
+            });
+            const mobileBtn = document.getElementById('btn-theme-toggle-mobile');
+            if (mobileBtn) {
+                const span = mobileBtn.querySelector('span');
+                if (span) span.textContent = icon;
+            }
+        }
+        
+        function toggleTheme() {
+            const cur = document.documentElement.getAttribute('data-theme') || 'light';
+            applyTheme(cur === 'dark' ? 'light' : 'dark');
+        }
+        window.toggleTheme = toggleTheme;
+        
         // ========== 用户体验增强功能 ==========
         
         // Loading提示
@@ -7056,6 +8067,7 @@
         
         // ========== 导入布局 ==========
         function importLayout() {
+            if (!canModifyLayout()) return;
             document.getElementById('import-file').click();
         }
         
