@@ -365,6 +365,7 @@
         .tool-btn-bao { background: linear-gradient(135deg, #4ecca3, #2ed573); color: #fff; }
         .tool-btn-keng { background: linear-gradient(135deg, #ff6b6b, #ee5253); color: #fff; }
         .tool-btn-kuang { background: linear-gradient(135deg, #ffd93d, #f39c12); color: #333; }
+        .tool-btn-shi { background: linear-gradient(135deg, #bdc3c7, #7f8c8d); color: #fff; }
         .tool-btn-delete { background: linear-gradient(135deg, #636e72, #2d3436); color: #fff; }
         .tool-btn-move { background: linear-gradient(135deg, #a29bfe, #6c5ce7); color: #fff; }
         .tool-btn-pointer { background: linear-gradient(135deg, #fd79a8, #e84393); color: #fff; }
@@ -1332,9 +1333,61 @@
         .login-tab.active { background: #3498db; color: #fff; font-weight: bold; }
         .login-hint { color: #95a5a6; font-size: 10px; margin: -8px 0 12px; text-align: left; }
         .cloud-sync-status {
-            font-size: 9px; padding: 2px 6px; border-radius: 4px;
+            font-size: 10px; padding: 4px 6px; border-radius: 6px;
             background: rgba(200,224,236,0.4); color: #5a7a8a;
+            width: 100%; box-sizing: border-box;
+            white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+            line-height: 1.3; display: block;
         }
+        .toolbar-top-bar {
+            display: flex; flex-direction: column; align-items: stretch; gap: 5px;
+            padding: 6px; margin-bottom: 8px;
+            background: var(--surface-2); border-radius: 8px; border: 1px solid var(--border);
+            overflow: visible;
+        }
+        .toolbar-top-actions {
+            display: grid; grid-template-columns: repeat(3, 1fr); gap: 4px;
+        }
+        .toolbar-top-bar .top-bar-btn {
+            width: 100%; padding: 5px 2px; border: none; border-radius: 6px;
+            font-size: 9px; cursor: pointer; white-space: nowrap; line-height: 1.3;
+            text-align: center;
+        }
+        .toolbar-top-bar .save-indicator {
+            text-align: center; font-size: 9px; color: #27ae60;
+            opacity: 0; transition: opacity 0.3s;
+        }
+        #btn-cloud-save { background: #2980b9; color: #fff; }
+        #btn-workspace { background: #8e44ad; color: #fff; }
+        #btn-logout { background: #e74c3c; color: #fff; }
+        .alliance-toggle {
+            border: none; background: transparent; color: inherit; font: inherit;
+            cursor: pointer; padding: 0; text-align: left;
+        }
+        @media (max-width: 768px) {
+            .alliance-section.collapsed-mobile .alliance-grid,
+            .alliance-section.collapsed-mobile .alliance-stats { display: none !important; }
+            .timeline-container {
+                left: 6px; right: 6px; transform: none;
+                width: auto; max-width: none; min-width: 0;
+                bottom: 52px;
+            }
+            .timeline-container.active {
+                flex-direction: column; align-items: stretch; gap: 6px;
+            }
+            .timeline-track-wrap { min-width: 0; width: 100%; }
+            .timeline-config { justify-content: center; flex-wrap: wrap; }
+            .mobile-timeline-fab { display: flex; }
+        }
+        .mobile-timeline-fab {
+            display: none;
+            position: fixed; bottom: 58px; right: 10px; z-index: 1002;
+            width: 44px; height: 44px; border-radius: 50%; border: 2px solid var(--border);
+            background: rgba(155,89,182,0.95); color: #fff; font-size: 18px;
+            align-items: center; justify-content: center; cursor: pointer;
+            box-shadow: 0 2px 12px rgba(0,0,0,0.25);
+        }
+        .mobile-timeline-fab.active { background: rgba(39,174,96,0.95); }
         .cloud-sync-status.ok { color: #27ae60; }
         .cloud-sync-status.error { color: #e74c3c; }
         .cloud-sync-status.saving { color: #f39c12; }
@@ -1385,10 +1438,8 @@
         }
         html[data-theme="dark"] .readonly-banner { background: rgba(241,196,15,0.12); color: #f1c40f; }
         .readonly-banner.show { display: flex; }
-        body.readonly-mode .tool-btn-qi,
-        body.readonly-mode .tool-btn-bao,
-        body.readonly-mode .tool-btn-keng,
         body.readonly-mode .tool-btn-kuang,
+        body.readonly-mode .tool-btn-shi,
         body.readonly-mode .tool-btn-delete,
         body.readonly-mode .tool-btn-drag,
         body.readonly-mode .mobile-tool-btn[data-tool="qi"],
@@ -1396,10 +1447,27 @@
         body.readonly-mode .mobile-tool-btn[data-tool="delete"],
         body.readonly-mode .mobile-tool-btn[data-tool="keng"],
         body.readonly-mode .mobile-tool-btn[data-tool="kuang"],
-        body.readonly-mode .mobile-tool-btn[data-tool="drag"] { opacity: 0.35; pointer-events: none; }
-        body.readonly-mode .action-btns .btn-export,
+        body.readonly-mode .mobile-tool-btn[data-tool="shi"],
+        body.readonly-mode .mobile-tool-btn[data-tool="drag"],
+        body.readonly-mode .mobile-tool-btn.tool-more { display: none !important; }
+        body.readonly-mode .toolbar { display: none !important; }
+        body.readonly-mode .rules-panel { display: none !important; }
+        body.readonly-mode .status-bar { display: none !important; }
+        body.readonly-mode .mobile-toolbar { display: none !important; }
+        body.readonly-mode .mobile-tool-more,
+        body.readonly-mode .mobile-action-more { display: none !important; }
+        body.readonly-mode .alliance-section { display: none !important; }
+        body.readonly-mode .header-rotation,
+        body.readonly-mode #btn-remove-watermark,
+        body.readonly-mode #btn-theme-toggle,
+        body.readonly-mode .shortcut-bar { display: none !important; }
+        body.readonly-mode .action-btns,
         body.readonly-mode #btn-undo,
-        body.readonly-mode #btn-redo { opacity: 0.35; pointer-events: none; }
+        body.readonly-mode #btn-redo { display: none !important; }
+        body.readonly-mode .members-section { display: none !important; }
+        @media (max-width: 768px) {
+            body.readonly-mode .toolbar { display: none !important; }
+        }
         
         .rule-item { background: var(--surface-2); padding: 8px; border-radius: 6px; margin-bottom: 6px; border-left: 3px solid #4ecca3; }
         .rule-item.warning { border-left-color: #ffd93d; }
@@ -1505,15 +1573,19 @@
         
         <!-- 地图选择移到header上方 -->
         
-        <div class="alliance-section">
-            <h3 style="display:flex;justify-content:space-between;align-items:center;">
-                🏴 选择联盟
-                <span style="display:flex;align-items:center;gap:4px;">
-                    <span id="cloud-sync-status" class="cloud-sync-status" style="display:none;"></span>
-                    <button id="btn-workspace" onclick="openWorkspacePanel()" style="display:none;padding:2px 8px;border:none;border-radius:4px;background:#8e44ad;color:#fff;font-size:9px;cursor:pointer;" title="工作区管理">📁 工作区</button>
-                    <button id="btn-logout" onclick="handleLogout()" style="display:none;padding:2px 8px;border:none;border-radius:4px;background:#e74c3c;color:#fff;font-size:9px;cursor:pointer;" title="退出登录">退出</button>
-                    <span id="save-indicator" style="font-size:9px;color:#27ae60;opacity:0;transition:opacity 0.3s;">✓ 已保存</span>
-                </span>
+        <div class="toolbar-top-bar" id="toolbar-top-bar">
+            <span id="cloud-sync-status" class="cloud-sync-status" style="display:none;"></span>
+            <div class="toolbar-top-actions">
+                <button id="btn-cloud-save" class="top-bar-btn" onclick="manualCloudSave()" style="display:none;" title="立即保存到云端">💾 保存</button>
+                <button id="btn-workspace" class="top-bar-btn" onclick="openWorkspacePanel()" style="display:none;" title="工作区管理">📁 工作区</button>
+                <button id="btn-logout" class="top-bar-btn" onclick="handleLogout()" style="display:none;" title="退出登录">退出</button>
+            </div>
+            <span id="save-indicator" class="save-indicator">✓ 已保存</span>
+        </div>
+        
+        <div class="alliance-section collapsed-mobile" id="alliance-section">
+            <h3 style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;">
+                <button type="button" class="alliance-toggle" id="alliance-toggle-btn" onclick="toggleAlliancePanel()">🏴 选择联盟 ▾</button>
             </h3>
             <div class="alliance-grid" id="alliance-grid">
                 <!-- 联盟按钮由JS生成 -->
@@ -1544,6 +1616,9 @@
             <button class="tool-btn tool-btn-kuang" onclick="selectTool('kuang')" id="tool-kuang">
                 <span class="tool-icon">💎</span><span>矿 (2×2)</span>
             </button>
+            <button class="tool-btn tool-btn-shi" onclick="selectTool('shi')" id="tool-shi">
+                <span class="tool-icon">🪨</span><span>石 (1×1)</span>
+            </button>
         </div>
         
         <div class="tool-section">
@@ -1560,8 +1635,8 @@
             <button class="tool-btn tool-btn-delete" onclick="selectTool('delete')" id="tool-delete">
                 <span class="tool-icon">🗑️</span><span>删除建筑</span>
             </button>
-            <button class="tool-btn" onclick="toggleGridSnap()" id="btn-grid-snap" style="background:#27ae60;">
-                <span class="tool-icon">🧲</span><span>吸附:开</span>
+            <button class="tool-btn" onclick="toggleGridSnap()" id="btn-grid-snap" style="background:#7f8c8d;">
+                <span class="tool-icon">🧲</span><span>吸附:关</span>
             </button>
         </div>
         </div>
@@ -1608,9 +1683,13 @@
         </div>
         
         <div class="readonly-banner" id="readonly-banner">
-            👁️ <strong>只读工作区</strong> — 可查看、缩放、切换地图、导出图片；不可增删改布局
-            <button onclick="refreshCloudData()" style="margin-left:8px;padding:2px 8px;border:none;border-radius:4px;background:rgba(255,255,255,0.2);cursor:pointer;font-size:10px;">刷新</button>
+            👁️ <strong>只读模式</strong> — 可切换地图、移动、查看坐标、缩放、保存图片
+            <button onclick="saveAsImage()" style="margin-left:8px;padding:2px 10px;border:none;border-radius:4px;background:rgba(255,255,255,0.25);cursor:pointer;font-size:10px;">🖼️ 保存图片</button>
+            <button onclick="toggleTimeline()" style="margin-left:4px;padding:2px 8px;border:none;border-radius:4px;background:rgba(255,255,255,0.2);cursor:pointer;font-size:10px;">⏱️ 时间轴</button>
+            <button onclick="refreshCloudData()" style="margin-left:4px;padding:2px 8px;border:none;border-radius:4px;background:rgba(255,255,255,0.2);cursor:pointer;font-size:10px;">🔄 刷新</button>
         </div>
+    
+    <button type="button" id="btn-timeline-mobile" class="mobile-timeline-fab" onclick="toggleTimeline()" title="时间轴">⏱️</button>
         <div class="header" style="border-radius: 0 0 8px 8px; margin-top: 0;">
             <h1 id="map-title">🏯 地图设计</h1>
             <div class="header-info">
@@ -1711,6 +1790,7 @@
                     <div class="stat-row"><span class="stat-label">🏰 堡(未生效)</span><span class="stat-value warning" id="stat-bao-inactive">0</span></div>
                     <div class="stat-row"><span class="stat-label">⭕ 坑</span><span class="stat-value" id="stat-keng">0</span></div>
                     <div class="stat-row"><span class="stat-label">💎 矿</span><span class="stat-value" id="stat-kuang">0</span></div>
+                    <div class="stat-row"><span class="stat-label">🪨 石</span><span class="stat-value" id="stat-shi">0</span></div>
                 </div>
             </div>
         </div>
@@ -1733,7 +1813,8 @@
             <div class="rule-item info"><h4>🚩 旗 7×7</h4><p>6联盟不同色 | 同盟相连=激活</p></div>
             <div class="rule-item"><h4>🏰 堡 2×2</h4><p>旗内=绿(生效) | 旗外=灰(不生效)</p></div>
             <div class="rule-item warning"><h4>⭕ 坑 3×3</h4><p>可放多个 | 不能重叠</p></div>
-            <div class="rule-item"><h4>💎 矿 2×2</h4><p>任意位置</p></div>
+            <div class="rule-item"><h4>💎 矿 2×2</h4><p>任意位置，旗/堡不可重叠</p></div>
+            <div class="rule-item"><h4>🪨 石 1×1</h4><p>同矿规则，旗/堡不可重叠</p></div>
             <div class="rule-item" style="border-left-color: #666;"><h4>🏛️ NPC建筑</h4><p>东南西北四方 | 固定显示不可删除</p></div>
             
             <h4 style="color:#2980b9;margin-top:10px;">🗺️ 特殊区域</h4>
@@ -1945,6 +2026,7 @@
         <div class="mobile-more-grid">
             <button class="mobile-more-btn" onclick="selectTool('keng');closeMobilePanels()"><span>⭕</span>坑</button>
             <button class="mobile-more-btn" onclick="selectTool('kuang');closeMobilePanels()"><span>💎</span>矿</button>
+            <button class="mobile-more-btn" onclick="selectTool('shi');closeMobilePanels()"><span>🪨</span>石</button>
             <button class="mobile-more-btn" onclick="selectTool('drag');closeMobilePanels()"><span>🔀</span>拖动</button>
             <button class="mobile-more-btn" onclick="toggleGridSnap();closeMobilePanels()"><span>🧲</span>吸附</button>
         </div>
@@ -1953,6 +2035,8 @@
     <!-- 手机端次要操作（不常用） -->
     <div class="mobile-action-more" id="mobile-action-more">
         <div class="mobile-more-grid">
+            <button class="mobile-more-btn" onclick="toggleTimeline();closeMobilePanels()"><span>⏱️</span>时间轴</button>
+            <button class="mobile-more-btn" onclick="manualCloudSave();closeMobilePanels()"><span>💾</span>保存</button>
             <button class="mobile-more-btn" onclick="importLayout();closeMobilePanels()"><span>📥</span>导入</button>
             <button class="mobile-more-btn" onclick="saveAsImage();closeMobilePanels()"><span>🖼️</span>保存图</button>
             <button class="mobile-more-btn" onclick="openWorkspacePanel();closeMobilePanels()"><span>📁</span>工作区</button>
@@ -2118,6 +2202,8 @@
         let appStarted = false;
         let guestViewMode = false;
         let pendingViewToken = null;
+        let lastRemoteSyncAt = null;
+        let cloudPollTimer = null;
         
         function ensureAppStarted() {
             document.getElementById('login-overlay')?.classList.add('hidden');
@@ -2194,10 +2280,100 @@
             const cloudLoggedIn = isCloudLoggedIn();
             const btn = document.getElementById('btn-logout');
             const wsBtn = document.getElementById('btn-workspace');
+            const saveBtn = document.getElementById('btn-cloud-save');
             if (btn) btn.style.display = loggedIn ? 'inline-block' : 'none';
+            if (saveBtn) {
+                saveBtn.style.display = (cloudLoggedIn && CloudSync.canEdit()) ? 'inline-block' : 'none';
+            }
             if (wsBtn) {
                 wsBtn.style.display = (loggedIn || guestViewMode) ? 'inline-block' : 'none';
                 wsBtn.title = guestViewMode ? '只读预览' : (cloudLoggedIn ? '工作区管理' : '工作区（需登录云端）');
+            }
+        }
+        
+        function toggleAlliancePanel() {
+            const el = document.getElementById('alliance-section');
+            if (!el) return;
+            el.classList.toggle('collapsed-mobile');
+            const btn = document.getElementById('alliance-toggle-btn');
+            if (btn) btn.textContent = el.classList.contains('collapsed-mobile') ? '🏴 选择联盟 ▸' : '🏴 选择联盟 ▾';
+        }
+        window.toggleAlliancePanel = toggleAlliancePanel;
+        
+        function flashSaveIndicator() {
+            const el = document.getElementById('save-indicator');
+            if (!el) return;
+            el.style.opacity = '1';
+            setTimeout(() => { el.style.opacity = '0'; }, 2000);
+        }
+        
+        async function manualCloudSave() {
+            if (guestViewMode) { showToast('只读预览无法保存', 'warning'); return; }
+            if (!cloudReady || !CloudSync.isLoggedIn() || !CloudSync.canEdit()) {
+                showToast('请先登录可编辑的工作区', 'warning');
+                return;
+            }
+            showLoading('保存到云端…');
+            try {
+                saveLocalAppData();
+                await CloudSync.flushSave(collectAppData());
+                flashSaveIndicator();
+                showToast('已保存到云端', 'success');
+            } catch (e) {
+                showToast('保存失败: ' + (e.message || ''), 'error');
+            } finally {
+                hideLoading();
+            }
+        }
+        window.manualCloudSave = manualCloudSave;
+        
+        function stopCloudPoll() {
+            if (cloudPollTimer) {
+                clearInterval(cloudPollTimer);
+                cloudPollTimer = null;
+            }
+        }
+        
+        async function pollCloudUpdates() {
+            if (!cloudReady) return;
+            try {
+                if (guestViewMode && pendingViewToken) {
+                    const pwd = sessionStorage.getItem('guestViewPwd');
+                    if (!pwd) return;
+                    const result = await CloudSync.fetchViewShare(pendingViewToken, pwd);
+                    const remoteAt = result && result.data && result.data.savedAt;
+                    if (remoteAt && remoteAt === lastRemoteSyncAt) return;
+                    if (result && result.data) {
+                        applyAppData(result.data);
+                        lastRemoteSyncAt = remoteAt || Date.now();
+                        updateCoverage();
+                        updateStats();
+                        render();
+                    }
+                    return;
+                }
+                if (!CloudSync.isLoggedIn() || !CloudSync.workspaceId) return;
+                const meta = await CloudSync.loadLayoutMeta();
+                if (!meta) return;
+                const remoteAt = meta.updated_at || meta.data?.savedAt;
+                if (remoteAt && remoteAt === lastRemoteSyncAt) return;
+                if (meta.data && Object.keys(meta.data).length > 0) {
+                    applyAppData(meta.data);
+                    lastRemoteSyncAt = remoteAt;
+                    updateCoverage();
+                    updateStats();
+                    render();
+                }
+            } catch (e) {
+                console.warn('[云端] 轮询更新失败', e);
+            }
+        }
+        
+        function startCloudPoll() {
+            stopCloudPoll();
+            if (!cloudReady) return;
+            if (CloudSync.isLoggedIn() || guestViewMode) {
+                cloudPollTimer = setInterval(pollCloudUpdates, 20000);
             }
         }
         
@@ -2222,6 +2398,8 @@
             sessionStorage.removeItem('loggedIn');
             sessionStorage.removeItem('localOnlyMode');
             sessionStorage.removeItem('cloudWorkspace');
+            sessionStorage.removeItem('guestViewPwd');
+            stopCloudPoll();
             appDataBootstrapped = false;
             updateLogoutUI();
             document.getElementById('login-overlay').classList.remove('hidden');
@@ -2268,6 +2446,14 @@
             if (readonly && !['move', 'pointer'].includes(currentTool)) {
                 selectTool('move');
             }
+            syncTimelineReadOnly();
+        }
+        
+        function syncTimelineReadOnly() {
+            const readonly = document.body.classList.contains('readonly-mode');
+            document.querySelectorAll('.timeline-btn.save, .timeline-btn.clear').forEach(btn => {
+                btn.style.display = readonly ? 'none' : '';
+            });
         }
         
         function formatWsTime(iso) {
@@ -2327,9 +2513,12 @@
                 guestViewMode = true;
                 appDataBootstrapped = true;
                 pendingViewToken = viewToken;
+                sessionStorage.setItem('guestViewPwd', password);
+                lastRemoteSyncAt = layout.savedAt || null;
                 ensureAppStarted();
                 syncReadOnlyMode();
                 updateLogoutUI();
+                startCloudPoll();
                 showToast('已打开：' + (result.label || '只读分享'), 'success');
             } finally {
                 hideLoading();
@@ -2832,6 +3021,7 @@
             el.title = (message || '') + '（点击刷新云端数据）';
             el.style.cursor = cloudReady ? 'pointer' : 'default';
             el.onclick = cloudReady ? refreshCloudData : null;
+            if (status === 'ok' && /已同步|已保存/.test(message || '')) flashSaveIndicator();
         }
         
         function checkLogin() {
@@ -2862,6 +3052,7 @@
                 updateLogoutUI();
                 syncReadOnlyMode();
                 ensureAppStarted();
+                startCloudPoll();
                 return hadLocalData;
             } finally {
                 hideLoading();
@@ -2971,10 +3162,10 @@
             return {
                 version: 1,
                 mapBuildings: {
-                    wangcheng: { qi: [], bao: [], keng: [], kuang: [] },
-                    binggongchang: { qi: [], bao: [], keng: [], kuang: [] },
-                    xiagu: { qi: [], bao: [], keng: [], kuang: [] },
-                    shuanglong: { qi: [], bao: [], keng: [], kuang: [] }
+                    wangcheng: { qi: [], bao: [], keng: [], kuang: [], shi: [] },
+                    binggongchang: { qi: [], bao: [], keng: [], kuang: [], shi: [] },
+                    xiagu: { qi: [], bao: [], keng: [], kuang: [], shi: [] },
+                    shuanglong: { qi: [], bao: [], keng: [], kuang: [], shi: [] }
                 },
                 currentMapId: 'wangcheng',
                 allianceMembers: [],
@@ -2989,7 +3180,14 @@
         
         function applyAppData(data) {
             if (!data || typeof data !== 'object') return false;
-            if (data.mapBuildings) mapBuildings = data.mapBuildings;
+            if (data.mapBuildings) {
+                mapBuildings = data.mapBuildings;
+                for (const mapId of Object.keys(mapBuildings)) {
+                    const mb = mapBuildings[mapId];
+                    if (!mb) continue;
+                    BUILDING_TYPES.forEach(t => { if (!Array.isArray(mb[t])) mb[t] = []; });
+                }
+            }
             if (data.allianceMembers) allianceMembers = data.allianceMembers;
             if (data.teams) teams = data.teams;
             if (data.arrows) arrows = data.arrows;
@@ -3010,13 +3208,13 @@
                 const mapConfig = MAP_CONFIGS[currentMapId];
                 GAME_SIZE = mapConfig.size;
                 MAX_COORD = mapConfig.size - 1;
-                buildings = mapBuildings[currentMapId] || { qi: [], bao: [], keng: [], kuang: [] };
+                buildings = mapBuildings[currentMapId] || { qi: [], bao: [], keng: [], kuang: [], shi: [] };
                 document.querySelectorAll('.map-tab').forEach(btn => {
                     btn.classList.toggle('active', btn.id === `map-${currentMapId}`);
                 });
                 updateMapTitle();
             } else {
-                buildings = mapBuildings[currentMapId] || { qi: [], bao: [], keng: [], kuang: [] };
+                buildings = mapBuildings[currentMapId] || { qi: [], bao: [], keng: [], kuang: [], shi: [] };
             }
             saveLocalAppData(data);
             appDataBootstrapped = true;
@@ -3052,6 +3250,7 @@
                     const cloudData = await CloudSync.loadLayout();
                     if (cloudData && Object.keys(cloudData).length > 0) {
                         applyAppData(cloudData);
+                        lastRemoteSyncAt = cloudData.savedAt || lastRemoteSyncAt;
                         return;
                     }
                 } catch (e) {
@@ -3069,11 +3268,33 @@
         }
         
         async function refreshCloudData() {
+            if (guestViewMode && pendingViewToken) {
+                const pwd = sessionStorage.getItem('guestViewPwd');
+                if (!pwd) { showValidationMessage('无法刷新'); return; }
+                try {
+                    showLoading('刷新中…');
+                    const result = await CloudSync.fetchViewShare(pendingViewToken, pwd);
+                    if (result && result.data) {
+                        applyAppData(result.data);
+                        lastRemoteSyncAt = result.data.savedAt || lastRemoteSyncAt;
+                        updateCoverage();
+                        updateStats();
+                        render();
+                        showValidationMessage('已刷新最新布局');
+                    }
+                } catch (e) {
+                    showValidationMessage('刷新失败');
+                } finally {
+                    hideLoading();
+                }
+                return;
+            }
             if (!cloudReady || !CloudSync.isLoggedIn()) return;
             try {
                 const remote = await CloudSync.loadLayout();
                 if (remote && Object.keys(remote).length > 0) {
                     applyAppData(remote);
+                    lastRemoteSyncAt = remote.savedAt || lastRemoteSyncAt;
                     updateCoverage();
                     updateStats();
                     render();
@@ -3126,6 +3347,7 @@
                     await bootstrapAppData();
                     updateLogoutUI();
                     ensureAppStarted();
+                    startCloudPoll();
                 } finally {
                     hideLoading();
                 }
@@ -3209,10 +3431,10 @@
         
         // 各地图的建筑数据
         let mapBuildings = {
-            wangcheng: { qi: [], bao: [], keng: [], kuang: [] },
-            binggongchang: { qi: [], bao: [], keng: [], kuang: [] },
-            xiagu: { qi: [], bao: [], keng: [], kuang: [] },
-            shuanglong: { qi: [], bao: [], keng: [], kuang: [] }
+            wangcheng: { qi: [], bao: [], keng: [], kuang: [], shi: [] },
+            binggongchang: { qi: [], bao: [], keng: [], kuang: [], shi: [] },
+            xiagu: { qi: [], bao: [], keng: [], kuang: [], shi: [] },
+            shuanglong: { qi: [], bao: [], keng: [], kuang: [], shi: [] }
         };
         
         // 时间轴配置
@@ -3265,11 +3487,17 @@
             { id: 5, name: '橙盟', color: '#e67e22', colorActive: 'rgba(230, 126, 34, 0.5)', colorInactive: 'rgba(230, 126, 34, 0.2)', borderActive: '#e67e22', borderInactive: '#8a4c14' }
         ];
         
+        const BUILDING_TYPES = ['qi', 'bao', 'keng', 'kuang', 'shi'];
+        function emptyBuildings() {
+            return { qi: [], bao: [], keng: [], kuang: [], shi: [] };
+        }
+        
         const BUILDING_CONFIG = {
             qi:    { size: 7, name: '旗', icon: '🚩', coordType: 'center' },
             bao:   { size: 2, colorActive: '#4ecca3', colorInactive: '#636e72', border: '#2ed573', name: '堡', icon: '🏰', coordType: 'bottomRight' },
             keng:  { size: 3, color: 'rgba(255, 107, 107, 0.6)', border: '#ee5253', name: '坑', icon: '⭕', coordType: 'center' },
-            kuang: { size: 2, color: '#ffd93d', border: '#f39c12', name: '矿', icon: '💎', coordType: 'bottomRight' }
+            kuang: { size: 2, color: '#ffd93d', border: '#f39c12', name: '矿', icon: '💎', coordType: 'bottomRight' },
+            shi:   { size: 1, color: '#95a5a6', border: '#636e72', name: '石', icon: '🪨', coordType: 'bottomRight' }
         };
         
         // NPC建筑配置（固定显示，不可删除）
@@ -3349,7 +3577,7 @@
         
         // 状态
         let currentTool = 'move';  // 默认为移动画布工具
-        let buildings = { qi: [], bao: [], keng: [], kuang: [] };
+        let buildings = { qi: [], bao: [], keng: [], kuang: [], shi: [] };
         let panOffset = { x: 0, y: 0 };
         let zoom = 1;
         let rotation = 45;  // 默认旋转45度
@@ -3601,7 +3829,7 @@
                     MAX_COORD = mapConfig.size - 1;
                     
                     // 加载新地图的建筑数据
-                    buildings = mapBuildings[mapId] ? JSON.parse(JSON.stringify(mapBuildings[mapId])) : { qi: [], bao: [], keng: [], kuang: [] };
+                    buildings = mapBuildings[mapId] ? JSON.parse(JSON.stringify(mapBuildings[mapId])) : { qi: [], bao: [], keng: [], kuang: [], shi: [] };
                     
                     // 更新UI
                     document.querySelectorAll('.map-tab').forEach(btn => {
@@ -3664,7 +3892,7 @@
                     const mapConfig = MAP_CONFIGS[currentMapId];
                     GAME_SIZE = mapConfig.size;
                     MAX_COORD = mapConfig.size - 1;
-                    buildings = mapBuildings[currentMapId] || { qi: [], bao: [], keng: [], kuang: [] };
+                    buildings = mapBuildings[currentMapId] || { qi: [], bao: [], keng: [], kuang: [], shi: [] };
                     
                     document.querySelectorAll('.map-tab').forEach(btn => {
                         btn.classList.toggle('active', btn.id === `map-${currentMapId}`);
@@ -3833,7 +4061,7 @@
             let minDistance = ARROW_SNAP_DISTANCE + 1;
             
             // 检查所有建筑类型
-            for (const buildType of ['qi', 'bao', 'keng', 'kuang']) {
+            for (const buildType of BUILDING_TYPES) {
                 for (const b of buildings[buildType]) {
                     const size = BUILDING_CONFIG[buildType].size;
                     // 计算建筑中心
@@ -4691,9 +4919,11 @@
             timelineConfig.enabled = !timelineConfig.enabled;
             const container = document.getElementById('timeline-container');
             const btn = document.getElementById('btn-timeline');
+            const mobileFab = document.getElementById('btn-timeline-mobile');
             
             container.classList.toggle('active', timelineConfig.enabled);
-            btn.style.background = timelineConfig.enabled ? '#27ae60' : '#9b59b6';
+            if (btn) btn.style.background = timelineConfig.enabled ? '#27ae60' : '#9b59b6';
+            if (mobileFab) mobileFab.classList.toggle('active', timelineConfig.enabled);
             
             if (timelineConfig.enabled) {
                 renderTimelineTrack();
@@ -4815,6 +5045,7 @@
         }
         
         function saveTimelineSnapshot() {
+            if (!canModifyLayout()) return;
             const mapKey = currentMapId;
             const time = timelineConfig.currentTime;
             
@@ -4838,6 +5069,7 @@
         }
         
         function clearTimelineSnapshot() {
+            if (!canModifyLayout()) return;
             const mapKey = currentMapId;
             const time = timelineConfig.currentTime;
             
@@ -5972,7 +6204,7 @@
             }
             
             // 建筑放置工具
-            if (['qi', 'bao', 'keng', 'kuang'].includes(currentTool)) {
+            if (BUILDING_TYPES.includes(currentTool)) {
                 previewPos = alignToGrid(gamePos, currentTool);
                 const validation = validatePlacement(currentTool, previewPos.x, previewPos.y);
                 const coord = getBuildingDisplayCoord(currentTool, previewPos.x, previewPos.y);
@@ -6005,7 +6237,7 @@
         
         function findBuildingAt(gameX, gameY) {
             // 检测范围稍微宽松一点，使用 <= 而不是 <
-            for (const type of ['bao', 'kuang', 'keng', 'qi']) {
+            for (const type of ['bao', 'kuang', 'shi', 'keng', 'qi']) {
                 const config = BUILDING_CONFIG[type];
                 const size = config.size;
                 for (const b of buildings[type]) {
@@ -6158,7 +6390,7 @@
             
             if (currentTool === 'pointer') return;
             
-            if (['qi', 'bao', 'keng', 'kuang'].includes(currentTool) && previewPos) {
+            if (BUILDING_TYPES.includes(currentTool) && previewPos) {
                 const validation = validatePlacement(currentTool, previewPos.x, previewPos.y);
                 if (validation.valid) {
                     placeBuilding(currentTool, previewPos.x, previewPos.y);
@@ -6563,7 +6795,7 @@
                 }
                 
                 onMouseMove({ clientX: usePos.x, clientY: usePos.y });
-                if (['qi', 'bao', 'keng', 'kuang'].includes(currentTool) && previewPos) {
+                if (BUILDING_TYPES.includes(currentTool) && previewPos) {
                     const validation = validatePlacement(currentTool, previewPos.x, previewPos.y);
                     if (validation.valid) {
                         placeBuilding(currentTool, previewPos.x, previewPos.y);
@@ -6734,7 +6966,7 @@
             document.querySelectorAll('.mobile-tool-btn[data-tool]').forEach(btn => {
                 btn.classList.toggle('active', btn.dataset.tool === tool);
             });
-            const secondaryTools = ['keng', 'kuang', 'drag'];
+            const secondaryTools = ['keng', 'kuang', 'shi', 'drag'];
             document.querySelectorAll('.mobile-tool-btn.tool-more').forEach(btn => {
                 btn.classList.toggle('active', secondaryTools.includes(tool));
             });
@@ -6789,7 +7021,7 @@
             const gy = Math.floor(gameY);
             
             // 检查各类型建筑
-            for (const type of ['qi', 'bao', 'keng', 'kuang']) {
+            for (const type of BUILDING_TYPES) {
                 const size = BUILDING_CONFIG[type].size;
                 for (let i = 0; i < buildings[type].length; i++) {
                     const b = buildings[type][i];
@@ -6825,7 +7057,7 @@
             const maxY = Math.max(start.y, end.y);
             
             const result = [];
-            for (const type of ['qi', 'bao', 'keng', 'kuang']) {
+            for (const type of BUILDING_TYPES) {
                 const size = BUILDING_CONFIG[type].size;
                 for (let i = 0; i < buildings[type].length; i++) {
                     const b = buildings[type][i];
@@ -6904,14 +7136,14 @@
         }
         
         // 网格吸附开关和吸附距离
-        let gridSnapEnabled = true;
+        let gridSnapEnabled = false;
         const SNAP_DISTANCE = 3;  // 吸附距离（格子数）
         
         function alignToGrid(pos, type) {
             const size = BUILDING_CONFIG[type].size;
             let alignedPos;
             
-            if (type === 'bao' || type === 'kuang') {
+            if (type === 'bao' || type === 'kuang' || type === 'shi') {
                 // 堡和矿：直接使用当前坐标
                 alignedPos = { x: pos.x, y: pos.y };
             } else {
@@ -6933,7 +7165,7 @@
             let minDistance = SNAP_DISTANCE + 1;
             
             // 检查所有建筑类型
-            for (const buildType of ['qi', 'bao', 'keng', 'kuang']) {
+            for (const buildType of BUILDING_TYPES) {
                 for (const b of buildings[buildType]) {
                     const bSize = BUILDING_CONFIG[buildType].size;
                     
@@ -6992,6 +7224,16 @@
         
         // ========== 验证 ==========
         
+        function overlapsMineOrStone(x, y, w, h) {
+            for (const k of buildings.kuang) {
+                if (isOverlap(x, y, w, h, k.x, k.y, BUILDING_CONFIG.kuang.size)) return '矿';
+            }
+            for (const s of (buildings.shi || [])) {
+                if (isOverlap(x, y, w, h, s.x, s.y, BUILDING_CONFIG.shi.size)) return '石';
+            }
+            return null;
+        }
+        
         function validatePlacement(type, x, y) {
             const size = BUILDING_CONFIG[type].size;
             
@@ -7005,11 +7247,11 @@
             }
             
             if (type === 'qi') {
-                // 检查是否与现有旗重叠（完全相同位置）
                 for (const q of buildings.qi) {
                     if (q.x === x && q.y === y) return { valid: false, message: '❌ 位置已有旗' };
                 }
-                // 旗可以随意放置，但显示是否激活
+                const blocked = overlapsMineOrStone(x, y, 7, 7);
+                if (blocked) return { valid: false, message: `❌ 旗不能与${blocked}重叠` };
                 const allianceName = ALLIANCES[currentAlliance].name;
                 const sameAllianceQi = getQiByAlliance(currentAlliance);
                 const willBeActive = sameAllianceQi.length === 0 || isAdjacentToExistingQi(x, y, currentAlliance);
@@ -7025,7 +7267,8 @@
                     }
                 }
                 for (const b of buildings.bao) { if (isOverlap(x, y, size, b.x, b.y, size)) return { valid: false, message: '❌ 堡不能重叠' }; }
-                for (const k of buildings.kuang) { if (isOverlap(x, y, size, k.x, k.y, 2)) return { valid: false, message: '❌ 堡不能与矿重叠' }; }
+                const blocked = overlapsMineOrStone(x, y, size, size);
+                if (blocked) return { valid: false, message: `❌ 堡不能与${blocked}重叠` };
                 return { valid: true, message: isBaoInQi(x, y) ? '✓ 堡（生效）' : '⚠ 堡（不生效）' };
             }
             
@@ -7036,7 +7279,7 @@
                 for (let dx = 0; dx < size; dx++) {
                     for (let dy = 0; dy < size; dy++) {
                         for (const b of buildings.bao) { if (isOverlap(x + dx, y + dy, 1, b.x, b.y, 2)) return { valid: false, message: '❌ 坑不能与堡重叠' }; }
-                        for (const k of buildings.kuang) { if (isOverlap(x + dx, y + dy, 1, k.x, k.y, 2)) return { valid: false, message: '❌ 坑不能与矿重叠' }; }
+                        if (overlapsMineOrStone(x + dx, y + dy, 1, 1)) return { valid: false, message: '❌ 坑不能与矿/石重叠' };
                     }
                 }
                 return { valid: true, message: '✓ 可以放置坑' };
@@ -7050,7 +7293,16 @@
                 }
                 for (const k of buildings.kuang) { if (isOverlap(x, y, size, k.x, k.y, 2)) return { valid: false, message: '❌ 矿不能重叠' }; }
                 for (const b of buildings.bao) { if (isOverlap(x, y, size, b.x, b.y, 2)) return { valid: false, message: '❌ 矿不能与堡重叠' }; }
+                for (const s of (buildings.shi || [])) { if (isOverlap(x, y, size, s.x, s.y, 1)) return { valid: false, message: '❌ 矿不能与石重叠' }; }
                 return { valid: true, message: '✓ 可以放置矿' };
+            }
+            
+            if (type === 'shi') {
+                if (kengCoverage.has(`${x},${y}`)) return { valid: false, message: '❌ 石不能建在坑上' };
+                for (const s of (buildings.shi || [])) { if (s.x === x && s.y === y) return { valid: false, message: '❌ 石不能重叠' }; }
+                for (const b of buildings.bao) { if (isOverlap(x, y, 1, b.x, b.y, 2)) return { valid: false, message: '❌ 石不能与堡重叠' }; }
+                for (const k of buildings.kuang) { if (isOverlap(x, y, 1, k.x, k.y, 2)) return { valid: false, message: '❌ 石不能与矿重叠' }; }
+                return { valid: true, message: '✓ 可以放置石' };
             }
             
             return { valid: false, message: '未知错误' };
@@ -7178,6 +7430,7 @@
         
         function placeBuilding(type, x, y) {
             if (!canModifyLayout()) return;
+            if (!buildings[type]) buildings[type] = [];
             saveToHistory();  // 保存到历史记录
             if (type === 'qi') {
                 buildings[type].push({ x, y, alliance: currentAlliance });
@@ -7215,7 +7468,7 @@
                 return;
             }
             
-            for (const type of ['bao', 'kuang', 'keng', 'qi']) {
+            for (const type of ['bao', 'kuang', 'shi', 'keng', 'qi']) {
                 const size = BUILDING_CONFIG[type].size;
                 for (let i = buildings[type].length - 1; i >= 0; i--) {
                     const b = buildings[type][i];
@@ -7341,12 +7594,13 @@
             buildings.qi.forEach(b => drawBuilding('qi', b));
             buildings.keng.forEach(b => drawBuilding('keng', b));
             buildings.kuang.forEach(b => drawBuilding('kuang', b));
+            (buildings.shi || []).forEach(b => drawBuilding('shi', b));
             buildings.bao.forEach(b => drawBuilding('bao', b));
             
             // 绘制画布内水印
             drawCanvasWatermark();
             
-            if (previewPos && ['qi', 'bao', 'keng', 'kuang'].includes(currentTool)) {
+            if (previewPos && BUILDING_TYPES.includes(currentTool)) {
                 const validation = validatePlacement(currentTool, previewPos.x, previewPos.y);
                 drawPreview(currentTool, previewPos.x, previewPos.y, validation.valid);
             }
@@ -7706,6 +7960,11 @@
                 ctx.fillStyle = '#333'; 
                 ctx.fillText('矿', drawX + pSize/2, drawY + pSize/2); 
             }
+            if (type === 'shi') { 
+                ctx.font = 'bold 8px Arial';
+                ctx.fillStyle = '#fff'; 
+                ctx.fillText('石', drawX + pSize/2, drawY + pSize/2); 
+            }
             if (type === 'bao') {
                 // 获取坐标
                 const coord = getBuildingDisplayCoord('bao', building.x, building.y);
@@ -8015,6 +8274,8 @@
             // 统计坑和矿
             document.getElementById('stat-keng').textContent = buildings.keng.length;
             document.getElementById('stat-kuang').textContent = buildings.kuang.length;
+            const statShi = document.getElementById('stat-shi');
+            if (statShi) statShi.textContent = (buildings.shi || []).length;
             
             // 统计堡的生效/未生效数量
             let baoActiveCount = 0, baoInactiveCount = 0;
@@ -8029,7 +8290,7 @@
         function clearAll() {
             if (confirm('确定清空？')) {
                 saveToHistory();  // 保存到历史记录
-                buildings = { qi: [], bao: [], keng: [], kuang: [] };
+                buildings = { qi: [], bao: [], keng: [], kuang: [], shi: [] };
                 // 清除成员的放置状态
                 allianceMembers.forEach(m => m.placedAt = null);
                 renderMembersList();
@@ -8041,7 +8302,7 @@
         
         function exportLayout() {
             const exportData = { rotation, mapId: currentMapId, alliances: ALLIANCES.map(a => a.name), buildings: {} };
-            for (const type of ['qi', 'bao', 'keng', 'kuang']) {
+            for (const type of BUILDING_TYPES) {
                 exportData.buildings[type] = buildings[type].map(b => {
                     const coord = exportBuildingCoord(b, type);
                     const data = { ...coord };
@@ -8081,7 +8342,7 @@
                     const data = JSON.parse(e.target.result);
                     
                     // 清空现有建筑
-                    buildings = { qi: [], bao: [], keng: [], kuang: [] };
+                    buildings = { qi: [], bao: [], keng: [], kuang: [], shi: [] };
                     
                     // 导入旗
                     if (data.buildings && data.buildings.qi) {
@@ -8120,6 +8381,14 @@
                         });
                     }
                     
+                    // 导入石
+                    if (data.buildings && data.buildings.shi) {
+                        buildings.shi = data.buildings.shi.map(b => {
+                            const pos = importBuildingCoord(b);
+                            return { x: pos.x, y: pos.y };
+                        });
+                    }
+                    
                     // 导入地图（不加载本地缓存，保留即将导入的建筑）
                     if (data.mapId && MAP_CONFIGS[data.mapId] && data.mapId !== currentMapId) {
                         currentMapId = data.mapId;
@@ -8143,7 +8412,7 @@
                     updateStats();
                     saveMapDataToStorage();
                     render();
-                    showValidationMessage(`已导入: 旗${buildings.qi.length} 堡${buildings.bao.length} 坑${buildings.keng.length} 矿${buildings.kuang.length}`);
+                    showValidationMessage(`已导入: 旗${buildings.qi.length} 堡${buildings.bao.length} 坑${buildings.keng.length} 矿${buildings.kuang.length} 石${(buildings.shi||[]).length}`);
                     
                 } catch (err) {
                     showValidationMessage('导入失败: JSON格式错误');

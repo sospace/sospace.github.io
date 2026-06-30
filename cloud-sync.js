@@ -364,6 +364,20 @@
             }
         },
 
+        async loadLayoutMeta() {
+            if (!this.isLoggedIn() || !this.workspaceId) return null;
+            try {
+                const rows = await this._fetch(
+                    `/rest/v1/workspaces?id=eq.${encodeURIComponent(this.workspaceId)}&select=data,updated_at`,
+                    { method: 'GET', headers: { Accept: 'application/json' } }
+                );
+                return rows && rows[0] ? rows[0] : null;
+            } catch (e) {
+                console.warn('[云端] loadLayoutMeta 失败', e);
+                return null;
+            }
+        },
+
         async saveLayout(data) {
             if (!this.isLoggedIn() || !this.workspaceId) return false;
             if (!this.canEdit()) {
