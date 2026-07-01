@@ -527,6 +527,10 @@
         .timeline-btn.save:hover { background: #2ecc71; }
         .timeline-btn.clear { background: #c0392b; }
         .timeline-btn.clear:hover { background: #e74c3c; }
+        .timeline-btn.live { background: #3498db; }
+        .timeline-btn.live:hover { background: #2980b9; }
+        .timeline-btn.live.active { background: #e67e22; box-shadow: 0 0 6px rgba(230,126,34,0.6); }
+        .timeline-config input[type="number"] { width: 38px; }
         .timeline-time-display {
             font-size: 14px; font-weight: bold; color: #fff;
             font-family: monospace; min-width: 45px; text-align: center;
@@ -1916,6 +1920,8 @@
             <input type="text" id="timeline-start" value="19:00" placeholder="开始" onchange="updateTimelineConfig()">
             <span>~</span>
             <input type="text" id="timeline-end" value="24:00" placeholder="结束" onchange="updateTimelineConfig()">
+            <input type="number" id="timeline-interval" value="30" min="5" max="120" step="5" title="刻度间隔（分钟）" onchange="updateTimelineConfig()">
+            <span>分</span>
         </div>
         <div class="timeline-track-wrap">
             <div class="timeline-ruler" id="timeline-ruler"></div>
@@ -1927,6 +1933,7 @@
         </div>
         <div class="timeline-time-display" id="timeline-current">19:00</div>
         <div class="timeline-actions">
+            <button class="timeline-btn live" id="timeline-btn-live" onclick="restoreTimelineLive()" title="回到当前布局">↩</button>
             <button class="timeline-btn save" onclick="saveTimelineSnapshot()" title="保存快照">💾</button>
             <button class="timeline-btn clear" onclick="clearTimelineSnapshot()" title="清除快照">🗑️</button>
             <button class="timeline-btn" onclick="toggleTimeline()" title="关闭">✕</button>
@@ -3143,6 +3150,9 @@
         }
         
         function collectAppData() {
+            if (!timelinePreviewMode) {
+                mapBuildings[currentMapId] = JSON.parse(JSON.stringify(buildings));
+            }
             return {
                 version: 1,
                 mapBuildings: JSON.parse(JSON.stringify(mapBuildings)),
@@ -3153,6 +3163,7 @@
                 teamIdCounter,
                 arrows: JSON.parse(JSON.stringify(arrows)),
                 timelineSnapshots: JSON.parse(JSON.stringify(timelineSnapshots)),
+                mapTimelineConfigs: JSON.parse(JSON.stringify(mapTimelineConfigs)),
                 rotation,
                 savedAt: new Date().toISOString()
             };
@@ -3174,6 +3185,12 @@
                 teamIdCounter: 0,
                 arrows: [],
                 timelineSnapshots: {},
+                mapTimelineConfigs: {
+                    wangcheng: { startTime: '19:00', endTime: '24:00', interval: 30, currentTime: '19:00' },
+                    binggongchang: { startTime: '19:00', endTime: '24:00', interval: 30, currentTime: '19:00' },
+                    xiagu: { startTime: '19:00', endTime: '24:00', interval: 30, currentTime: '19:00' },
+                    shuanglong: { startTime: '19:00', endTime: '24:00', interval: 30, currentTime: '19:00' }
+                },
                 rotation: 0
             };
         }
@@ -3192,6 +3209,14 @@
             if (data.teams) teams = data.teams;
             if (data.arrows) arrows = data.arrows;
             if (data.timelineSnapshots) timelineSnapshots = data.timelineSnapshots;
+            if (data.mapTimelineConfigs) {
+                mapTimelineConfigs = data.mapTimelineConfigs;
+                for (const mapId of Object.keys(MAP_CONFIGS)) {
+                    if (!mapTimelineConfigs[mapId]) {
+                        mapTimelineConfigs[mapId] = { ...DEFAULT_TIMELINE_CONFIG };
+                    }
+                }
+            }
             if (data.memberIdCounter != null) memberIdCounter = data.memberIdCounter;
             if (data.teamIdCounter != null) teamIdCounter = data.teamIdCounter;
             if (data.rotation != null) {
@@ -3216,6 +3241,7 @@
             } else {
                 buildings = mapBuildings[currentMapId] || { qi: [], bao: [], keng: [], kuang: [], shi: [] };
             }
+            syncTimelineUiFromMap();
             saveLocalAppData(data);
             appDataBootstrapped = true;
             return true;
@@ -3437,14 +3463,23 @@
             shuanglong: { qi: [], bao: [], keng: [], kuang: [], shi: [] }
         };
         
-        // 时间轴配置
-        let timelineConfig = {
-            enabled: false,
-            startTime: '19:00',
-            endTime: '24:00',
-            interval: 30,  // 每30分钟一个时间点
-            currentTime: '19:00'
+        // 时间轴：面板开关（全局）+ 各地图独立配置
+        let timelinePanelOpen = false;
+        let timelinePreviewMode = false;
+        const DEFAULT_TIMELINE_CONFIG = { startTime: '19:00', endTime: '24:00', interval: 30, currentTime: '19:00' };
+        let mapTimelineConfigs = {
+            wangcheng: { ...DEFAULT_TIMELINE_CONFIG },
+            binggongchang: { ...DEFAULT_TIMELINE_CONFIG },
+            xiagu: { ...DEFAULT_TIMELINE_CONFIG },
+            shuanglong: { ...DEFAULT_TIMELINE_CONFIG }
         };
+        
+        function getTimelineConfig() {
+            if (!mapTimelineConfigs[currentMapId]) {
+                mapTimelineConfigs[currentMapId] = { ...DEFAULT_TIMELINE_CONFIG };
+            }
+            return mapTimelineConfigs[currentMapId];
+        }
         
         // 时间轴快照数据 { mapId: { 'HH:MM': { buildings: {...} } } }
         let timelineSnapshots = {};
@@ -3817,8 +3852,10 @@
             // 使用setTimeout让loading先显示出来
             setTimeout(() => {
                 try {
-                    // 保存当前地图的建筑数据
-                    mapBuildings[currentMapId] = JSON.parse(JSON.stringify(buildings));
+                    // 保存当前地图的建筑数据（快照预览中不覆盖）
+                    if (!timelinePreviewMode) {
+                        mapBuildings[currentMapId] = JSON.parse(JSON.stringify(buildings));
+                    }
                     
                     // 切换到新地图
                     currentMapId = mapId;
@@ -3830,6 +3867,7 @@
                     
                     // 加载新地图的建筑数据
                     buildings = mapBuildings[mapId] ? JSON.parse(JSON.stringify(mapBuildings[mapId])) : { qi: [], bao: [], keng: [], kuang: [], shi: [] };
+                    timelinePreviewMode = false;
                     
                     // 更新UI
                     document.querySelectorAll('.map-tab').forEach(btn => {
@@ -3846,6 +3884,7 @@
                     // 更新缓存和渲染
                     updateCaches();
                     render();
+                    syncTimelineUiFromMap();
                     
                     saveMapDataToStorage();
                     showValidationMessage(`切换到 ${mapConfig.name}`);
@@ -3865,7 +3904,9 @@
         
         function saveMapDataToStorage() {
             try {
-                mapBuildings[currentMapId] = JSON.parse(JSON.stringify(buildings));
+                if (!timelinePreviewMode) {
+                    mapBuildings[currentMapId] = JSON.parse(JSON.stringify(buildings));
+                }
                 persistAllData();
             } catch (e) {
                 console.warn('保存地图数据失败:', e);
@@ -4125,6 +4166,7 @@
         let renameArrowId = null;
         
         function renameArrow(arrowId) {
+            if (!canModifyLayout()) return;
             const arrow = arrows.find(a => a.id === arrowId);
             if (!arrow) return;
             renameArrowId = arrowId;
@@ -4142,6 +4184,7 @@
         }
         
         function confirmRenameArrow() {
+            if (!canModifyLayout()) return;
             if (renameArrowId == null) return;
             const arrow = arrows.find(a => a.id === renameArrowId);
             if (!arrow) { closeRenameArrowModal(); return; }
@@ -4915,32 +4958,59 @@
         
         // ========== 时间轴功能 ==========
         
+        function syncTimelineUiFromMap() {
+            const cfg = getTimelineConfig();
+            const startEl = document.getElementById('timeline-start');
+            const endEl = document.getElementById('timeline-end');
+            const intervalEl = document.getElementById('timeline-interval');
+            const curEl = document.getElementById('timeline-current');
+            if (startEl) startEl.value = cfg.startTime;
+            if (endEl) endEl.value = cfg.endTime;
+            if (intervalEl) intervalEl.value = cfg.interval;
+            if (curEl) curEl.textContent = cfg.currentTime;
+            updateTimelineLiveButton();
+            if (timelinePanelOpen) renderTimelineTrack();
+        }
+        
+        function updateTimelineLiveButton() {
+            const btn = document.getElementById('timeline-btn-live');
+            if (btn) btn.classList.toggle('active', timelinePreviewMode);
+        }
+        
         function toggleTimeline() {
-            timelineConfig.enabled = !timelineConfig.enabled;
+            timelinePanelOpen = !timelinePanelOpen;
             const container = document.getElementById('timeline-container');
             const btn = document.getElementById('btn-timeline');
             const mobileFab = document.getElementById('btn-timeline-mobile');
             
-            container.classList.toggle('active', timelineConfig.enabled);
-            if (btn) btn.style.background = timelineConfig.enabled ? '#27ae60' : '#9b59b6';
-            if (mobileFab) mobileFab.classList.toggle('active', timelineConfig.enabled);
+            container.classList.toggle('active', timelinePanelOpen);
+            if (btn) btn.style.background = timelinePanelOpen ? '#27ae60' : '#9b59b6';
+            if (mobileFab) mobileFab.classList.toggle('active', timelinePanelOpen);
             
-            if (timelineConfig.enabled) {
-                renderTimelineTrack();
+            if (timelinePanelOpen) {
+                syncTimelineUiFromMap();
             }
         }
         
         function updateTimelineConfig() {
-            timelineConfig.startTime = document.getElementById('timeline-start').value;
-            timelineConfig.endTime = document.getElementById('timeline-end').value;
+            const cfg = getTimelineConfig();
+            cfg.startTime = document.getElementById('timeline-start').value.trim();
+            cfg.endTime = document.getElementById('timeline-end').value.trim();
+            let interval = parseInt(document.getElementById('timeline-interval').value, 10);
+            if (!interval || interval < 5) interval = 5;
+            if (interval > 120) interval = 120;
+            cfg.interval = interval;
+            document.getElementById('timeline-interval').value = interval;
+            restoreTimelineLive(false);
             renderTimelineTrack();
         }
         
         function renderTimelineTrack() {
+            const cfg = getTimelineConfig();
             const track = document.getElementById('timeline-track');
             const ruler = document.getElementById('timeline-ruler');
-            const startMinutes = timeToMinutes(timelineConfig.startTime);
-            const endMinutes = timeToMinutes(timelineConfig.endTime);
+            const startMinutes = timeToMinutes(cfg.startTime);
+            const endMinutes = timeToMinutes(cfg.endTime);
             const totalMinutes = endMinutes - startMinutes;
             
             if (totalMinutes <= 0) {
@@ -4948,33 +5018,32 @@
                 return;
             }
             
-            // 生成刻度尺
+            // 刻度尺：短范围按间隔，长范围按小时
             const rulerMarks = [];
-            const majorInterval = 60; // 每小时一个主刻度
-            for (let m = startMinutes; m <= endMinutes; m += majorInterval) {
+            const labelStep = totalMinutes <= 180 ? cfg.interval : 60;
+            for (let m = startMinutes; m <= endMinutes; m += labelStep) {
                 rulerMarks.push(minutesToTime(m));
             }
             if (ruler) ruler.innerHTML = rulerMarks.map(t => `<span>${t}</span>`).join('');
             
-            // 生成时间点（每15分钟一个点）
             const points = [];
-            for (let m = startMinutes; m <= endMinutes; m += timelineConfig.interval) {
+            for (let m = startMinutes; m <= endMinutes; m += cfg.interval) {
                 const time = minutesToTime(m);
                 const percent = ((m - startMinutes) / totalMinutes) * 100;
                 const mapKey = currentMapId;
                 const hasSnapshot = timelineSnapshots[mapKey] && timelineSnapshots[mapKey][time];
-                const isActive = time === timelineConfig.currentTime;
+                const isActive = time === cfg.currentTime;
+                const isStart = time === cfg.startTime;
                 
                 points.push(`
                     <div class="timeline-point ${hasSnapshot ? 'has-snapshot' : ''} ${isActive ? 'active' : ''}"
                          style="left: calc(${percent}% - 4px);"
                          onclick="event.stopPropagation();selectTimelinePoint('${time}')"
-                         title="${time}${hasSnapshot ? ' (有快照)' : ''}">
+                         title="${time}${hasSnapshot ? ' (有快照)' : isStart ? ' (起始/当前布局)' : ''}">
                     </div>
                 `);
             }
             
-            // 保留进度条和当前标记，只更新时间点
             const progressEl = document.getElementById('timeline-progress');
             const markerEl = document.getElementById('timeline-current-marker');
             track.innerHTML = '';
@@ -4986,9 +5055,10 @@
         }
         
         function updateTimelineProgress() {
-            const startMinutes = timeToMinutes(timelineConfig.startTime);
-            const endMinutes = timeToMinutes(timelineConfig.endTime);
-            const currentMinutes = timeToMinutes(timelineConfig.currentTime);
+            const cfg = getTimelineConfig();
+            const startMinutes = timeToMinutes(cfg.startTime);
+            const endMinutes = timeToMinutes(cfg.endTime);
+            const currentMinutes = timeToMinutes(cfg.currentTime);
             const totalMinutes = endMinutes - startMinutes;
             
             if (totalMinutes <= 0) return;
@@ -5003,51 +5073,67 @@
         }
         
         function onTimelineClick(event) {
+            const cfg = getTimelineConfig();
             const track = document.getElementById('timeline-track');
             const rect = track.getBoundingClientRect();
             const x = event.clientX - rect.left;
             const percent = (x / rect.width) * 100;
             
-            const startMinutes = timeToMinutes(timelineConfig.startTime);
-            const endMinutes = timeToMinutes(timelineConfig.endTime);
+            const startMinutes = timeToMinutes(cfg.startTime);
+            const endMinutes = timeToMinutes(cfg.endTime);
             const totalMinutes = endMinutes - startMinutes;
             
-            // 计算点击位置对应的时间（对齐到interval）
             let targetMinutes = startMinutes + (percent / 100) * totalMinutes;
-            targetMinutes = Math.round(targetMinutes / timelineConfig.interval) * timelineConfig.interval;
+            targetMinutes = Math.round(targetMinutes / cfg.interval) * cfg.interval;
             targetMinutes = Math.max(startMinutes, Math.min(endMinutes, targetMinutes));
             
-            const time = minutesToTime(targetMinutes);
-            selectTimelinePoint(time);
+            selectTimelinePoint(minutesToTime(targetMinutes));
+        }
+        
+        function restoreTimelineLive(showMsg, targetTime) {
+            const cfg = getTimelineConfig();
+            timelinePreviewMode = false;
+            cfg.currentTime = targetTime != null ? targetTime : cfg.startTime;
+            buildings = JSON.parse(JSON.stringify(mapBuildings[currentMapId] || { qi: [], bao: [], keng: [], kuang: [], shi: [] }));
+            const curEl = document.getElementById('timeline-current');
+            if (curEl) curEl.textContent = cfg.currentTime;
+            updateTimelineLiveButton();
+            updateCaches();
+            render();
+            renderTimelineTrack();
+            if (showMsg !== false) {
+                showValidationMessage('↩ 已回到当前布局');
+            }
         }
         
         function selectTimelinePoint(time) {
-            timelineConfig.currentTime = time;
+            const cfg = getTimelineConfig();
+            cfg.currentTime = time;
             document.getElementById('timeline-current').textContent = time;
             
-            // 更新进度条
             updateTimelineProgress();
             
-            // 更新时间点激活状态
             document.querySelectorAll('.timeline-point').forEach(el => {
                 el.classList.toggle('active', el.title.startsWith(time));
             });
             
-            // 检查是否有快照
             const mapKey = currentMapId;
             if (timelineSnapshots[mapKey] && timelineSnapshots[mapKey][time]) {
-                // 加载快照
                 buildings = JSON.parse(JSON.stringify(timelineSnapshots[mapKey][time].buildings));
+                timelinePreviewMode = true;
+                updateTimelineLiveButton();
                 updateCaches();
                 render();
-                showValidationMessage(`⏱️ ${time} 已加载`);
+                showValidationMessage(`⏱️ ${time} 快照预览（点 ↩ 可回到当前布局）`);
+            } else {
+                restoreTimelineLive(false, time);
             }
         }
         
         function saveTimelineSnapshot() {
             if (!canModifyLayout()) return;
             const mapKey = currentMapId;
-            const time = timelineConfig.currentTime;
+            const time = getTimelineConfig().currentTime;
             
             if (!timelineSnapshots[mapKey]) {
                 timelineSnapshots[mapKey] = {};
@@ -5071,7 +5157,7 @@
         function clearTimelineSnapshot() {
             if (!canModifyLayout()) return;
             const mapKey = currentMapId;
-            const time = timelineConfig.currentTime;
+            const time = getTimelineConfig().currentTime;
             
             if (timelineSnapshots[mapKey] && timelineSnapshots[mapKey][time]) {
                 delete timelineSnapshots[mapKey][time];
@@ -6502,6 +6588,7 @@
         
         // 双击事件处理
         function onDblClick(e) {
+            if (!canModifyLayout()) return;
             const gamePos = screenToGame(e.clientX, e.clientY);
             const gameX = Math.floor(gamePos.x);
             const gameY = Math.floor(gamePos.y);
@@ -6535,6 +6622,7 @@
         }
         
         function renameBao(index, bao) {
+            if (!canModifyLayout()) return;
             renameBaoIndex = index;
             document.getElementById('rename-bao-coord').textContent = `坐标: (${bao.y}, ${bao.x})`;
             const input = document.getElementById('rename-bao-input');
@@ -6549,6 +6637,7 @@
         }
         
         function confirmRenameBao() {
+            if (!canModifyLayout()) return;
             if (renameBaoIndex < 0) return;
             const newName = document.getElementById('rename-bao-input').value.trim();
             buildings.bao[renameBaoIndex].name = newName;
@@ -6712,7 +6801,7 @@
             if (arrow) {
                 const key = 'arrow-' + arrow.id;
                 if (now - lastTapTime < 450 && lastTapKey === key) {
-                    renameArrow(arrow.id);
+                    if (canModifyLayout()) renameArrow(arrow.id);
                     lastTapTime = 0;
                     lastTapKey = null;
                     return true;
@@ -6727,7 +6816,7 @@
             if (baoIdx >= 0) {
                 const key = 'bao-' + baoIdx;
                 if (now - lastTapTime < 450 && lastTapKey === key) {
-                    renameBao(baoIdx, buildings.bao[baoIdx]);
+                    if (canModifyLayout()) renameBao(baoIdx, buildings.bao[baoIdx]);
                     lastTapTime = 0;
                     lastTapKey = null;
                     return true;
